@@ -1,740 +1,303 @@
 "use client";
 
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { CredibilityBadge } from "@/components/ui/credibility-badge";
+import { getTierInfo } from "@/lib/credibility";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import {
-  CheckCircle,
-  Circle,
-  Calendar,
   Mail,
-  Briefcase,
-  Award,
-  FolderOpen,
-  FileCheck,
+  ArrowUpRight,
   User,
+  LayoutGrid,
+  List,
+  Sparkles,
+  FileCheck,
   Image as ImageIcon,
-  Link2,
-  Code,
-  BarChart3,
-  ChevronDown,
+  Link as LinkIcon,
 } from "lucide-react";
-import {
-  IconBrandGithub,
-  IconBrandLinkedin,
-  IconBrandTwitter,
-  IconBrandYoutube,
-  IconBrandFigma,
-  IconBrandCodepen,
-  IconBrandDribbble,
-  IconBrandVercel,
-  IconWorld,
-} from "@tabler/icons-react";
 import Image from "next/image";
-import { PublicProfileData, EvidenceWithSkills } from "@/lib/actions/public";
-import { Profile, Skill, Project, ProfileSettings } from "@prisma/client";
+import { PublicProfileData } from "@/lib/actions/public";
+import { Project } from "@prisma/client";
+import { SkillTimelineV2 } from "./skill-timeline-v2";
 
 interface PublicProfileViewProps {
   data: PublicProfileData;
 }
 
-// Type for skills with evidenceCount
-type SkillWithCount = Skill & { evidenceCount: number };
 type ProjectWithCount = Project & { evidenceCount: number };
 
-// Smart link icon detector
-interface LinkInfo {
-  icon: React.ReactNode;
-  label: string;
-}
-
-function getLinkInfo(url: string): LinkInfo {
-  const u = url.toLowerCase();
-  if (u.includes("github.com"))
-    return { icon: <IconBrandGithub className="w-4 h-4" />, label: "GitHub" };
-  if (u.includes("linkedin.com"))
-    return {
-      icon: <IconBrandLinkedin className="w-4 h-4" />,
-      label: "LinkedIn",
-    };
-  if (u.includes("twitter.com") || u.includes("x.com"))
-    return { icon: <IconBrandTwitter className="w-4 h-4" />, label: "Twitter" };
-  if (u.includes("youtube.com") || u.includes("youtu.be"))
-    return { icon: <IconBrandYoutube className="w-4 h-4" />, label: "YouTube" };
-  if (u.includes("figma.com"))
-    return { icon: <IconBrandFigma className="w-4 h-4" />, label: "Figma" };
-  if (u.includes("codepen.io"))
-    return { icon: <IconBrandCodepen className="w-4 h-4" />, label: "CodePen" };
-  if (u.includes("dribbble.com"))
-    return {
-      icon: <IconBrandDribbble className="w-4 h-4" />,
-      label: "Dribbble",
-    };
-  if (u.includes("vercel.com") || u.includes("vercel.app"))
-    return { icon: <IconBrandVercel className="w-4 h-4" />, label: "Vercel" };
-  return { icon: <IconWorld className="w-4 h-4" />, label: "Website" };
-}
-
-// Simple syntax highlighting for code snippets
-function highlightCode(code: string): React.ReactNode[] {
-  const lines = code.split("\n");
-
-  return lines.map((line, lineIndex) => {
-    // Process each line for syntax highlighting
-    let highlighted = line;
-
-    // Keywords (purple/pink)
-    const keywords = [
-      "import",
-      "export",
-      "from",
-      "const",
-      "let",
-      "var",
-      "function",
-      "return",
-      "if",
-      "else",
-      "for",
-      "while",
-      "class",
-      "extends",
-      "interface",
-      "type",
-      "enum",
-      "default",
-      "async",
-      "await",
-      "try",
-      "catch",
-      "throw",
-      "new",
-      "this",
-      "super",
-      "static",
-      "public",
-      "private",
-      "protected",
-      "readonly",
-    ];
-
-    // Create regex pattern for keywords
-    const keywordPattern = new RegExp(`\\b(${keywords.join("|")})\\b`, "g");
-
-    // Split line into parts and process
-    const parts: React.ReactNode[] = [];
-    let lastIndex = 0;
-
-    // Handle strings first (green)
-    const stringRegex = /(["'`])(?:(?!\1)[^\\]|\\.)*?\1/g;
-    let match;
-    const stringMatches: { start: number; end: number; text: string }[] = [];
-
-    while ((match = stringRegex.exec(line)) !== null) {
-      stringMatches.push({
-        start: match.index,
-        end: match.index + match[0].length,
-        text: match[0],
-      });
-    }
-
-    // Handle comments (gray)
-    const commentStart = line.indexOf("//");
-    const hasComment = commentStart !== -1;
-
-    // Build the line with highlights
-    let currentPos = 0;
-
-    for (let i = 0; i < line.length; i++) {
-      // Check if we're in a string
-      const inString = stringMatches.some((s) => i >= s.start && i < s.end);
-      const inComment = hasComment && i >= commentStart;
-
-      if (inString || inComment) continue;
-    }
-
-    // Simple approach: just colorize the whole line based on patterns
-    let result = line
-      .replace(
-        keywordPattern,
-        '<span class="text-blue-600 font-semibold">$1</span>'
-      )
-      .replace(
-        /(["'`])(?:(?!\1)[^\\]|\\.)*?\1/g,
-        '<span class="text-green-600">$&</span>'
-      )
-      .replace(/\/\/.*/g, '<span class="text-gray-500 italic">$&</span>')
-      .replace(/\b(\d+)\b/g, '<span class="text-orange-600">$1</span>')
-      .replace(/\{|\}|\(|\)|\[|\]/g, '<span class="text-gray-500">$&</span>')
-      .replace(
-        /\b(className|href|src|alt|key|variant|size)\b/g,
-        '<span class="text-purple-600">$1</span>'
-      );
-
-    return (
-      <span key={lineIndex}>
-        <span dangerouslySetInnerHTML={{ __html: result }} />
-        {lineIndex < lines.length - 1 && "\n"}
-      </span>
-    );
+const formatDate = (date: Date) => {
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
   });
-}
+};
 
 export function PublicProfileView({ data }: PublicProfileViewProps) {
-  const { profile, skills, projects, evidence, email, userName } = data;
+  const {
+    profile,
+    skills,
+    projects,
+    evidence,
+    email,
+    userName,
+    profileCredibility,
+  } = data;
 
-  const typedSkills = skills as SkillWithCount[];
   const typedProjects = projects as ProjectWithCount[];
-
-  const provenSkills = typedSkills.filter((s) => s.evidenceCount > 0);
-  const unprovenSkills = typedSkills.filter((s) => s.evidenceCount === 0);
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString(undefined, {
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  const getSkillNames = (evidenceItem: EvidenceWithSkills) => {
-    return evidenceItem.skills.map((es) => es.skill.name);
-  };
-
-  const getEvidenceIcon = (type: string) => {
-    switch (type) {
-      case "SCREENSHOT":
-        return <ImageIcon className="w-4 h-4" />;
-      case "LINK":
-        return <Link2 className="w-4 h-4" />;
-      case "CODE_SNIPPET":
-        return <Code className="w-4 h-4" />;
-      case "METRIC":
-        return <BarChart3 className="w-4 h-4" />;
-      default:
-        return <FileCheck className="w-4 h-4" />;
-    }
-  };
-
   const displayName = userName || profile.slug;
-
-  // Calculate stats
-  const totalEvidence = evidence.length;
-  const totalSkills = typedSkills.length;
-  const totalProjects = typedProjects.length;
-
-  // Track expanded evidence sections
-  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(
-    new Set()
-  );
-  // Track expanded code snippets
-  const [expandedCodeItems, setExpandedCodeItems] = useState<Set<string>>(
-    new Set()
+  const [activeTab, setActiveTab] = useState<"overview" | "projects">(
+    "overview"
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto py-8 px-4 space-y-4 ">
-        {/* Profile Header */}
-        <Card className="border-y-[0.5px] shadow-none ring-0 ">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-4">
-              {/* Avatar */}
-              <div className="relative">
-                <div className="w-20 h-20 rounded-full overflow-hidden bg-muted border-b-2 border-border flex items-center justify-center ">
-                  {profile.image ? (
-                    <Image
-                      src={profile.image}
-                      alt={displayName}
-                      width={80}
-                      height={80}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-10 h-10 text-muted-foreground" />
-                  )}
-                </div>
+    <div className="min-h-screen bg-[#F8F9FA] text-stone-900 font-sans p-4 md:p-8 flex justify-center items-start">
+      <div className="w-full max-w-3xl space-y-6">
+        {/* --- SIMPLE COMPACT HEADER --- */}
+        <div className="flex items-center gap-4 px-2">
+          <div className="w-16 h-16 rounded-full overflow-hidden border border-stone-200 shadow-sm bg-white shrink-0">
+            {profile.image ? (
+              <Image
+                src={profile.image}
+                alt={displayName}
+                width={64}
+                height={64}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-stone-300">
+                <User className="w-8 h-8" />
               </div>
-
-              {/* Name & Info */}
-              <div className="flex-1 pl-2">
-                <div className="flex justify-between items-center">
-                  <h1 className="text-2xl font-bold tracking-tighter">
-                    {displayName}
-                  </h1>
-                  <Badge
-                    variant="default"
-                    className="text-xs rounded-sm tracking-tighter "
-                  >
-                    Skill Proof
-                  </Badge>
-                </div>
-                {profile.headline && (
-                  <span className="text-muted-foreground text-sm mt-2">
-                    {profile.headline}
-                  </span>
-                )}
-                {email && (
-                  <a
-                    href={`mailto:${email}`}
-                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mt-1 transition-colors"
-                  >
-                    <Mail className="w-3.5 h-3.5" />
-                    {email}
-                  </a>
-                )}
-              </div>
-            </div>
-
-            {/* Summary */}
-            {profile.summary && (
-              <p className="text-sm text-muted-foreground mt-4 leading-tight">
-                {profile.summary}
-              </p>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-2 ">
-          <Card className="ring-0">
-            <CardContent className="text-center">
-              <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
-                <Award className="w-4 h-4" />
-                <span className="text-xs font-medium uppercase tracking-wider">
-                  Skills
-                </span>
-              </div>
-              <p className="text-xl font-bold">{totalSkills}</p>
-              <p className="text-xs text-muted-foreground">
-                {provenSkills.length} proven
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="ring-0">
-            <CardContent className="text-center">
-              <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
-                <FolderOpen className="w-4 h-4" />
-                <span className="text-xs font-medium uppercase tracking-wider">
-                  Projects
-                </span>
-              </div>
-              <p className="text-xl font-bold">{totalProjects}</p>
-            </CardContent>
-          </Card>
-
-          <Card className="ring-0">
-            <CardContent className="text-center">
-              <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
-                <FileCheck className="w-4 h-4" />
-                <span className="text-xs font-medium uppercase tracking-wider">
-                  Evidence
-                </span>
-              </div>
-              <p className="text-2xl font-bold">{totalEvidence}</p>
-            </CardContent>
-          </Card>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl font-bold tracking-tight text-stone-900 truncate">
+              {displayName}
+            </h1>
+            <p className="text-sm font-medium text-stone-500 truncate">
+              {profile.headline || "Design Engineer"}
+            </p>
+          </div>
+          {email && (
+            <a
+              href={`mailto:${email}`}
+              className="text-xs font-bold text-stone-900 bg-white border border-stone-200 hover:bg-stone-50 px-4 py-2 rounded-full transition-colors flex items-center gap-2 shadow-sm"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              Contact
+            </a>
+          )}
         </div>
 
-        {/* Skills Section */}
-        <Card className="ring-0 border-y-[0.5px]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold flex items-center gap-1">
-              <Award className="w-4 h-4" />
-              Skills
-            </CardTitle>
-            <CardDescription>
-              Proven skills are verified with project evidence
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Proven Skills */}
-            {provenSkills.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Proven with Evidence
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {provenSkills.map((skill) => (
-                    <Badge
-                      key={skill.id}
-                      variant="default"
-                      className="rounded-sm"
-                    >
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      {skill.name}
-                      <span className="ml-1 opacity-60 text-xs">
-                        ({skill.evidenceCount})
-                      </span>
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+        {/* --- TABS --- */}
+        <div className="border-b border-stone-200 flex gap-6 text-sm px-2">
+          <button
+            onClick={() => setActiveTab("overview")}
+            className={cn(
+              "pb-3 -mb-px font-semibold transition-colors flex items-center gap-2",
+              activeTab === "overview"
+                ? "text-stone-900 border-b-2 border-stone-900"
+                : "text-stone-400 hover:text-stone-600"
             )}
-
-            {/* Unproven Skills */}
-            {unprovenSkills.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Circle className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Claimed
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {unprovenSkills.map((skill) => (
-                    <Badge key={skill.id} variant="outline">
-                      {skill.name}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+          >
+            <LayoutGrid className="w-4 h-4" /> Overview
+          </button>
+          <button
+            onClick={() => setActiveTab("projects")}
+            className={cn(
+              "pb-3 -mb-px font-semibold transition-colors flex items-center gap-2",
+              activeTab === "projects"
+                ? "text-stone-900 border-b-2 border-stone-900"
+                : "text-stone-400 hover:text-stone-600"
             )}
+          >
+            <List className="w-4 h-4" /> Projects
+          </button>
+        </div>
 
-            {typedSkills.length === 0 && (
-              <p className="text-sm text-muted-foreground italic">
-                No skills listed yet.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Projects & Evidence Section */}
-        <Card className="ring-0 border-y-[0.5px]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <Briefcase className="w-4 h-4" />
-              Projects & Evidence
-            </CardTitle>
-            <CardDescription>
-              Work experience with verifiable proof
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {typedProjects.length === 0 ? (
-              <p className="text-sm text-muted-foreground italic">
-                No projects listed yet.
-              </p>
-            ) : (
-              <div className="relative">
-                {/* Timeline line */}
-                <div className="absolute left-[5px] top-3 bottom-3 w-px border-l-2 border-dashed border-border" />
-
-                <div className="space-y-6">
-                  {typedProjects.map((project, index) => {
-                    const projectEvidence = evidence.filter(
-                      (e) => e.projectId === project.id
-                    );
-
-                    return (
-                      <div key={project.id} className="relative pl-6">
-                        {/* Timeline dot */}
-                        <div className="absolute left-0 top-1.5 w-3 h-3 rounded-full bg-primary ring-4 ring-background" />
-
-                        <div className="space-y-4">
-                          {/* Project Header */}
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <h3 className="font-semibold">{project.title}</h3>
-                              {(project.startDate || project.endDate) && (
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                                  <Calendar className="w-3 h-3" />
-                                  {project.startDate &&
-                                    formatDate(project.startDate)}
-                                  {project.startDate && " — "}
-                                  {project.endDate
-                                    ? formatDate(project.endDate)
-                                    : "Present"}
-                                </div>
-                              )}
-                            </div>
-                            {project.url &&
-                              (() => {
-                                const linkInfo = getLinkInfo(project.url);
-                                return (
-                                  <a
-                                    href={project.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
-                                  >
-                                    {linkInfo.icon}
-                                    <span>{linkInfo.label}</span>
-                                  </a>
-                                );
-                              })()}
-                          </div>
-
-                          {/* Description */}
-                          {project.description && (
-                            <p className="text-sm text-muted-foreground">
-                              {project.description}
-                            </p>
-                          )}
-
-                          {/* Evidence Items */}
-                          {projectEvidence.length > 0 &&
-                            (() => {
-                              const isExpanded = expandedProjects.has(
-                                project.id
-                              );
-                              const showFirst = projectEvidence[0];
-                              const hasMore = projectEvidence.length > 1;
-                              const itemsToShow = isExpanded
-                                ? projectEvidence
-                                : [showFirst];
-
-                              const toggleExpand = () => {
-                                setExpandedProjects((prev) => {
-                                  const newSet = new Set(prev);
-                                  if (newSet.has(project.id)) {
-                                    newSet.delete(project.id);
-                                  } else {
-                                    newSet.add(project.id);
-                                  }
-                                  return newSet;
-                                });
-                              };
-
-                              return (
-                                <div className="pt-2">
-                                  {/* Collapsible header when multiple items */}
-                                  {hasMore && (
-                                    <button
-                                      onClick={toggleExpand}
-                                      className="w-full flex items-center justify-between py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors"
-                                    >
-                                      <span>
-                                        Evidence ({projectEvidence.length})
-                                      </span>
-                                      <ChevronDown
-                                        className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
-                                      />
-                                    </button>
-                                  )}
-
-                                  {!hasMore && (
-                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-2">
-                                      Evidence ({projectEvidence.length})
-                                    </p>
-                                  )}
-
-                                  <div className="space-y-4">
-                                    {itemsToShow.map((item) => (
-                                      <div key={item.id} className="py-1">
-                                        {/* Evidence Header */}
-                                        <div className="py-2">
-                                          <div className="flex items-center justify-between gap-2">
-                                            <div className="flex items-center gap-2">
-                                              <span className="text-muted-foreground">
-                                                {getEvidenceIcon(item.type)}
-                                              </span>
-                                              <span className="font-medium text-sm">
-                                                {item.title}
-                                              </span>
-                                            </div>
-                                            {item.url &&
-                                              item.type !== "SCREENSHOT" &&
-                                              (() => {
-                                                const linkInfo = getLinkInfo(
-                                                  item.url
-                                                );
-                                                return (
-                                                  <a
-                                                    href={item.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
-                                                  >
-                                                    {linkInfo.icon}
-                                                    <span>
-                                                      {linkInfo.label}
-                                                    </span>
-                                                  </a>
-                                                );
-                                              })()}
-                                          </div>
-
-                                          {/* Skills demonstrated */}
-                                          {getSkillNames(item).length > 0 && (
-                                            <div className="flex flex-wrap gap-1.5 mt-2">
-                                              {getSkillNames(item).map(
-                                                (name, i) => (
-                                                  <Badge
-                                                    key={i}
-                                                    variant="secondary"
-                                                    className="text-xs py-0.5 rounded-full"
-                                                  >
-                                                    {name}
-                                                  </Badge>
-                                                )
-                                              )}
-                                            </div>
-                                          )}
-                                        </div>
-
-                                        {/* Screenshot Preview - Centered with nice styling */}
-                                        {item.type === "SCREENSHOT" &&
-                                          item.url && (
-                                            <div className="p-4 flex justify-center bg-muted/20">
-                                              <a
-                                                href={item.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="block max-w-md"
-                                              >
-                                                <img
-                                                  src={item.url}
-                                                  alt={item.title}
-                                                  className="rounded shadow-lg hover:shadow-xl transition-shadow max-h-64 object-contain"
-                                                />
-                                              </a>
-                                            </div>
-                                          )}
-
-                                        {/* Code Snippet - Beautiful styling */}
-                                        {item.type === "CODE_SNIPPET" &&
-                                          item.content &&
-                                          (() => {
-                                            const isCodeExpanded =
-                                              expandedCodeItems.has(item.id);
-                                            const toggleCodeExpand = () => {
-                                              setExpandedCodeItems((prev) => {
-                                                const newSet = new Set(prev);
-                                                if (newSet.has(item.id))
-                                                  newSet.delete(item.id);
-                                                else newSet.add(item.id);
-                                                return newSet;
-                                              });
-                                            };
-
-                                            return (
-                                              <div className="overflow-hidden border border-gray-200 rounded-lg">
-                                                <div className="bg-gray-100 px-4 py-2 flex items-center justify-between border-b border-gray-200">
-                                                  <div className="flex items-center gap-2">
-                                                    <div className="flex gap-1.5">
-                                                      <span className="w-3 h-3 rounded-full bg-red-400" />
-                                                      <span className="w-3 h-3 rounded-full bg-yellow-400" />
-                                                      <span className="w-3 h-3 rounded-full bg-green-400" />
-                                                    </div>
-                                                    <span className="text-xs text-gray-500 ml-2 font-medium">
-                                                      code snippet
-                                                    </span>
-                                                  </div>
-                                                  <button
-                                                    onClick={toggleCodeExpand}
-                                                    className="text-xs text-primary hover:underline font-medium"
-                                                  >
-                                                    {isCodeExpanded
-                                                      ? "Collapse"
-                                                      : "Expand"}
-                                                  </button>
-                                                </div>
-                                                <div
-                                                  className={`relative bg-white ${isCodeExpanded ? "" : "max-h-48 overflow-hidden"}`}
-                                                >
-                                                  <pre className="p-4 text-sm font-mono leading-relaxed overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                                                    <code>
-                                                      {highlightCode(
-                                                        item.content
-                                                      )}
-                                                    </code>
-                                                  </pre>
-
-                                                  {/* Gradient Mask */}
-                                                  {!isCodeExpanded && (
-                                                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-white to-transparent pointer-events-none flex items-end justify-center pb-4">
-                                                      <div className="pointer-events-auto">
-                                                        <button
-                                                          onClick={
-                                                            toggleCodeExpand
-                                                          }
-                                                          className="bg-white/80 backdrop-blur-sm shadow-sm border border-gray-200 px-3 py-1 rounded-full text-xs font-medium text-gray-600 hover:text-black hover:bg-white transition-all flex items-center gap-1"
-                                                        >
-                                                          <ChevronDown className="w-3 h-3" />
-                                                          Show full code
-                                                        </button>
-                                                      </div>
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              </div>
-                                            );
-                                          })()}
-
-                                        {/* Metric - Nice card styling */}
-                                        {item.type === "METRIC" &&
-                                          item.content && (
-                                            <div className="p-6 text-center bg-primary/5">
-                                              <p className="text-3xl font-bold text-primary">
-                                                {item.content}
-                                              </p>
-                                            </div>
-                                          )}
-
-                                        {/* Link type - just show the link info */}
-                                        {item.type === "LINK" && item.url && (
-                                          <div className="p-4 flex justify-center">
-                                            <a
-                                              href={item.url}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
-                                            >
-                                              {getLinkInfo(item.url).icon}
-                                              <span>
-                                                View{" "}
-                                                {getLinkInfo(item.url).label}
-                                              </span>
-                                            </a>
-                                          </div>
-                                        )}
-                                      </div>
-                                    ))}
-                                  </div>
-
-                                  {/* Show more indicator */}
-                                  {hasMore && !isExpanded && (
-                                    <button
-                                      onClick={toggleExpand}
-                                      className="w-full mt-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1"
-                                    >
-                                      <span>
-                                        Show {projectEvidence.length - 1} more
-                                        evidence
-                                      </span>
-                                      <ChevronDown className="w-3.5 h-3.5" />
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            })()}
-                        </div>
+        {/* --- MAIN CONTENT --- */}
+        <div className="space-y-6">
+          {activeTab === "overview" && (
+            <>
+              {/* 
+                        THE WIDGETS (EXACTLY AS REQUESTED) 
+                        - Compact
+                        - Solid Colors (No Gradients)
+                        - Specific Typography 
+                    */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 px-2 py-4 border-b border-stone-200/60">
+                {/* WIDGET 1: CREDIBILITY */}
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">
+                        Credibility Score
                       </div>
-                    );
-                  })}
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold font-mono text-stone-900 tracking-tight">
+                          {profileCredibility.overallScore}%
+                        </span>
+                        <span className="text-[10px] font-medium text-stone-400">
+                          Top {100 - profileCredibility.overallScore}%
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-[9px] font-bold text-[#0284C7] bg-[#E0F2FE] px-2 py-0.5 rounded-md mb-1">
+                      Updated today
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    {/* Progress Bar */}
+                    <div className="h-1.5 w-full bg-stone-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#0EA5E9] rounded-full relative"
+                        style={{ width: `${profileCredibility.overallScore}%` }}
+                      >
+                        <div
+                          className="absolute inset-0 w-full h-full"
+                          style={{
+                            backgroundImage:
+                              "linear-gradient(45deg,rgba(255,255,255,0.3) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.3) 50%,rgba(255,255,255,0.3) 75%,transparent 75%,transparent)",
+                            backgroundSize: "4px 4px",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* WIDGET 2: STATS */}
+                <div className="flex items-center justify-between sm:justify-start sm:gap-12">
+                  <div>
+                    <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">
+                      Skills
+                    </div>
+                    <div className="text-2xl font-bold text-[#A855F7] leading-none">
+                      {skills.length}
+                    </div>
+                  </div>
+
+                  <div className="w-px h-8 bg-stone-200" />
+
+                  <div>
+                    <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">
+                      Proofs
+                    </div>
+                    <div className="text-2xl font-bold text-[#EC4899] leading-none">
+                      {evidence.length}
+                    </div>
+                  </div>
+
+                  <div className="hidden sm:block w-px h-8 bg-stone-200" />
+
+                  <div className="hidden sm:block text-right">
+                    <div className="text-[10px] font-medium text-stone-400">
+                      Verification
+                    </div>
+                    <div className="text-base font-bold text-stone-900">
+                      100%
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
 
-        {/* Footer */}
-        <div className="text-center py-4">
-          <p className="text-xs text-muted-foreground">
-            Verified profile powered by{" "}
-            <span className="font-semibold text-foreground">SkillProof</span>
-          </p>
+              {/* TIMELINE V2 (Enhanced Credibility Engine) */}
+              {skills.length > 0 && (
+                <div className="px-2 pt-2 pb-6 border-b border-stone-200/60">
+                  <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-4">
+                    Competency Evolution
+                  </h3>
+                  <SkillTimelineV2
+                    skills={skills}
+                    evidence={evidence}
+                    projects={typedProjects.map((p) => ({
+                      id: p.id,
+                      title: p.title,
+                    }))}
+                    compact
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+          {/* PROJECTS TAB (Standard Professoinal Cards) */}
+          {activeTab === "projects" && (
+            <div className="space-y-4">
+              {typedProjects.length > 0 ? (
+                typedProjects.map((project) => {
+                  const projectEvidence = evidence.filter(
+                    (e) => e.projectId === project.id
+                  );
+                  return (
+                    <div
+                      key={project.id}
+                      className="bg-white rounded-2xl p-5 border border-stone-100 shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-base font-bold text-stone-900">
+                          {project.title}
+                        </h3>
+                        {project.url && (
+                          <a
+                            href={project.url}
+                            target="_blank"
+                            rel="noopener"
+                            className="text-stone-400 hover:text-stone-900 transition-colors"
+                          >
+                            <ArrowUpRight className="w-4 h-4" />
+                          </a>
+                        )}
+                      </div>
+                      <div className="text-[11px] font-bold text-stone-400 uppercase tracking-wide mb-3">
+                        {project.startDate
+                          ? formatDate(project.startDate)
+                          : "Ongoing"}
+                      </div>
+                      {project.description && (
+                        <p className="text-sm text-stone-600 leading-relaxed mb-4 max-w-2xl">
+                          {project.description}
+                        </p>
+                      )}
+
+                      {/* Standard Mini Grid for Evidence */}
+                      {projectEvidence.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
+                          {projectEvidence.map((item) => (
+                            <div
+                              key={item.id}
+                              className="bg-stone-50 rounded-lg p-2.5 border border-stone-100 flex flex-col justify-center min-h-[60px] hover:border-stone-200 transition-colors"
+                            >
+                              <div className="flex items-center gap-1.5 mb-1.5 opacity-70">
+                                {item.type === "SCREENSHOT" ? (
+                                  <ImageIcon className="w-3 h-3 text-purple-600" />
+                                ) : item.type === "CODE_SNIPPET" ? (
+                                  <FileCheck className="w-3 h-3 text-stone-600" />
+                                ) : (
+                                  <LinkIcon className="w-3 h-3 text-sky-600" />
+                                )}
+                                <span className="text-[9px] font-bold uppercase">
+                                  {item.type}
+                                </span>
+                              </div>
+                              <div className="text-[11px] font-semibold text-stone-900 truncate">
+                                {item.title}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-10 text-stone-400 text-sm">
+                  No projects found.
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

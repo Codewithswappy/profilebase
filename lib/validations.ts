@@ -143,7 +143,7 @@ export const CreateEvidenceSchema = z.object({
     .min(1, "Evidence title is required")
     .max(150, "Evidence title must be at most 150 characters"),
   type: EvidenceTypeSchema.optional(),
-  content: z.string().max(5000).optional(),
+  content: z.string().max(20000).optional(),
   url: z.string().url("Invalid URL").optional().or(z.literal("")),
 });
 
@@ -151,7 +151,7 @@ export const UpdateEvidenceSchema = z.object({
   evidenceId: z.string().cuid(),
   title: z.string().min(1).max(150).optional(),
   type: EvidenceTypeSchema.optional(),
-  content: z.string().max(5000).optional(),
+  content: z.string().max(20000).optional(),
   url: z.string().url("Invalid URL").optional().or(z.literal("")),
   skillIds: z.array(z.string().cuid()).optional(),
 });

@@ -1,23 +1,31 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateProfile, FullProfile } from "@/lib/actions/profile";
+import {
+  updateProfile,
+  updateProfileSettings,
+  FullProfile,
+} from "@/lib/actions/profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { AlertCircle, Save, Upload, User, X } from "lucide-react";
+  AlertCircle,
+  User,
+  X,
+  ImageIcon,
+  Loader2,
+  Globe,
+  Eye,
+  Lock,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { UploadButton } from "@/lib/uploadthing";
+import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 
 interface ProfileEditorProps {
   data: FullProfile;
@@ -25,15 +33,17 @@ interface ProfileEditorProps {
 
 export function ProfileEditor({ data }: ProfileEditorProps) {
   const router = useRouter();
-  const { profile } = data;
+  const { profile, profileSettings } = data;
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(
-    profile.image || null
+    profile.image || null,
   );
+
+  // We keep imageUrl state for form submission, updated by upload success
   const [imageUrl, setImageUrl] = useState<string>(profile.image || "");
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -61,13 +71,21 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
     setIsLoading(false);
   }
 
-  // For direct URL input (UploadThing gives you a URL)
+  // Handle Public/Private Toggle
+  async function handleVisibilityToggle(checked: boolean) {
+    const result = await updateProfileSettings({
+      isPublic: checked,
+    });
+    if (result.success) {
+      router.refresh();
+    }
+  }
+
   function handleImageUrlChange(url: string) {
     setImageUrl(url);
     setImagePreview(url);
   }
 
-  // Clear image
   function handleRemoveImage() {
     setImageUrl("");
     setImagePreview(null);
@@ -75,166 +93,206 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
 
   return (
     <div className="space-y-6">
-      {/* Profile Image Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile Picture</CardTitle>
-          <CardDescription>
-            Add a professional photo for your public profile.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row items-start gap-6">
-            {/* Image Preview */}
-            <div className="relative">
-              <div className="w-32 h-32 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 border-2 border-dashed border-zinc-300 dark:border-zinc-600 flex items-center justify-center">
+      {/* BENTO GRID - Profile Settings */}
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-sm overflow-hidden">
+        {/* Header Row */}
+        <div className="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-zinc-800">
+          <p className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">
+            Identity & Status
+          </p>
+
+          <div className="flex items-center gap-3">
+            {/* Public Toggle */}
+            <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800/50 rounded-sm px-3 py-1 border border-zinc-100 dark:border-zinc-700/50">
+              {profileSettings.isPublic ? (
+                <Globe className="w-3.5 h-3.5 text-emerald-500" />
+              ) : (
+                <Lock className="w-3.5 h-3.5 text-zinc-400" />
+              )}
+              <span
+                className={cn(
+                  "text-xs font-medium",
+                  profileSettings.isPublic
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-zinc-500",
+                )}
+              >
+                {profileSettings.isPublic ? "Public" : "Private"}
+              </span>
+              <Switch
+                checked={profileSettings.isPublic}
+                onCheckedChange={handleVisibilityToggle}
+                className="scale-75 ml-1"
+              />
+            </div>
+
+            {/* View Link */}
+            <Link
+              href={`/${profile.slug}`}
+              target="_blank"
+              className="flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>View</span>
+            </Link>
+          </div>
+        </div>
+
+        <form action={handleSubmit}>
+          {/* Avatar Row */}
+          <div className="flex flex-col md:flex-row gap-6 items-center p-5 border-b border-zinc-200 dark:border-zinc-800">
+            {/* Avatar */}
+            <div className="relative group">
+              <div
+                className={cn(
+                  "relative w-20 h-20 rounded-sm overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center transition-all duration-500 border border-zinc-200 dark:border-zinc-700",
+                  isUploadingImage && "ring-2 ring-indigo-500/30 scale-105",
+                )}
+              >
+                {isUploadingImage && (
+                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-[2px] animate-in fade-in">
+                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+                  </div>
+                )}
                 {imagePreview ? (
                   <Image
                     src={imagePreview}
                     alt="Profile preview"
-                    width={128}
-                    height={128}
+                    width={80}
+                    height={80}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User className="w-12 h-12 text-zinc-400" />
+                  <User className="w-8 h-8 text-zinc-300" />
                 )}
               </div>
-              {imagePreview && (
+              {imagePreview && !isUploadingImage && (
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-sm flex items-center justify-center hover:scale-110 transition-transform shadow-lg z-10"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3 h-3" />
                 </button>
               )}
             </div>
 
-            {/* Upload Options */}
-            <div className="flex-1 space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="imageUrl">Image URL</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="imageUrl"
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => handleImageUrlChange(e.target.value)}
-                    placeholder="https://uploadthing.com/your-image.jpg"
-                    className="flex-1"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Paste an image URL from UploadThing or any image hosting
-                  service.
-                </p>
-              </div>
-
-              {/* UploadThing Integration */}
-              <div className="p-4 border-2 border-dashed border-zinc-200 dark:border-zinc-700 rounded-lg text-center flex flex-col items-center justify-center">
+            {/* Upload Button */}
+            <div className="flex-1 space-y-2 w-full max-w-sm">
+              <div className="relative w-max mx-auto md:mx-0">
                 <UploadButton
                   endpoint="imageUploader"
+                  appearance={{
+                    button: cn(
+                      "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-sm text-[10px] font-semibold tracking-wide h-8 px-4 w-auto shadow-none transition-all hover:opacity-90",
+                      isUploadingImage &&
+                        "opacity-80 cursor-wait pointer-events-none",
+                    ),
+                    allowedContent: "hidden",
+                  }}
+                  content={{
+                    button({ ready }) {
+                      if (ready) {
+                        return isUploadingImage ? (
+                          <span className="flex items-center gap-1.5">
+                            Processing...
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1.5">
+                            <ImageIcon className="w-3.5 h-3.5" /> Change Photo
+                          </span>
+                        );
+                      }
+                      return "Loading...";
+                    },
+                  }}
+                  onUploadBegin={() => setIsUploadingImage(true)}
                   onClientUploadComplete={(res) => {
-                    // Do something with the response
-                    console.log("Files: ", res);
+                    setIsUploadingImage(false);
                     if (res && res[0]) {
                       handleImageUrlChange(res[0].url);
-                      alert("Upload Completed");
                     }
                   }}
                   onUploadError={(error: Error) => {
-                    // Do something with the error.
+                    setIsUploadingImage(false);
                     alert(`ERROR! ${error.message}`);
                   }}
                 />
-                <p className="text-xs text-zinc-400 mt-2">
-                  Supported formats: PNG, JPG, JPEG (max 4MB)
-                </p>
               </div>
+              <p className="text-[10px] text-zinc-400 text-center md:text-left">
+                JPG, PNG (Max 4MB)
+              </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Profile Details Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile Details</CardTitle>
-          <CardDescription>
-            Your core profile information visible to recruiters.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form
-            id="profile-editor-form"
-            action={handleSubmit}
-            className="space-y-6"
-          >
-            <div className="space-y-2">
-              <Label htmlFor="slug">Profile URL</Label>
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground text-sm">
+          {/* Form Fields */}
+          <div className="p-5 space-y-5">
+            <div className="grid gap-2">
+              <Label className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">
+                Username
+              </Label>
+              <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950/50 rounded-sm px-3 border border-zinc-200 dark:border-zinc-800 focus-within:border-zinc-300 dark:focus-within:border-zinc-700 transition-colors">
+                <span className="text-zinc-400 text-sm font-mono">
                   skillproof.app/
                 </span>
                 <Input
-                  id="slug"
                   name="slug"
                   defaultValue={profile.slug}
                   required
-                  placeholder="your-username"
                   pattern="[a-z0-9-]+"
-                  className="font-mono bg-zinc-50 dark:bg-zinc-900"
+                  className="border-none shadow-none bg-transparent h-10 px-0 focus-visible:ring-0 font-medium text-zinc-800 dark:text-zinc-200"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
-                Warning: Changing this will break existing links to your
-                profile.
-              </p>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="headline">Headline</Label>
+            <div className="grid gap-2">
+              <Label className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">
+                Headline
+              </Label>
               <Input
-                id="headline"
                 name="headline"
                 defaultValue={profile.headline || ""}
-                placeholder="e.g. Senior Frontend Engineer"
+                placeholder="e.g. Senior Product Designer"
+                className="h-10 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50 rounded-sm shadow-none focus-visible:ring-1 focus-visible:ring-zinc-300 dark:focus-visible:ring-zinc-700"
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="summary">Summary</Label>
+            <div className="grid gap-2">
+              <Label className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">
+                About You
+              </Label>
               <Textarea
-                id="summary"
                 name="summary"
                 defaultValue={profile.summary || ""}
-                placeholder="Brief professional bio..."
-                rows={6}
+                placeholder="Tell your story..."
+                rows={5}
+                className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50 rounded-sm shadow-none focus-visible:ring-1 focus-visible:ring-zinc-300 dark:focus-visible:ring-zinc-700 resize-none p-4"
               />
             </div>
+          </div>
 
-            {error && (
-              <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
-                <AlertCircle className="w-4 h-4" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            {success && (
-              <div className="flex items-center gap-2 p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md">
-                <Save className="w-4 h-4" />
-                <span>Profile saved successfully</span>
-              </div>
-            )}
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button type="submit" form="profile-editor-form" disabled={isLoading}>
-            {isLoading ? "Saving..." : "Save Changes"}
-          </Button>
-        </CardFooter>
-      </Card>
+          {/* Footer Row */}
+          <div className="flex justify-between items-center p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/30">
+            <div>
+              {success && (
+                <span className="text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-sm animate-in fade-in flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" /> Saved
+                </span>
+              )}
+              {error && <span className="text-xs text-red-500">{error}</span>}
+            </div>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="rounded-sm px-8 shadow-none bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 h-9 text-xs font-medium transition-all"
+            >
+              {isLoading ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteProject } from "@/lib/actions/project";
 import { deleteEvidence } from "@/lib/actions/evidence";
-import { EvidenceForm } from "@/components/dashboard/evidence-form";
+import { EvidenceWizard } from "@/components/dashboard/evidence-wizard";
+import { EvidenceSuggester } from "@/components/dashboard/ai-suggestions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,7 +19,13 @@ import {
   Code,
   BarChart3,
 } from "lucide-react";
+import {
+  IconSparkles,
+  IconChevronDown,
+  IconChevronUp,
+} from "@tabler/icons-react";
 import { Project, Evidence, Skill, EvidenceSkill } from "@prisma/client";
+import type { AIEvidenceSuggestion } from "@/lib/types";
 
 // Extended evidence type with skills
 type EvidenceWithSkills = Evidence & {
@@ -41,6 +48,17 @@ export function ProjectDetailPanel({
   const router = useRouter();
   const [isAddingEvidence, setIsAddingEvidence] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showAISuggestions, setShowAISuggestions] = useState(false);
+  const [prefillEvidence, setPrefillEvidence] = useState<{
+    title: string;
+    type: string;
+    content?: string;
+  } | null>(null);
+
+  // Get skills associated with this project's evidence
+  const projectSkillNames = [
+    ...new Set(evidence.flatMap((e) => e.skills.map((es) => es.skill.name))),
+  ];
 
   const getEvidenceIcon = (type: string) => {
     switch (type) {
@@ -60,7 +78,7 @@ export function ProjectDetailPanel({
   async function handleDeleteProject() {
     if (
       !confirm(
-        "Are you sure? This will delete the project and all its evidence."
+        "Are you sure? This will delete the project and all its evidence.",
       )
     )
       return;
@@ -85,14 +103,51 @@ export function ProjectDetailPanel({
     }
   }
 
+  // Handle AI evidence suggestion selection
+  const handleSelectAIEvidence = (suggestion: AIEvidenceSuggestion) => {
+    setPrefillEvidence({
+      title: suggestion.title,
+      type: suggestion.type,
+      content: suggestion.content,
+    });
+    setIsAddingEvidence(true);
+    setShowAISuggestions(false);
+  };
+
   if (isAddingEvidence) {
+    // Get existing URLs for duplicate detection
+    const existingUrls = evidence
+      .map((e) => e.url)
+      .filter((url): url is string => !!url);
+
     return (
-      <EvidenceForm
-        preselectedProjectId={project.id}
-        skills={allSkills}
-        onCancel={() => setIsAddingEvidence(false)}
-        onSuccess={() => setIsAddingEvidence(false)}
-      />
+      <div className="flex flex-col h-full w-full">
+        <EvidenceWizard
+          projects={[
+            {
+              id: project.id,
+              title: project.title,
+              description: project.description,
+            },
+          ]}
+          skills={allSkills.map((s) => ({
+            id: s.id,
+            name: s.name,
+            category: s.category,
+          }))}
+          existingUrls={existingUrls}
+          preselectedProjectId={project.id}
+          onCancel={() => {
+            setIsAddingEvidence(false);
+            setPrefillEvidence(null);
+          }}
+          onSuccess={() => {
+            setIsAddingEvidence(false);
+            setPrefillEvidence(null);
+            router.refresh();
+          }}
+        />
+      </div>
     );
   }
 
@@ -150,6 +205,40 @@ export function ProjectDetailPanel({
           </div>
         )}
 
+        {/* AI Suggestions Collapsible */}
+        {allSkills.length > 0 && (
+          <div className="border rounded-lg overflow-hidden">
+            <button
+              onClick={() => setShowAISuggestions(!showAISuggestions)}
+              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+            >
+              <span className="flex items-center gap-2 font-medium">
+                <IconSparkles className="w-4 h-4 text-purple-500" />
+                AI Evidence Suggestions
+              </span>
+              {showAISuggestions ? (
+                <IconChevronUp className="w-4 h-4" />
+              ) : (
+                <IconChevronDown className="w-4 h-4" />
+              )}
+            </button>
+            {showAISuggestions && (
+              <div className="p-4 pt-0 border-t">
+                <EvidenceSuggester
+                  projectTitle={project.title}
+                  projectDescription={project.description || undefined}
+                  skills={
+                    projectSkillNames.length > 0
+                      ? projectSkillNames
+                      : allSkills.slice(0, 5).map((s) => s.name)
+                  }
+                  onSelectEvidence={handleSelectAIEvidence}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Evidence List */}
         <div className="space-y-4 pt-4 border-t">
           {evidence.length === 0 ? (
@@ -157,10 +246,19 @@ export function ProjectDetailPanel({
               <p className="text-muted-foreground mb-4">
                 No skills proven with this project yet.
               </p>
-              <Button onClick={() => setIsAddingEvidence(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Evidence
-              </Button>
+              <div className="flex justify-center gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAISuggestions(true)}
+                >
+                  <IconSparkles className="w-4 h-4 mr-2" />
+                  AI Suggest
+                </Button>
+                <Button onClick={() => setIsAddingEvidence(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Evidence
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">

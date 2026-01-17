@@ -17,6 +17,7 @@ import {
   X,
   Check,
 } from "lucide-react";
+import { IconSparkles } from "@tabler/icons-react";
 import { Skill, Project } from "@prisma/client";
 import { UploadButton } from "@/lib/uploadthing";
 
@@ -27,6 +28,12 @@ interface EvidenceFormProps {
   projects?: Project[];
   onCancel: () => void;
   onSuccess: () => void;
+  initialData?: {
+    title?: string;
+    type?: string;
+    content?: string;
+    url?: string;
+  };
 }
 
 // Simplified evidence types - focused on verifiable proof
@@ -69,35 +76,39 @@ export function EvidenceForm({
   projects = [],
   onCancel,
   onSuccess,
+  initialData,
 }: EvidenceFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedType, setSelectedType] = useState<EvidenceType>("LINK");
+  const [selectedType, setSelectedType] = useState<EvidenceType>(
+    (initialData?.type as EvidenceType) || "LINK",
+  );
   const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>(
-    preselectedSkillId ? [preselectedSkillId] : []
+    preselectedSkillId ? [preselectedSkillId] : [],
   );
   const [selectedProjectId, setSelectedProjectId] = useState<string>(
-    preselectedProjectId || ""
+    preselectedProjectId || "",
   );
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [content, setContent] = useState(initialData?.content || "");
+  const [url, setUrl] = useState(initialData?.url || "");
+
+  const isAIPrefilled = !!initialData;
 
   // Toggle skill selection
   const toggleSkill = (skillId: string) => {
     setSelectedSkillIds((prev) =>
       prev.includes(skillId)
         ? prev.filter((id) => id !== skillId)
-        : [...prev, skillId]
+        : [...prev, skillId],
     );
   };
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
     setError(null);
-
-    const title = formData.get("title") as string;
-    const url = formData.get("url") as string;
-    const content = formData.get("content") as string;
 
     // Get IDs from state
     const skillIds = preselectedSkillId
@@ -252,6 +263,14 @@ export function EvidenceForm({
             </div>
           )}
 
+          {/* AI Prefilled Indicator */}
+          {isAIPrefilled && (
+            <div className="flex items-center gap-2 p-3 bg-purple-50 border border-purple-200 rounded-lg text-sm text-purple-700">
+              <IconSparkles className="w-4 h-4" />
+              AI-suggested evidence - review and customize as needed
+            </div>
+          )}
+
           {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="title">Evidence Title *</Label>
@@ -260,6 +279,8 @@ export function EvidenceForm({
               name="title"
               required
               placeholder="e.g. Implemented Auth Flow"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
               Brief description of what you did
@@ -308,6 +329,8 @@ export function EvidenceForm({
                 placeholder="https://github.com/..."
                 type="url"
                 required
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
                 GitHub repo, live demo, PR, or documentation
@@ -369,6 +392,8 @@ export function EvidenceForm({
                   rows={6}
                   className="font-mono text-sm"
                   required
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -379,6 +404,8 @@ export function EvidenceForm({
                   placeholder="https://github.com/..."
                   type="url"
                   required
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
                   Link to the file or commit in your repository
@@ -397,6 +424,8 @@ export function EvidenceForm({
                   name="content"
                   placeholder="e.g. Reduced load time by 40%"
                   required
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -407,6 +436,8 @@ export function EvidenceForm({
                   placeholder="https://..."
                   type="url"
                   required
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
                   Link to analytics dashboard, report, or documentation

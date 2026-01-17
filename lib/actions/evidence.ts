@@ -33,7 +33,9 @@ export async function createEvidence(input: CreateEvidenceInput): Promise<Action
     const validated = CreateEvidenceSchema.safeParse(input);
 
     if (!validated.success) {
-      return { success: false, error: (validated.error as any).errors[0].message };
+      console.error("Validation error:", JSON.stringify(validated.error, null, 2));
+      const errorMsg = validated.error.issues?.[0]?.message || JSON.stringify(validated.error);
+      return { success: false, error: `Validation: ${errorMsg}` };
     }
 
     const { skillIds, projectId, title, type, content, url } = validated.data;
@@ -86,7 +88,10 @@ export async function createEvidence(input: CreateEvidenceInput): Promise<Action
     return { success: true, data: evidence };
   } catch (error) {
     console.error("createEvidence error:", error);
-    return { success: false, error: "Failed to create evidence" };
+    return { 
+      success: false, 
+      error: `Failed to create evidence: ${error instanceof Error ? error.message : String(error)}` 
+    };
   }
 }
 

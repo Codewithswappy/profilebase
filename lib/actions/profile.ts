@@ -10,19 +10,13 @@ import {
   UpdateProfileInput,
   UpdateProfileSettingsInput,
 } from "@/lib/validations";
-import { Profile, ProfileSettings, Skill, Project, Evidence } from "@prisma/client";
+import { Profile, ProfileSettings } from "@prisma/client";
 
-export type ActionResult<T = void> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+// Import from centralized types
+import type { ActionResult, FullProfile } from "@/lib/types";
 
-export type FullProfile = {
-  profile: Profile;
-  profileSettings: ProfileSettings;
-  skills: (Skill & { evidenceCount: number })[];
-  projects: (Project & { evidenceCount: number })[];
-  evidence: Evidence[];
-};
+// Re-export for backward compatibility
+export type { ActionResult, FullProfile } from "@/lib/types";
 
 // ============================================
 // GET MY PROFILE (Dashboard)

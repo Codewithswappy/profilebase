@@ -127,6 +127,7 @@ model Profile {
   // 1:many relationships
   skills   Skill[]
   projects Project[]
+  dailyAnalytics DailyAnalytics[]
 
   @@index([slug])
   @@index([userId])
@@ -253,3 +254,28 @@ model EvidenceSkill {
   @@index([skillId])
 }
 
+
+// ============================================
+// ANALYTICS
+// ============================================
+// Lightweight daily aggregation for profile stats.
+// ============================================
+
+model DailyAnalytics {
+  id                 String   @id @default(cuid())
+  profileId          String
+  date               DateTime @db.Date // Store only the date part
+  views              Int      @default(0)
+  uniqueVisitors     String[] // Array of hashed visitor IDs for dedup calculation
+  totalDuration      Int      @default(0) // Total seconds spent by all visitors
+  geoStats           Json?    @default("{}") // e.g. { "US": 50, "IN": 20 }
+  deviceStats        Json?    @default("{}") // e.g. { "desktop": 80, "mobile": 20 }
+  referrerStats      Json?    @default("{}") // e.g. { "linkedin.com": 10, "direct": 50 }
+  skillInteractions  Json?    @default("{}") // e.g. { "skill_id": count }
+  projectInteractions Json?   @default("{}") // e.g. { "project_id": count }
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, date])
+  @@index([date])
+}

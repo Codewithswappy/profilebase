@@ -1,11 +1,11 @@
 import { getMyProfile } from "@/lib/actions/profile";
-import { SkillsManager } from "@/components/dashboard/skills/skills-manager";
+import { PortfolioManager } from "@/components/dashboard/portfolio/portfolio-manager";
 
 export const metadata = {
-  title: "Skills Manager — SkillProof",
+  title: "Portfolio Manager — SkillProof",
 };
 
-export default async function SkillsPage() {
+export default async function PortfolioPage() {
   const result = await getMyProfile();
 
   if (!result.success) {
@@ -24,5 +24,5 @@ export default async function SkillsPage() {
     );
   }
 
-  return <SkillsManager data={data} />;
+  return <PortfolioManager data={data} />;
 }

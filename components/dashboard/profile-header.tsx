@@ -19,67 +19,65 @@ export function ProfileHeader({ data }: ProfileHeaderProps) {
   async function handleToggle() {
     setIsLoading(true);
     const newStatus = !isPublic;
-
-    // Optimistic update
     setIsPublic(newStatus);
-
     const result = await toggleProfileVisibility(newStatus);
-
     if (!result.success) {
-      // Revert if failed
       setIsPublic(!newStatus);
-      // Could show toast error here
     }
-
     setIsLoading(false);
   }
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 p-6 bg-card rounded-lg border shadow-sm">
+    <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-6">
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <span className="font-medium text-foreground">{profile.slug}</span>
-          <span className="text-xs">•</span>
-          <span className="truncate max-w-md">
-            {profile.headline || "No headline set"}
+        <h1 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100">
+          Dashboard
+        </h1>
+        <div className="flex items-center gap-3 text-sm text-zinc-500">
+          <span className="font-medium text-zinc-900 dark:text-zinc-200">
+            {profile.slug}
+          </span>
+          <span className="text-zinc-300 dark:text-zinc-700">•</span>
+          <span className="truncate max-w-md text-zinc-500 font-light">
+            {profile.headline || "Ready to build your portfolio"}
           </span>
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+      <div className="flex items-center gap-2">
         {isPublic && (
           <Link
             href={`/${profile.slug}`}
             target="_blank"
             className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "w-full sm:w-auto gap-2"
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "h-9 px-3 rounded-md text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors",
             )}
           >
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-4 h-4 mr-2" />
             View Public
           </Link>
         )}
 
         <Button
-          variant={isPublic ? "default" : "secondary"}
+          variant="outline"
           size="sm"
           onClick={handleToggle}
           disabled={isLoading}
           className={cn(
-            "w-full sm:w-auto gap-2 transition-all",
-            isPublic ? "bg-green-600 hover:bg-green-700" : ""
+            "h-9 rounded-md transition-all border-none bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-none",
+            isPublic &&
+              "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30",
           )}
         >
           {isPublic ? (
             <>
-              <Globe className="w-4 h-4" />
+              <Globe className="w-3.5 h-3.5 mr-2" />
               Public
             </>
           ) : (
             <>
-              <Lock className="w-4 h-4" />
+              <Lock className="w-3.5 h-3.5 mr-2" />
               Private
             </>
           )}

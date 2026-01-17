@@ -30,6 +30,8 @@ export async function generateMetadata({
   };
 }
 
+import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
+
 export default async function PublicProfilePage({
   params,
 }: {
@@ -44,6 +46,7 @@ export default async function PublicProfilePage({
 
   return (
     <div className="min-h-screen bg-muted/30">
+      <AnalyticsTracker slug={slug} />
       <PublicProfileView data={result.data} />
     </div>
   );
