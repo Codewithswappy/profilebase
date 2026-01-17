@@ -233,7 +233,7 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
               </Label>
               <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950/50 rounded-sm px-3 border border-zinc-200 dark:border-zinc-800 focus-within:border-zinc-300 dark:focus-within:border-zinc-700 transition-colors">
                 <span className="text-zinc-400 text-sm font-mono">
-                  skillproof.app/
+                  skilldock.site/
                 </span>
                 <Input
                   name="slug"

@@ -47,13 +47,13 @@ export function DashboardSidebar() {
 
   return (
     <div className="flex flex-col h-full bg-zinc-50/50 dark:bg-zinc-900/50 border-r border-zinc-200/50 dark:border-zinc-800/50 backdrop-blur-xl">
-      <div className="p-6">
-        <Link
-          href="/dashboard"
-          className="flex items-center gap-2 font-bold text-xl text-zinc-800 dark:text-zinc-100"
-        >
-          <Shield className="w-6 h-6 text-zinc-900 dark:text-white fill-zinc-900 dark:fill-white" />
-          <span>SkillProof</span>
+      <div className=" flex justify-center items-center">
+        <Link href="/dashboard" className="flex items-center">
+          <img
+            src="/logo/logo.png"
+            alt="SkillDock"
+            className="h-20 w-auto max-w-full object-contain"
+          />
         </Link>
       </div>
 

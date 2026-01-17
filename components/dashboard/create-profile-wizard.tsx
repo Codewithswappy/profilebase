@@ -15,12 +15,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Rocket, AlertCircle } from "lucide-react";
+import { Rocket, AlertCircle, Sparkles } from "lucide-react";
 
 export function CreateProfileWizard() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [slugInput, setSlugInput] = useState("");
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -48,7 +49,13 @@ export function CreateProfileWizard() {
             <div className="p-2 bg-primary/10 rounded-full text-primary">
               <Rocket className="w-6 h-6" />
             </div>
-            <CardTitle>Welcome to SkillProof</CardTitle>
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-8 h-8 text-primary" />
+            </div>
+            <CardTitle>Welcome to SkillDock</CardTitle>
+            <CardDescription className="text-center">
+              Let's create your evidence-based profile in 3 simple steps.
+            </CardDescription>
           </div>
           <CardDescription>
             Let&apos;s set up your profile. You can change these details later.
@@ -64,7 +71,10 @@ export function CreateProfileWizard() {
               <Label htmlFor="slug">Profile URL</Label>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground text-sm">
-                  skillproof.dev/
+                  skilldock.site/
+                  <span className="text-primary font-bold">
+                    {slugInput || "your-username"}
+                  </span>
                 </span>
                 <Input
                   id="slug"
@@ -73,6 +83,7 @@ export function CreateProfileWizard() {
                   placeholder="your-username"
                   pattern="[a-z0-9-]+"
                   className="font-mono"
+                  onChange={(e) => setSlugInput(e.target.value)} // Added to simulate watchSlug
                 />
               </div>
               <p className="text-xs text-muted-foreground">

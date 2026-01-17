@@ -37,7 +37,7 @@ const getVisitorHash = async () => {
   
   const hash = crypto
     .createHash("sha256")
-    .update(`${ip}-${ua}-${process.env.AUTH_SECRET || "skillproof-salt"}`)
+    .update(`${ip}-${ua}-${process.env.AUTH_SECRET || "skilldock-salt"}`)
     .digest("hex");
   
   return hash;

@@ -47,7 +47,7 @@ export function RegisterForm() {
           Create an account
         </CardTitle>
         <CardDescription className="text-center">
-          Enter your information to create your SkillProof account
+          Enter your information to create your SkillDock account
         </CardDescription>
       </CardHeader>
       <CardContent>

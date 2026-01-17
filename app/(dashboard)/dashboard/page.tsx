@@ -4,7 +4,8 @@ import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 import { MagicLinkInput } from "@/components/dashboard/magic-link-input";
 
 export const metadata = {
-  title: "Dashboard — SkillProof",
+  title: "Dashboard — SkillDock",
+  description: "Manage your SkillDock profile",
 };
 
 export default async function DashboardPage() {

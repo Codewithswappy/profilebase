@@ -2,7 +2,7 @@ import { getMyProfile } from "@/lib/actions/profile";
 import { PortfolioManager } from "@/components/dashboard/portfolio/portfolio-manager";
 
 export const metadata = {
-  title: "Portfolio Manager — SkillProof",
+  title: "Portfolio Manager — SkillDock",
 };
 
 export default async function PortfolioPage() {

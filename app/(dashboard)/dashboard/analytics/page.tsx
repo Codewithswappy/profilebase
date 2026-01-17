@@ -2,7 +2,7 @@ import { getMyProfile } from "@/lib/actions/profile";
 import { AnalyticsDashboard } from "@/components/analytics/analytics-dashboard";
 
 export const metadata = {
-  title: "Analytics — SkillProof",
+  title: "Analytics — SkillDock",
 };
 
 export default async function AnalyticsPage() {

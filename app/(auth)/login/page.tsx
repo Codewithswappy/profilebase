@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata = {
-  title: "Login — SkillProof",
-  description: "Sign in to your SkillProof account",
+  title: "Login — SkillDock",
+  description: "Sign in to your SkillDock account",
 };
 
 export default function LoginPage() {

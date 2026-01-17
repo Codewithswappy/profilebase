@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
   const result = await getPublicProfile(slug);
@@ -89,7 +89,7 @@ export async function GET(
             </div>
           ) : (
             <div style={{ fontSize: 30, color: "#94a3b8", marginBottom: 40 }}>
-              SkillProof Profile
+              SkillDock Profile
             </div>
           )}
 
@@ -138,7 +138,7 @@ export async function GET(
           }}
         >
           <div style={{ fontSize: 20, color: "#cbd5e1" }}>
-            Managed via SkillProof
+            Managed via SkillDock
           </div>
         </div>
       </div>
@@ -146,6 +146,6 @@ export async function GET(
     {
       width: 1200,
       height: 630,
-    }
+    },
   );
 }

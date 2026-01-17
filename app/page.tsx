@@ -5,7 +5,7 @@ import { CheckCircle, Shield, ExternalLink, Rocket } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
-  title: "SkillProof — Proof Over Claims",
+  title: "SkillDock — Proof Over Claims",
   description:
     "The structured skills profile for developers. Prove your abilities to recruiters in 60 seconds.",
 };
@@ -14,10 +14,13 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Navigation */}
-      <header className="px-6 py-4 flex items-center justify-between max-w-7xl mx-auto w-full">
+      <header className="px-6 py-4 pt-0 flex items-center justify-between max-w-6xl mx-auto w-full">
         <div className="flex items-center gap-2 font-bold text-xl">
-          <Shield className="w-6 h-6 text-primary" />
-          <span>SkillProof</span>
+          <img
+            src="/logo/logo.png"
+            alt="SkillDock"
+            className="h-25 w-auto max-w-full object-contain"
+          />
         </div>
         <div className="flex items-center gap-4">
           <Link href="/login" className="text-sm font-medium hover:underline">
@@ -32,7 +35,7 @@ export default function Home() {
       {/* Hero */}
       <main className="flex-1">
         <section className="py-20 px-6 text-center">
-          <div className="max-w-3xl mx-auto space-y-6">
+          <div className="max-w-6xl mx-auto space-y-6">
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
               Stop claiming skills. <br />
               <span className="text-primary bg-clip-text">
@@ -49,7 +52,7 @@ export default function Home() {
                 href="/register"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "h-12 px-8 text-lg"
+                  "h-12 px-8 text-lg",
                 )}
               >
                 <Rocket className="w-5 h-5 mr-2" />
@@ -59,7 +62,7 @@ export default function Home() {
                 href="/demo-profile"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
-                  "h-12 px-8 text-lg"
+                  "h-12 px-8 text-lg",
                 )}
               >
                 View Demo Profile
@@ -69,8 +72,8 @@ export default function Home() {
         </section>
 
         {/* Problem / Solution */}
-        <section className="py-20 px-6 bg-card border-y">
-          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <section className="py-20 px-6">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h2 className="text-3xl font-bold">Resumes are broken.</h2>
               <div className="space-y-4">
@@ -101,7 +104,7 @@ export default function Home() {
               </div>
             </div>
             <div className="space-y-6">
-              <h2 className="text-3xl font-bold">SkillProof is different.</h2>
+              <h2 className="text-3xl font-bold">SkillDock is different.</h2>
               <div className="space-y-4">
                 <div className="flex gap-4">
                   <div className="p-2 h-10 w-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
@@ -138,14 +141,14 @@ export default function Home() {
         <section className="py-20 px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to stand out?</h2>
           <Link href="/register" className={buttonVariants({ size: "lg" })}>
-            Join SkillProof for Free
+            Join SkillDock for Free
           </Link>
         </section>
       </main>
 
       {/* Footer */}
       <footer className="py-8 border-t text-center text-sm text-muted-foreground bg-card">
-        <p>&copy; {new Date().getFullYear()} SkillProof. Proof over claims.</p>
+        <p>&copy; {new Date().getFullYear()} SkillDock. Proof over claims.</p>
       </footer>
     </div>
   );

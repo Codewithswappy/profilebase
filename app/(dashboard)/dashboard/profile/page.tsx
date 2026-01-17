@@ -3,7 +3,7 @@ import { ProfileEditor } from "@/components/dashboard/profile-editor";
 import { VisibilitySettings } from "@/components/dashboard/visibility-settings";
 
 export const metadata = {
-  title: "Profile Settings — SkillProof",
+  title: "Profile Settings — SkillDock",
 };
 
 export default async function ProfilePage() {
