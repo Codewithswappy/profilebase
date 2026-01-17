@@ -44,7 +44,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full ">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center">
           Welcome back

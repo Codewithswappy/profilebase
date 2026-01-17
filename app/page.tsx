@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { CheckCircle, Shield, ExternalLink, Rocket } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export const metadata = {
   title: "SkillDock — Proof Over Claims",
@@ -12,14 +13,21 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-background">
       {/* Navigation */}
       <header className="px-6 py-4 pt-0 flex items-center justify-between max-w-6xl mx-auto w-full">
-        <div className="flex items-center gap-2 font-bold text-xl">
+        <div className="flex items-center font-bold text-xl">
           <img
-            src="/logo/logo.png"
+            src="/logo/logo3.png"
             alt="SkillDock"
-            className="h-25 w-auto max-w-full object-contain"
+            aria-label="SkillDock Logo"
+            className="h-15 w-auto max-w-full object-contain block dark:hidden"
+          />
+          <img
+            src="/logo/logo4.png"
+            alt="SkillDock"
+            aria-label="SkillDock Logo"
+            className="h-15 w-auto max-w-full object-contain hidden dark:block"
           />
         </div>
         <div className="flex items-center gap-4">
@@ -29,6 +37,7 @@ export default function Home() {
           <Link href="/register" className={buttonVariants()}>
             Get Started
           </Link>
+          <ModeToggle />
         </div>
       </header>
 

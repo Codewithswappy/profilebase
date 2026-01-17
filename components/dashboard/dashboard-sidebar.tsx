@@ -56,9 +56,14 @@ export function DashboardSidebar({ className }: { className?: string }) {
       <div className=" flex justify-center items-center">
         <Link href="/dashboard" className="flex items-center">
           <img
-            src="/logo/logo.png"
+            src="/logo/logo3.png"
             alt="SkillDock"
-            className="h-20 w-auto max-w-full object-contain"
+            className="h-20 w-auto max-w-full object-contain block dark:hidden"
+          />
+          <img
+            src="/logo/logo4.png"
+            alt="SkillDock"
+            className="h-20 w-auto max-w-full object-contain hidden dark:block"
           />
         </Link>
       </div>
