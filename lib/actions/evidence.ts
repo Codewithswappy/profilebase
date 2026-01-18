@@ -12,11 +12,25 @@ import {
 } from "@/lib/validations";
 import { ActionResult } from "./profile";
 import { Evidence, EvidenceSkill, Skill } from "@prisma/client";
+import { detectPlatform, getTrustBonus } from "@/lib/platform-detection";
+import crypto from "crypto";
 
 // Extended type for evidence with skills
 export type EvidenceWithSkills = Evidence & {
   skills: (EvidenceSkill & { skill: Skill })[];
 };
+
+// ============================================
+// HELPER: Generate verification hash
+// ============================================
+
+function generateVerificationHash(content: string): string {
+  return crypto
+    .createHash("sha256")
+    .update(content + Date.now().toString())
+    .digest("hex")
+    .slice(0, 16);
+}
 
 // ============================================
 // CREATE EVIDENCE
@@ -62,7 +76,15 @@ export async function createEvidence(input: CreateEvidenceInput): Promise<Action
       return { success: false, error: "One or more skills not found or access denied" };
     }
 
-    // Create evidence first
+    // Detect platform and calculate trust bonus
+    const detectedPlatform = url ? detectPlatform(url) : null;
+    const platformBonus = url ? getTrustBonus(url) : 0;
+    
+    // Generate verification hash for content integrity
+    const contentToHash = [title, content || "", url || ""].join("|");
+    const verificationHash = generateVerificationHash(contentToHash);
+
+    // Create evidence with verification fields
     const evidence = await db.evidence.create({
       data: {
         projectId,
@@ -70,6 +92,10 @@ export async function createEvidence(input: CreateEvidenceInput): Promise<Action
         type: type ?? "LINK",
         content,
         url,
+        verifiedAt: new Date(),
+        verificationHash,
+        platform: detectedPlatform?.platform || null,
+        platformBonus,
       },
     });
 

@@ -63,12 +63,12 @@ export function RegisterForm() {
               name="email"
               type="email"
               required
-              placeholder="m@example.com"
+              placeholder="example@email.com"
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" required />
+            <Input id="password" name="password" type="password" placeholder="********" required />
             <p className="text-xs text-muted-foreground">
               Must contain at least 8 characters, one uppercase letter, and one
               number.

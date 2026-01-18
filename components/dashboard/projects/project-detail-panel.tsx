@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteProject } from "@/lib/actions/project";
 import { deleteEvidence } from "@/lib/actions/evidence";
-import { EvidenceWizard } from "@/components/dashboard/evidence-wizard";
+import { AddProofModal } from "@/components/dashboard/add-proof-modal";
 import { EvidenceSuggester } from "@/components/dashboard/ai-suggestions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -122,7 +122,7 @@ export function ProjectDetailPanel({
 
     return (
       <div className="flex flex-col h-full w-full">
-        <EvidenceWizard
+        <AddProofModal
           projects={[
             {
               id: project.id,
@@ -146,6 +146,7 @@ export function ProjectDetailPanel({
             setPrefillEvidence(null);
             router.refresh();
           }}
+          className="h-full border-0"
         />
       </div>
     );

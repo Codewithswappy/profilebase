@@ -107,7 +107,7 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
         </div>
 
         {error && (
-          <div className="mx-5 mb-5 bg-red-50 text-red-600 p-3 rounded-sm text-sm flex items-center gap-2">
+          <div className="mx-5 mb-5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-sm text-sm flex items-center gap-2 border border-red-200 dark:border-red-900/50">
             <AlertCircle className="w-4 h-4" />
             {error}
           </div>

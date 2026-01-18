@@ -22,8 +22,6 @@ export const metadata: Metadata = {
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 
-// ... (keep Metadata)
-
 export default function RootLayout({
   children,
 }: Readonly<{

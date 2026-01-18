@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Rocket, AlertCircle, Sparkles } from "lucide-react";
+import { Rocket, AlertCircle } from "lucide-react";
 
 export function CreateProfileWizard() {
   const router = useRouter();
@@ -44,19 +44,11 @@ export function CreateProfileWizard() {
   return (
     <div className="max-w-2xl mx-auto py-12">
       <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-primary/10 rounded-full text-primary">
-              <Rocket className="w-6 h-6" />
-            </div>
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-8 h-8 text-primary" />
-            </div>
-            <CardTitle>Welcome to SkillDock</CardTitle>
-            <CardDescription className="text-center">
-              Let's create your evidence-based profile in 3 simple steps.
-            </CardDescription>
+        <CardHeader className="text-center pb-2">
+          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+            <Rocket className="w-6 h-6 text-primary" />
           </div>
+          <CardTitle className="text-xl">Welcome to SkillDock</CardTitle>
           <CardDescription>
             Let&apos;s set up your profile. You can change these details later.
           </CardDescription>
@@ -111,7 +103,7 @@ export function CreateProfileWizard() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-900/50 dark:text-red-400">
                 <AlertCircle className="w-4 h-4" />
                 <span>{error}</span>
               </div>

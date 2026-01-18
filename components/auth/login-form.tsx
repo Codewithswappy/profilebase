@@ -69,12 +69,12 @@ export function LoginForm() {
               name="email"
               type="email"
               required
-              placeholder="m@example.com"
+              placeholder="example@email.com"
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" required />
+            <Input id="password" name="password" type="password" placeholder="********" required />
           </div>
 
           {error && (

@@ -274,7 +274,20 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
             <div>
               {success && (
                 <span className="text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-sm animate-in fade-in flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" /> Saved
+                  <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>{" "}
+                  Saved
                 </span>
               )}
               {error && <span className="text-xs text-red-500">{error}</span>}

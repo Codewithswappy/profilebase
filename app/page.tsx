@@ -13,9 +13,9 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-background">
+    <div className="flex flex-col min-h-screen bg-neutral-50 dark:bg-background">
       {/* Navigation */}
-      <header className="px-6 py-4 pt-0 flex items-center justify-between max-w-6xl mx-auto w-full">
+      <header className="px-6 py-4 flex items-center justify-between max-w-6xl mx-auto w-full">
         <div className="flex items-center font-bold text-xl">
           <img
             src="/logo/logo3.png"

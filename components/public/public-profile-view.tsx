@@ -47,15 +47,15 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
   const typedProjects = projects as ProjectWithCount[];
   const displayName = userName || profile.slug;
   const [activeTab, setActiveTab] = useState<"overview" | "projects">(
-    "overview"
+    "overview",
   );
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-stone-900 font-sans p-4 md:p-8 flex justify-center items-start">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans p-4 md:p-8 flex justify-center items-start">
       <div className="w-full max-w-3xl space-y-6">
         {/* --- SIMPLE COMPACT HEADER --- */}
         <div className="flex items-center gap-4 px-2">
-          <div className="w-16 h-16 rounded-full overflow-hidden border border-stone-200 shadow-sm bg-white shrink-0">
+          <div className="w-16 h-16 rounded-full overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-sm bg-white dark:bg-neutral-900 shrink-0">
             {profile.image ? (
               <Image
                 src={profile.image}
@@ -65,23 +65,23 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-stone-300">
+              <div className="w-full h-full flex items-center justify-center text-neutral-300 dark:text-neutral-600">
                 <User className="w-8 h-8" />
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold tracking-tight text-stone-900 truncate">
+            <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 truncate">
               {displayName}
             </h1>
-            <p className="text-sm font-medium text-stone-500 truncate">
+            <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400 truncate">
               {profile.headline || "Design Engineer"}
             </p>
           </div>
           {email && (
             <a
               href={`mailto:${email}`}
-              className="text-xs font-bold text-stone-900 bg-white border border-stone-200 hover:bg-stone-50 px-4 py-2 rounded-full transition-colors flex items-center gap-2 shadow-sm"
+              className="text-xs font-bold text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 px-4 py-2 rounded-full transition-colors flex items-center gap-2 shadow-sm"
             >
               <Mail className="w-3.5 h-3.5" />
               Contact
@@ -90,14 +90,14 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
         </div>
 
         {/* --- TABS --- */}
-        <div className="border-b border-stone-200 flex gap-6 text-sm px-2">
+        <div className="border-b border-neutral-200 dark:border-neutral-800 flex gap-6 text-sm px-2">
           <button
             onClick={() => setActiveTab("overview")}
             className={cn(
               "pb-3 -mb-px font-semibold transition-colors flex items-center gap-2",
               activeTab === "overview"
-                ? "text-stone-900 border-b-2 border-stone-900"
-                : "text-stone-400 hover:text-stone-600"
+                ? "text-neutral-900 dark:text-neutral-100 border-b-2 border-neutral-900 dark:border-neutral-100"
+                : "text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300",
             )}
           >
             <LayoutGrid className="w-4 h-4" /> Overview
@@ -107,8 +107,8 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
             className={cn(
               "pb-3 -mb-px font-semibold transition-colors flex items-center gap-2",
               activeTab === "projects"
-                ? "text-stone-900 border-b-2 border-stone-900"
-                : "text-stone-400 hover:text-stone-600"
+                ? "text-neutral-900 dark:text-neutral-100 border-b-2 border-neutral-900 dark:border-neutral-100"
+                : "text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300",
             )}
           >
             <List className="w-4 h-4" /> Projects
@@ -125,19 +125,19 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                         - Solid Colors (No Gradients)
                         - Specific Typography 
                     */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 px-2 py-4 border-b border-stone-200/60">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 px-2 py-4 border-b border-neutral-200/60 dark:border-neutral-800/60">
                 {/* WIDGET 1: CREDIBILITY */}
                 <div className="flex flex-col gap-3">
                   <div className="flex justify-between items-end">
                     <div>
-                      <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">
+                      <div className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-1">
                         Credibility Score
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold font-mono text-stone-900 tracking-tight">
+                        <span className="text-2xl font-bold font-mono text-neutral-900 dark:text-neutral-100 tracking-tight">
                           {profileCredibility.overallScore}%
                         </span>
-                        <span className="text-[10px] font-medium text-stone-400">
+                        <span className="text-[10px] font-medium text-neutral-400">
                           Top {100 - profileCredibility.overallScore}%
                         </span>
                       </div>
@@ -149,7 +149,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
 
                   <div className="space-y-1.5">
                     {/* Progress Bar */}
-                    <div className="h-1.5 w-full bg-stone-200 rounded-full overflow-hidden">
+                    <div className="h-1.5 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-[#0EA5E9] rounded-full relative"
                         style={{ width: `${profileCredibility.overallScore}%` }}
@@ -204,8 +204,8 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
 
               {/* TIMELINE V2 (Enhanced Credibility Engine) */}
               {skills.length > 0 && (
-                <div className="px-2 pt-2 pb-6 border-b border-stone-200/60">
-                  <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-4">
+                <div className="px-2 pt-2 pb-6 border-b border-neutral-200/60 dark:border-neutral-800/60">
+                  <h3 className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-4">
                     Competency Evolution
                   </h3>
                   <SkillTimelineV2
@@ -228,15 +228,15 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
               {typedProjects.length > 0 ? (
                 typedProjects.map((project) => {
                   const projectEvidence = evidence.filter(
-                    (e) => e.projectId === project.id
+                    (e) => e.projectId === project.id,
                   );
                   return (
                     <div
                       key={project.id}
-                      className="bg-white rounded-2xl p-5 border border-stone-100 shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
+                      className="bg-white dark:bg-neutral-900 rounded-2xl p-5 border border-neutral-100 dark:border-neutral-800 shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-base font-bold text-stone-900">
+                        <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100">
                           {project.title}
                         </h3>
                         {project.url && (
@@ -244,19 +244,19 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                             href={project.url}
                             target="_blank"
                             rel="noopener"
-                            className="text-stone-400 hover:text-stone-900 transition-colors"
+                            className="text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
                           >
                             <ArrowUpRight className="w-4 h-4" />
                           </a>
                         )}
                       </div>
-                      <div className="text-[11px] font-bold text-stone-400 uppercase tracking-wide mb-3">
+                      <div className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wide mb-3">
                         {project.startDate
                           ? formatDate(project.startDate)
                           : "Ongoing"}
                       </div>
                       {project.description && (
-                        <p className="text-sm text-stone-600 leading-relaxed mb-4 max-w-2xl">
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed mb-4 max-w-2xl">
                           {project.description}
                         </p>
                       )}
@@ -267,13 +267,13 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                           {projectEvidence.map((item) => (
                             <div
                               key={item.id}
-                              className="bg-stone-50 rounded-lg p-2.5 border border-stone-100 flex flex-col justify-center min-h-[60px] hover:border-stone-200 transition-colors"
+                              className="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-2.5 border border-neutral-100 dark:border-neutral-700 flex flex-col justify-center min-h-[60px] hover:border-neutral-200 dark:hover:border-neutral-600 transition-colors"
                             >
                               <div className="flex items-center gap-1.5 mb-1.5 opacity-70">
                                 {item.type === "SCREENSHOT" ? (
                                   <ImageIcon className="w-3 h-3 text-purple-600" />
                                 ) : item.type === "CODE_SNIPPET" ? (
-                                  <FileCheck className="w-3 h-3 text-stone-600" />
+                                  <FileCheck className="w-3 h-3 text-neutral-600 dark:text-neutral-400" />
                                 ) : (
                                   <LinkIcon className="w-3 h-3 text-sky-600" />
                                 )}
@@ -281,7 +281,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                                   {item.type}
                                 </span>
                               </div>
-                              <div className="text-[11px] font-semibold text-stone-900 truncate">
+                              <div className="text-[11px] font-semibold text-neutral-900 dark:text-neutral-100 truncate">
                                 {item.title}
                               </div>
                             </div>
@@ -292,7 +292,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                   );
                 })
               ) : (
-                <div className="text-center py-10 text-stone-400 text-sm">
+                <div className="text-center py-10 text-neutral-400 dark:text-neutral-500 text-sm">
                   No projects found.
                 </div>
               )}

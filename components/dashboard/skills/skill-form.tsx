@@ -56,7 +56,7 @@ export function SkillForm({ onCancel, onSuccess }: SkillFormProps) {
 
   return (
     <div className="flex flex-col h-full w-full">
-      <div className="p-6 border-b">
+      <div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
         <h2 className="text-xl font-semibold">Add New Skill</h2>
         <p className="text-sm text-muted-foreground">
           Define a skill you want to prove.
@@ -96,7 +96,7 @@ export function SkillForm({ onCancel, onSuccess }: SkillFormProps) {
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-900/50 dark:text-red-400">
               <AlertCircle className="w-4 h-4" />
               <span>{error}</span>
             </div>
@@ -104,7 +104,7 @@ export function SkillForm({ onCancel, onSuccess }: SkillFormProps) {
         </form>
       </div>
 
-      <div className="p-4 border-t bg-muted/20 flex unstack justify-end gap-3">
+      <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 bg-muted/20 flex unstack justify-end gap-3">
         <Button variant="ghost" onClick={onCancel} disabled={isLoading}>
           Cancel
         </Button>

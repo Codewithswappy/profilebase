@@ -230,6 +230,12 @@ model Evidence {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
+  // Verification fields for proof authenticity
+  verifiedAt       DateTime?    // When the URL/content was verified
+  verificationHash String?      // Hash of content at time of creation for integrity
+  platform         String?      // Detected platform (github, npm, vercel, etc.)
+  platformBonus    Int          @default(0) // Trust bonus from platform detection
+
   // Many:1 relationship to Project
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
