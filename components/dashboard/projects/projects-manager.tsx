@@ -4,140 +4,143 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FullProfile } from "@/lib/actions/profile";
 import { Button } from "@/components/ui/button";
-import { Plus, FolderPlus } from "lucide-react";
-import { IconBrandGithub } from "@tabler/icons-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Plus, FolderPlus, Search, LayoutGrid } from "lucide-react";
+import { IconBrandGithub, IconBoxMultiple } from "@tabler/icons-react";
 import { ProjectsList } from "./projects-list";
 import { ProjectDetailPanel } from "./project-detail-panel";
 import { ProjectForm } from "./project-form";
 import { GitHubImportPanel } from "../github-import";
+import { Input } from "@/components/ui/input";
 
 interface ProjectsManagerProps {
   data: FullProfile;
 }
-
-type ViewMode = "list" | "github" | "create";
 
 export function ProjectsManager({ data }: ProjectsManagerProps) {
   const router = useRouter();
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null,
   );
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showGithubModal, setShowGithubModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const selectedProject = data.projects.find((p) => p.id === selectedProjectId);
 
-  // Filter evidence for the selected project (cast to any since evidence includes skills from getMyProfile)
+  // Filter evidence for the selected project
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const projectEvidence = selectedProject
     ? (data.evidence as any[]).filter((e) => e.projectId === selectedProject.id)
     : [];
 
   const handleSelect = (id: string) => {
     setSelectedProjectId(id);
-    setViewMode("list");
   };
 
-  const handleCreate = () => {
-    setSelectedProjectId(null);
-    setViewMode("create");
+  const handleCreateClosed = () => {
+    setShowCreateModal(false);
   };
 
-  const handleGitHub = () => {
-    setSelectedProjectId(null);
-    setViewMode("github");
-  };
-
-  const handleClose = () => {
-    setSelectedProjectId(null);
-    setViewMode("list");
+  const handleGithubClosed = () => {
+    setShowGithubModal(false);
   };
 
   const handleImported = () => {
-    // Refresh the page to get updated data
     router.refresh();
-    setViewMode("list");
+    setShowGithubModal(false);
   };
 
+  const filteredProjects = data.projects.filter((p) =>
+    p.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
   return (
-    <div className="space-y-6 h-[calc(100vh-140px)] flex flex-col">
-      {/* Controls Header */}
-      <div className="flex items-center justify-between">
-        <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider hidden md:block">
-          Projects & Cases
-        </p>
-        <div className="flex gap-2 w-full md:w-auto justify-end">
+    <div className="flex flex-col h-[calc(100vh-100px)] -mt-4">
+      {/* Top Toolbar */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-950">
+        <div className="flex items-center gap-4">
+          <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight">
+            Projects
+          </h2>
+          <div className="relative w-64">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+            <Input
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-9 pl-9 bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-xs focus-visible:ring-1 focus-visible:ring-neutral-300 dark:focus-visible:ring-neutral-700"
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            onClick={handleGitHub}
-            className="rounded-sm h-8 text-xs bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 shadow-none hover:bg-neutral-50 dark:hover:bg-neutral-800"
+            onClick={() => setShowGithubModal(true)}
+            className="h-9 text-xs font-medium border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900"
           >
             <IconBrandGithub className="w-3.5 h-3.5 mr-2" />
             Import GitHub
           </Button>
           <Button
-            onClick={handleCreate}
-            className="rounded-sm h-8 text-xs shadow-none bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200"
+            onClick={() => setShowCreateModal(true)}
+            className="h-9 text-xs font-medium bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 shadow-sm"
           >
-            <Plus className="w-3.5 h-3.5 mr-1" />
-            Add Project
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            New Project
           </Button>
         </div>
       </div>
 
-      {/* BENTO GRID - List + Detail */}
-      <div className="flex flex-1 overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm">
-        {/* Left List Panel */}
-        <div className="w-full md:w-1/3 border-r border-neutral-200 dark:border-neutral-800 flex flex-col overflow-hidden">
+      {/* Main Split View */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Side: Project List */}
+        <div className="w-80 flex flex-col border-r border-neutral-200 dark:border-neutral-800 bg-neutral-50/30 dark:bg-neutral-900/10">
           <ProjectsList
-            projects={data.projects}
+            projects={filteredProjects}
             selectedId={selectedProjectId}
             onSelect={handleSelect}
           />
         </div>
 
-        {/* Right Detail Panel */}
-        <div className="hidden md:flex flex-1 overflow-hidden">
-          {viewMode === "github" ? (
-            <div className="w-full h-full overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800">
-              <GitHubImportPanel onImported={handleImported} />
-            </div>
-          ) : viewMode === "create" ? (
-            <ProjectForm onCancel={handleClose} onSuccess={handleClose} />
-          ) : selectedProject ? (
+        {/* Right Side: Detail or Empty State */}
+        <div className="flex-1 overflow-hidden bg-white dark:bg-neutral-950 relative">
+          {selectedProject ? (
             <ProjectDetailPanel
               project={selectedProject}
               evidence={projectEvidence}
               allSkills={data.skills}
-              onClose={handleClose}
+              onClose={() => setSelectedProjectId(null)}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center w-full h-full text-neutral-400 p-6 text-center space-y-4">
-              <div className="w-14 h-14 rounded-sm bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mb-2 border border-neutral-200 dark:border-neutral-700">
-                <FolderPlus className="w-7 h-7 text-neutral-300 dark:text-neutral-600" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500">
+              <div className="w-20 h-20 rounded-2xl bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center mb-6 shadow-sm border border-neutral-100 dark:border-neutral-800 rotate-3 transform transition-transform hover:rotate-6">
+                <IconBoxMultiple className="w-10 h-10 text-neutral-300 dark:text-neutral-600" />
               </div>
-              <div className="space-y-1">
-                <p className="font-medium text-neutral-600 dark:text-neutral-400">
-                  No Project Selected
-                </p>
-                <p className="text-xs text-neutral-400 max-w-xs mx-auto">
-                  Select a project from the list to manage evidence, or start
-                  fresh.
-                </p>
-              </div>
-              <div className="flex gap-3 pt-4">
+              <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-2">
+                Select a project to manage
+              </h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm leading-relaxed mb-8">
+                View detailed evidence, manage skills, or create new proof for
+                your portfolio projects.
+              </p>
+
+              <div className="flex gap-3">
                 <Button
                   variant="outline"
-                  onClick={handleGitHub}
-                  className="rounded-sm h-8 text-xs border-neutral-200 dark:border-neutral-800 shadow-none"
+                  onClick={() => setShowGithubModal(true)}
+                  className="h-9 text-xs"
                 >
                   <IconBrandGithub className="w-3.5 h-3.5 mr-2" />
                   Import
                 </Button>
                 <Button
-                  onClick={handleCreate}
-                  className="rounded-sm h-8 text-xs bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 shadow-none"
+                  onClick={() => setShowCreateModal(true)}
+                  className="h-9 text-xs bg-neutral-900 dark:bg-white text-white dark:text-neutral-900"
                 >
-                  <Plus className="w-3.5 h-3.5 mr-1" />
-                  Create
+                  <Plus className="w-3.5 h-3.5 mr-1.5" />
+                  Create Project
                 </Button>
               </div>
             </div>
@@ -145,37 +148,37 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
         </div>
       </div>
 
-      {/* Mobile Modal */}
-      {(selectedProjectId || viewMode !== "list") && (
-        <div className="fixed inset-0 z-50 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-sm md:hidden p-4 overflow-y-auto animate-in slide-in-from-bottom-10 fade-in duration-300">
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
-              Details
-            </p>
-            <Button
-              variant="ghost"
-              onClick={handleClose}
-              className="rounded-sm text-neutral-500 hover:text-neutral-900"
-            >
-              Close
-            </Button>
-          </div>
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm overflow-hidden min-h-[50vh]">
-            {viewMode === "github" ? (
+      {/* Create Project Modal */}
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-none shadow-2xl">
+          <ProjectForm
+            onCancel={handleCreateClosed}
+            onSuccess={handleCreateClosed}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* GitHub Import Modal */}
+      <Dialog open={showGithubModal} onOpenChange={setShowGithubModal}>
+        <DialogContent className="max-w-4xl h-[80vh] p-0 overflow-hidden border-none shadow-2xl">
+          <div className="h-full overflow-y-auto bg-white dark:bg-neutral-950">
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="p-2 rounded-lg bg-black text-white dark:bg-white dark:text-black">
+                  <IconBrandGithub className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Import from GitHub</h3>
+                  <p className="text-sm text-neutral-500">
+                    Select repositories to import as projects
+                  </p>
+                </div>
+              </div>
               <GitHubImportPanel onImported={handleImported} />
-            ) : viewMode === "create" ? (
-              <ProjectForm onCancel={handleClose} onSuccess={handleClose} />
-            ) : selectedProject ? (
-              <ProjectDetailPanel
-                project={selectedProject}
-                evidence={projectEvidence}
-                allSkills={data.skills}
-                onClose={handleClose}
-              />
-            ) : null}
+            </div>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
