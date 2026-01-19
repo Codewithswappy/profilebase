@@ -1,45 +1,73 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { FullProfile, ActionResult } from "./profile";
-import { Evidence, EvidenceSkill, Skill } from "@prisma/client";
-import {
-  calculateAllSkillCredibility,
-  calculateProfileCredibility,
-  SkillCredibilityResult,
-  EvidenceForScoring,
-  CredibilityTier,
-} from "@/lib/credibility";
+import { ActionResult } from "./profile";
+import { Project, Experience, SocialLink } from "@prisma/client";
 import { getUserVerifications, VerificationData } from "./verification";
 
-// Extended evidence type with skills
-export type EvidenceWithSkills = Evidence & {
-  skills: (EvidenceSkill & { skill: Skill })[];
-};
+// Project data type (simplified without evidence)
+export type ProjectData = Project;
 
-// Profile credibility summary
-export type ProfileCredibility = {
+// Profile completeness score
+export type ProfileCompleteness = {
   overallScore: number;
-  tier: CredibilityTier;
-  provenSkillsCount: number;
-  totalSkillsCount: number;
-};
-
-// Skill with credibility score
-export type SkillWithCredibility = Skill & {
-  evidenceCount: number;
-  credibility: SkillCredibilityResult;
+  projectCount: number;
 };
 
 // Extended public profile type
-export type PublicProfileData = Omit<FullProfile, "evidence" | "skills"> & {
-  email?: string | null;
+export type PublicProfileData = {
+  profile: {
+    id: string;
+    slug: string;
+    headline: string | null;
+    summary: string | null;
+    image: string | null;
+    coverImage: string | null;
+  };
+  profileSettings: {
+    isPublic: boolean;
+    showEmail: boolean;
+  };
+  projects: ProjectData[];
+  experiences: Experience[];
+  socialLinks: SocialLink[];
   userName?: string | null;
-  evidence: EvidenceWithSkills[];
-  skills: SkillWithCredibility[];
-  profileCredibility: ProfileCredibility;
+  email?: string | null;
+  profileCompleteness: ProfileCompleteness;
   verifications: VerificationData[];
 };
+
+// ============================================
+// CALCULATE PROFILE COMPLETENESS
+// ============================================
+
+function calculateProfileCompleteness(
+  projects: Project[]
+): ProfileCompleteness {
+  let score = 0;
+  
+  // Base score for having projects
+  score += Math.min(projects.length * 15, 45); // Max 45 points for 3+ projects
+  
+  // Points for project completeness
+  projects.forEach((project) => {
+    if (project.repoUrl) score += 5;
+    if (project.demoUrl) score += 5;
+    if (project.thumbnail) score += 3;
+    if (project.techStack && project.techStack.length > 0) score += 5;
+    if (project.highlights && project.highlights.length > 0) score += 5;
+    if (project.role) score += 2;
+    if (project.description) score += 5;
+  });
+  
+  // Cap at 100
+  score = Math.min(score, 100);
+  
+  return {
+    overallScore: score,
+    projectCount: projects.length,
+  };
+}
 
 // ============================================
 // GET PUBLIC PROFILE
@@ -51,17 +79,20 @@ export async function getPublicProfile(slug: string): Promise<ActionResult<Publi
     const profile = await db.profile.findUnique({
       where: { slug },
       include: {
-        skills: {
+        projects: {
+          where: { isPublic: true },
           orderBy: { displayOrder: "asc" },
         },
-        projects: {
+        experiences: {
+          orderBy: { startDate: "desc" },
+        },
+        socialLinks: {
           orderBy: { displayOrder: "asc" },
         },
       },
     });
 
     if (!profile) {
-      // 404 behavior for non-existent profiles
       return { success: true, data: null };
     }
 
@@ -71,109 +102,44 @@ export async function getPublicProfile(slug: string): Promise<ActionResult<Publi
     });
 
     if (!profileSettings || !profileSettings.isPublic) {
-      // 404 behavior for private profiles (security requirement)
       return { success: true, data: null };
     }
 
-    // 3. Get all evidence with skills
-    const evidence = await db.evidence.findMany({
-      where: {
-        project: { profileId: profile.id },
-      },
-      include: {
-        skills: {
-          include: {
-            skill: true,
-          },
-        },
-      },
-      orderBy: { displayOrder: "asc" },
-    });
+    // 3. Calculate profile completeness
+    const profileCompleteness = calculateProfileCompleteness(profile.projects);
 
-    // 4. Compute counts & filter visible data
-    
-    // Get all skill IDs that have evidence
-    const skillIdsWithEvidence = new Set<string>();
-    evidence.forEach(e => {
-      e.skills.forEach(es => {
-        skillIdsWithEvidence.add(es.skillId);
-      });
-    });
-    
-    // Filter skills based on settings
-    let visibleSkills = profile.skills;
-    
-    if (!profileSettings.showUnprovenSkills) {
-      // Filter out skills that have no evidence
-      visibleSkills = visibleSkills.filter(skill => 
-        skillIdsWithEvidence.has(skill.id)
-      );
-    }
-    
-    // 5. Calculate credibility scores
-    
-    // Transform evidence for scoring
-    const evidenceForScoring: EvidenceForScoring[] = evidence.map(e => ({
-      id: e.id,
-      type: e.type,
-      url: e.url,
-      content: e.content,
-      createdAt: e.createdAt,
-      skillIds: e.skills.map(es => es.skillId),
-    }));
-    
-    // Calculate credibility for all skills
-    const credibilityResults = calculateAllSkillCredibility(
-      visibleSkills.map(s => ({ id: s.id, name: s.name })),
-      evidenceForScoring
-    );
-    
-    // Create a map for quick lookup
-    const credibilityMap = new Map(
-      credibilityResults.map(r => [r.skillId, r])
-    );
-    
-    // Build skills with credibility
-    const skillsWithCredibility: SkillWithCredibility[] = visibleSkills.map((skill) => {
-      const credibility = credibilityMap.get(skill.id)!;
-      return {
-        ...skill,
-        evidenceCount: credibility.evidenceCount,
-        credibility,
-      };
-    });
-    
-    // Calculate overall profile credibility
-    const profileCredibility = calculateProfileCredibility(credibilityResults);
-
-    const projectsWithCounts = profile.projects.map((project) => ({
-      ...project,
-      evidenceCount: evidence.filter((e) => e.projectId === project.id).length,
-    }));
-
-    // Fetch user info (name, email based on settings)
+    // 4. Fetch user info
     const user = await db.user.findUnique({
       where: { id: profile.userId },
-      select: { email: true, name: true }
+      select: { email: true, name: true },
     });
 
-    // Fetch verification status
+    // 5. Fetch verification status
     const verificationsResult = await getUserVerifications(profile.userId);
     const verifications = verificationsResult.success ? verificationsResult.data : [];
 
     const result: PublicProfileData = {
-      profile,
-      profileSettings,
-      skills: skillsWithCredibility,
-      projects: projectsWithCounts,
-      evidence,
+      profile: {
+        id: profile.id,
+        slug: profile.slug,
+        headline: profile.headline,
+        summary: profile.summary,
+        image: profile.image,
+        coverImage: profile.coverImage,
+      },
+      profileSettings: {
+        isPublic: profileSettings.isPublic,
+        showEmail: profileSettings.showEmail,
+      },
+      projects: profile.projects,
+      experiences: profile.experiences,
+      socialLinks: profile.socialLinks,
       userName: user?.name,
       email: profileSettings.showEmail ? user?.email : undefined,
-      profileCredibility,
+      profileCompleteness,
       verifications,
     };
 
-    // 5. Return assembled public profile
     return {
       success: true,
       data: result,

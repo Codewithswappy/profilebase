@@ -6,12 +6,8 @@ import { Folder, ExternalLink, Calendar } from "lucide-react";
 import { Project } from "@prisma/client";
 import { IconFolderCode, IconBrandGithub } from "@tabler/icons-react";
 
-interface ProjectWithCount extends Project {
-  evidenceCount: number;
-}
-
 interface ProjectsListProps {
-  projects: ProjectWithCount[];
+  projects: Project[];
   selectedId: string | null;
   onSelect: (id: string) => void;
 }
@@ -31,7 +27,7 @@ export function ProjectsList({
           No projects found
         </p>
         <p className="text-xs text-neutral-400 mt-1 max-w-[150px]">
-          Create a project to start adding evidence.
+          Create a project to get started.
         </p>
       </div>
     );
@@ -86,7 +82,7 @@ export function ProjectsList({
                 >
                   {project.title}
                 </span>
-                {project.evidenceCount > 0 && (
+                {project.techStack && project.techStack.length > 0 && (
                   <span
                     className={cn(
                       "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
@@ -95,7 +91,7 @@ export function ProjectsList({
                         : "bg-neutral-50 dark:bg-neutral-900 text-neutral-400 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-800",
                     )}
                   >
-                    {project.evidenceCount}
+                    {project.techStack.length}
                   </span>
                 )}
               </div>

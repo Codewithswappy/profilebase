@@ -126,14 +126,8 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
     );
   }
 
-  const {
-    summary,
-    history,
-    topSkills,
-    topProjects,
-    deviceBreakdown,
-    referrerBreakdown,
-  } = data;
+  const { summary, history, topProjects, deviceBreakdown, referrerBreakdown } =
+    data;
 
   return (
     <div className="space-y-8">
@@ -401,8 +395,8 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
         {/* Divider between rows */}
         <div className="border-t border-neutral-200 dark:border-neutral-800" />
 
-        {/* Row 2: Sources + Skills + Projects */}
-        <div className="grid lg:grid-cols-3 divide-x divide-neutral-200 dark:divide-neutral-800">
+        {/* Row 2: Sources + Projects */}
+        <div className="grid lg:grid-cols-2 divide-x divide-neutral-200 dark:divide-neutral-800">
           {/* Traffic Sources */}
           <div className="p-5">
             <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider mb-4">
@@ -463,47 +457,6 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
             )}
           </div>
 
-          {/* Top Skills */}
-          <div className="p-5">
-            <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider mb-4">
-              Top Skills
-            </p>
-            {topSkills.length > 0 ? (
-              <div className="space-y-3">
-                {topSkills.map((s: TopItem, i: number) => {
-                  const max = topSkills[0]?.count || 1;
-                  const pct = Math.round((s.count / max) * 100);
-                  return (
-                    <div key={i}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 truncate max-w-[120px]">
-                          {s.id}
-                        </span>
-                        <span className="text-xs font-medium text-neutral-400">
-                          {s.count}
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${pct}%`,
-                            backgroundColor:
-                              REFERRER_COLORS[i % REFERRER_COLORS.length],
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="h-[200px] flex items-center justify-center text-sm text-neutral-400">
-                No skill data
-              </div>
-            )}
-          </div>
-
           {/* Top Projects */}
           <div className="p-5">
             <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider mb-4">
@@ -517,7 +470,7 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
                   return (
                     <div key={i}>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 truncate max-w-[120px]">
+                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 truncate max-w-[200px]">
                           {p.id}
                         </span>
                         <span className="text-xs font-medium text-neutral-400">
@@ -530,7 +483,7 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
                           style={{
                             width: `${pct}%`,
                             backgroundColor:
-                              REFERRER_COLORS[(i + 2) % REFERRER_COLORS.length],
+                              REFERRER_COLORS[i % REFERRER_COLORS.length],
                           }}
                         />
                       </div>

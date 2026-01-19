@@ -1,9 +1,9 @@
 // ============================================
 // SKILLPROOF PRISMA SCHEMA
-// Phase 3: Database Schema & Relational Integrity
+// Portfolio Generator Architecture
 // ============================================
-// This schema implements exactly 6 entities from Phase 2.
-// No additional entities are permitted.
+// Clean portfolio creation with projects,
+// experience, and social links.
 // ============================================
 
 generator client {
@@ -13,28 +13,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-}
-
-// ============================================
-// ENUMS
-// ============================================
-
-enum EvidenceType {
-  SCREENSHOT
-  LINK
-  CODE_SNIPPET
-  DESCRIPTION
-  METRIC
-}
-
-enum SkillCategory {
-  LANGUAGE
-  FRAMEWORK
-  TOOL
-  DATABASE
-  CONCEPT
-  SOFT_SKILL
-  OTHER
 }
 
 // ============================================
@@ -117,7 +95,8 @@ model Profile {
   slug      String   @unique
   headline  String?
   summary   String?  @db.Text
-  image     String?  // Profile picture URL (UploadThing)
+  image     String?  // Profile picture URL
+  coverImage String? // Profile cover/banner image URL
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -125,8 +104,9 @@ model Profile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // 1:many relationships
-  skills   Skill[]
-  projects Project[]
+  projects       Project[]
+  experiences    Experience[]
+  socialLinks    SocialLink[]
   dailyAnalytics DailyAnalytics[]
 
   @@index([slug])
@@ -134,20 +114,68 @@ model Profile {
 }
 
 // ============================================
+// EXPERIENCE
+// ============================================
+// Work history and professional experience.
+// ============================================
+
+model Experience {
+  id           String    @id @default(cuid())
+  profileId    String
+  position     String
+  company      String
+  logo         String?   // Company logo URL
+  location     String?
+  startDate    DateTime
+  endDate      DateTime?
+  current      Boolean   @default(false)
+  employmentType String? // e.g., "Full-time", "Contract"
+  skills       String[]  // e.g., ["React", "TypeScript"]
+  description  String?   @db.Text
+  displayOrder Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+// ============================================
+// SOCIAL LINKS
+// ============================================
+// External social media and custom links.
+// ============================================
+
+model SocialLink {
+  id           String   @id @default(cuid())
+  profileId    String
+  platform     String   // e.g. "github", "twitter", "linkedin", "instagram", "custom"
+  url          String
+  title        String?  // Required for custom links
+  icon         String?  // For custom icons later if needed
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+// ============================================
 // PROFILE SETTINGS
 // ============================================
 // Privacy and visibility controls.
-// Separated from Profile to keep content clean.
 // ============================================
 
 model ProfileSettings {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  isPublic           Boolean  @default(false)
-  showEmail          Boolean  @default(false)
-  showUnprovenSkills Boolean  @default(false)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  isPublic  Boolean  @default(false)
+  showEmail Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // 1:1 relationship to User
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -156,109 +184,50 @@ model ProfileSettings {
 }
 
 // ============================================
-// SKILL
-// ============================================
-// A claimed ability the User wishes to demonstrate.
-// Has no value until Evidence is attached.
-// ============================================
-
-model Skill {
-  id           String        @id @default(cuid())
-  profileId    String
-  name         String
-  category     SkillCategory @default(OTHER)
-  displayOrder Int           @default(0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-
-  // Many:1 relationship to Profile
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
-  // Many:Many relationship to Evidence via junction table
-  evidenceLinks EvidenceSkill[]
-
-  @@unique([profileId, name])
-  @@index([profileId])
-  @@index([category])
-}
-
-// ============================================
 // PROJECT
 // ============================================
 // A body of work created by the User.
-// Container for Evidence.
+// Showcases skills and achievements.
 // ============================================
 
 model Project {
-  id           String    @id @default(cuid())
-  profileId    String
-  title        String
-  description  String?   @db.Text
-  url          String?
-  startDate    DateTime?
-  endDate      DateTime?
-  displayOrder Int       @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  profileId   String
+  title       String
+  description String?   @db.Text
+  
+  // Links
+  url         String?   // Main project URL
+  repoUrl     String?   // GitHub/GitLab repository URL
+  demoUrl     String?   // Live demo URL
+  
+  // Media
+  thumbnail   String?   // Preview image URL
+  
+  // Tech & Context
+  techStack   String[]  // Array of technologies (e.g. ["React", "Node.js"])
+  role        String?   // User's role (e.g. "Lead Developer", "Designer")
+  highlights  String[]  // Key achievements as bullet points
+  
+  // Timeline
+  startDate   DateTime?
+  endDate     DateTime?
+  
+  // Status & Display
+  status       String?   @default("complete") // "planning" | "in_progress" | "complete" | "archived"
+  isFeatured   Boolean  @default(false) // Pin to top of profile
+  isPublic     Boolean  @default(true)  // Show on public profile
+  displayOrder Int      @default(0)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   // Many:1 relationship to Profile
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
-  // 1:many relationship to Evidence
-  evidence Evidence[]
-
   @@index([profileId])
 }
 
-// ============================================
-// EVIDENCE
-// ============================================
-// The atomic unit of proof.
-// Proves that Skills were applied within a Project.
-// Supports multiple skills per evidence.
-// ============================================
-
-model Evidence {
-  id           String       @id @default(cuid())
-  projectId    String
-  title        String
-  description  String?      @db.Text
-  type         EvidenceType @default(DESCRIPTION)
-  content      String?      @db.Text
-  url          String?
-  displayOrder Int          @default(0)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-
-  // Verification fields for proof authenticity
-  verifiedAt       DateTime?    // When the URL/content was verified
-  verificationHash String?      // Hash of content at time of creation for integrity
-  platform         String?      // Detected platform (github, npm, vercel, etc.)
-  platformBonus    Int          @default(0) // Trust bonus from platform detection
-
-  // Many:1 relationship to Project
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  // Many:Many relationship to Skills via junction table
-  skills EvidenceSkill[]
-
-  @@index([projectId])
-}
-
-// Junction table for Evidence-Skill many-to-many relationship
-model EvidenceSkill {
-  id         String   @id @default(cuid())
-  evidenceId String
-  skillId    String
-  createdAt  DateTime @default(now())
-
-  evidence Evidence @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
-  skill    Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
-
-  @@unique([evidenceId, skillId])
-  @@index([evidenceId])
-  @@index([skillId])
-}
 
 
 // ============================================
@@ -268,17 +237,16 @@ model EvidenceSkill {
 // ============================================
 
 model DailyAnalytics {
-  id                 String   @id @default(cuid())
-  profileId          String
-  date               DateTime @db.Date // Store only the date part
-  views              Int      @default(0)
-  uniqueVisitors     String[] // Array of hashed visitor IDs for dedup calculation
-  totalDuration      Int      @default(0) // Total seconds spent by all visitors
-  geoStats           Json?    @default("{}") // e.g. { "US": 50, "IN": 20 }
-  deviceStats        Json?    @default("{}") // e.g. { "desktop": 80, "mobile": 20 }
-  referrerStats      Json?    @default("{}") // e.g. { "linkedin.com": 10, "direct": 50 }
-  skillInteractions  Json?    @default("{}") // e.g. { "skill_id": count }
-  projectInteractions Json?   @default("{}") // e.g. { "project_id": count }
+  id                  String   @id @default(cuid())
+  profileId           String
+  date                DateTime @db.Date
+  views               Int      @default(0)
+  uniqueVisitors      String[]
+  totalDuration       Int      @default(0)
+  geoStats            Json?    @default("{}")
+  deviceStats         Json?    @default("{}")
+  referrerStats       Json?    @default("{}")
+  projectInteractions Json?    @default("{}")
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 

@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { revalidatePath } from "next/cache";
 import {
   CreateProfileSchema,
   UpdateProfileSchema,
@@ -32,14 +33,17 @@ export async function getMyProfile(): Promise<ActionResult<FullProfile | null>> 
 
     const userId = session.user.id;
 
-    // Get profile with all related data
+    // Get profile with projects
     const profile = await db.profile.findUnique({
       where: { userId },
       include: {
-        skills: {
+        projects: {
           orderBy: { displayOrder: "asc" },
         },
-        projects: {
+        experiences: {
+          orderBy: { startDate: "desc" },
+        },
+        socialLinks: {
           orderBy: { displayOrder: "asc" },
         },
       },
@@ -58,42 +62,14 @@ export async function getMyProfile(): Promise<ActionResult<FullProfile | null>> 
       return { success: false, error: "Profile settings not found" };
     }
 
-    // Get all evidence with skills
-    const evidence = await db.evidence.findMany({
-      where: {
-        project: { profileId: profile.id },
-      },
-      include: {
-        skills: {
-          include: {
-            skill: true,
-          },
-        },
-      },
-      orderBy: { displayOrder: "asc" },
-    });
-
-    // Compute evidence counts based on junction table
-    const skillsWithCounts = profile.skills.map((skill) => ({
-      ...skill,
-      evidenceCount: evidence.filter(e => 
-        e.skills.some(es => es.skillId === skill.id)
-      ).length,
-    }));
-
-    const projectsWithCounts = profile.projects.map((project) => ({
-      ...project,
-      evidenceCount: evidence.filter((e) => e.projectId === project.id).length,
-    }));
-
     return {
       success: true,
       data: {
         profile,
         profileSettings,
-        skills: skillsWithCounts,
-        projects: projectsWithCounts,
-        evidence,
+        projects: profile.projects,
+        experiences: profile.experiences,
+        socialLinks: profile.socialLinks,
       },
     };
   } catch (error) {
@@ -161,7 +137,6 @@ export async function createProfile(
           userId,
           isPublic: false,
           showEmail: false,
-          showUnprovenSkills: false,
         },
       });
 
@@ -169,9 +144,10 @@ export async function createProfile(
     });
 
     return { success: true, data: result };
-  } catch (error) {
+  } catch (error: any) {
     console.error("createProfile error:", error);
-    return { success: false, error: "Failed to create profile" };
+    const errorMessage = error?.message || "Failed to create profile";
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -198,7 +174,7 @@ export async function updateProfile(
       return { success: false, error: (validated.error as any).errors[0].message };
     }
 
-    const { slug, headline, summary, image } = validated.data;
+    const { slug, headline, summary, image, coverImage } = validated.data;
 
     // Get existing profile
     const existingProfile = await db.profile.findUnique({
@@ -228,8 +204,12 @@ export async function updateProfile(
         ...(headline !== undefined && { headline }),
         ...(summary !== undefined && { summary }),
         ...(image !== undefined && { image: image || null }),
+        ...(coverImage !== undefined && { coverImage: coverImage || null }),
       },
     });
+
+    revalidatePath(`/${profile.slug}`);
+    revalidatePath("/dashboard/profile");
 
     return { success: true, data: profile };
   } catch (error) {
@@ -289,14 +269,13 @@ export async function updateProfileSettings(
       return { success: false, error: (validated.error as any).errors[0].message };
     }
 
-    const { isPublic, showEmail, showUnprovenSkills } = validated.data;
+    const { isPublic, showEmail } = validated.data;
 
     const settings = await db.profileSettings.update({
       where: { userId },
       data: {
         ...(isPublic !== undefined && { isPublic }),
         ...(showEmail !== undefined && { showEmail }),
-        ...(showUnprovenSkills !== undefined && { showUnprovenSkills }),
       },
     });
 
@@ -322,7 +301,7 @@ export async function deleteProfile(): Promise<ActionResult> {
     const userId = session.user.id;
 
     // Delete profile and settings in a transaction
-    // Profile cascade will delete skills, projects, evidence
+    // Profile cascade will delete projects
     await db.$transaction(async (tx) => {
       await tx.profile.delete({
         where: { userId },

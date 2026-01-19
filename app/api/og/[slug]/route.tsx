@@ -15,29 +15,13 @@ export async function GET(
     return new Response("Not Found", { status: 404 });
   }
 
-  const { profile, skills, profileSettings } = result.data;
+  const { profile, projects, profileCompleteness } = result.data;
 
-  // Logic: If showUnprovenSkills is false, ONLY show proven skills.
-  // If true, show top 3 skills regardless (but visually proven ones are nicer,
-  // though for OG image simpler is better).
-  // Actually, Phase 6 correction said:
-  // "If showUnprovenSkills = true → Show top 3 skills (proven first, then unproven)" - Wait, user said "show unproven if no proven"?
-  // User said: "Top 3 Skills → First 3 proven skills; show unproven if no proven" was WRONG.
-  // Correct rule:
-  // If showUnprovenSkills = false: OG image shows only proven skills. If zero proven, show no skills.
+  // Get top 3 projects to display
+  const displayProjects = projects.slice(0, 3);
 
-  const provenSkills = skills.filter((s) => s.evidenceCount > 0);
-  let displaySkills: typeof skills = [];
-
-  if (profileSettings.showUnprovenSkills) {
-    // Phase 6 correction: "Top 3 skills (any)"
-    // But implicitly, proven ones are more valuable to show.
-    // For simplicity and matching "Public Profile" view which likely shows mostly proven:
-    // I'll take top 3 from the list. The list is sorted by displayOrder.
-    displaySkills = skills.slice(0, 3);
-  } else {
-    displaySkills = provenSkills.slice(0, 3);
-  }
+  // Get all tech from projects
+  const allTech = [...new Set(projects.flatMap((p) => p.techStack || []))];
 
   return new ImageResponse(
     (
@@ -49,7 +33,7 @@ export async function GET(
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#0f172a", // Slate 950
+          backgroundColor: "#0f172a",
           color: "white",
           fontFamily: "sans-serif",
           padding: "40px",
@@ -89,42 +73,45 @@ export async function GET(
             </div>
           ) : (
             <div style={{ fontSize: 30, color: "#94a3b8", marginBottom: 40 }}>
-              SkillDock Profile
+              Developer Portfolio
             </div>
           )}
 
-          {displaySkills.length > 0 && (
+          {displayProjects.length > 0 && (
             <div style={{ display: "flex", gap: "20px" }}>
-              {displaySkills.map((skill) => (
+              {displayProjects.map((project) => (
                 <div
-                  key={skill.id}
+                  key={project.id}
                   style={{
                     padding: "10px 24px",
                     backgroundColor: "#1e293b",
-                    borderRadius: "50px",
-                    fontSize: 24,
+                    borderRadius: "12px",
+                    fontSize: 22,
                     border: "1px solid #334155",
                     display: "flex",
                     alignItems: "center",
                   }}
                 >
-                  {/* Simple circle for bullet */}
-                  {skill.evidenceCount > 0 && (
-                    <div
-                      style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: "50%",
-                        backgroundColor: "#4ade80",
-                        marginRight: 10,
-                      }}
-                    />
-                  )}
-                  {skill.name}
+                  {project.title}
                 </div>
               ))}
             </div>
           )}
+
+          {/* Stats */}
+          <div
+            style={{
+              display: "flex",
+              gap: 30,
+              marginTop: 40,
+              fontSize: 18,
+              color: "#64748b",
+            }}
+          >
+            <span>{profileCompleteness.projectCount} Projects</span>
+            <span>•</span>
+            <span>{allTech.length} Technologies</span>
+          </div>
         </div>
 
         <div
@@ -138,7 +125,7 @@ export async function GET(
           }}
         >
           <div style={{ fontSize: 20, color: "#cbd5e1" }}>
-            Managed via SkillDock
+            SkillProof Portfolio
           </div>
         </div>
       </div>

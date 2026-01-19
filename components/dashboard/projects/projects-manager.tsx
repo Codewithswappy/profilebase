@@ -23,17 +23,12 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null,
   );
+  const [editingProject, setEditingProject] = useState<any>(null); // Use existing project type
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showGithubModal, setShowGithubModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const selectedProject = data.projects.find((p) => p.id === selectedProjectId);
-
-  // Filter evidence for the selected project
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const projectEvidence = selectedProject
-    ? (data.evidence as any[]).filter((e) => e.projectId === selectedProject.id)
-    : [];
 
   const handleSelect = (id: string) => {
     setSelectedProjectId(id);
@@ -41,6 +36,12 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
 
   const handleCreateClosed = () => {
     setShowCreateModal(false);
+    setEditingProject(null);
+  };
+
+  const handleEdit = (project: any) => {
+    setEditingProject(project);
+    setShowCreateModal(true);
   };
 
   const handleImported = () => {
@@ -87,7 +88,7 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
               onClick={() => setShowGithubModal(true)}
               className="h-9 text-xs font-medium border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900"
             >
-              <IconBrandGithub className="w-3.5 h-3.5 mr-2" />
+              <IconBrandGithub className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Import GitHub</span>
               <span className="md:hidden">Import</span>
             </Button>
@@ -139,9 +140,8 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
           {selectedProject ? (
             <ProjectDetailPanel
               project={selectedProject}
-              evidence={projectEvidence}
-              allSkills={data.skills}
               onClose={() => setSelectedProjectId(null)}
+              onEdit={() => handleEdit(selectedProject)}
             />
           ) : (
             <div className="h-full w-full flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500">
@@ -152,8 +152,8 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
                 Select a project to manage
               </h3>
               <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm leading-relaxed mb-8">
-                View detailed evidence, manage skills, or create new proof for
-                your portfolio projects.
+                View project details, manage tech stack, or create new projects
+                for your portfolio.
               </p>
             </div>
           )}
@@ -162,8 +162,9 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
 
       {/* Create Project Modal */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="w-[95vw] sm:max-w-[500px] p-0 overflow-hidden border-none shadow-2xl rounded-xl">
+        <DialogContent className="w-[95vw] sm:max-w-[500px] max-h-[90vh] p-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] border-none shadow-2xl rounded-xl">
           <ProjectForm
+            initialData={editingProject}
             onCancel={handleCreateClosed}
             onSuccess={handleCreateClosed}
           />
@@ -172,27 +173,14 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
 
       {/* GitHub Import Modal */}
       <Dialog open={showGithubModal} onOpenChange={setShowGithubModal}>
-        <DialogContent className="w-[95vw] max-w-4xl h-[85vh] p-0 overflow-hidden border-none shadow-2xl rounded-xl">
-          <div className="h-full overflow-y-auto bg-white dark:bg-neutral-950">
-            <div className="p-4 md:p-6 sticky top-0 bg-white dark:bg-neutral-950 z-10 border-b border-neutral-100 dark:border-neutral-800">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-black text-white dark:bg-white dark:text-black">
-                  <IconBrandGithub className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold leading-none">
-                    GitHub Import
-                  </h3>
-                  <p className="text-xs text-neutral-500 mt-1">
-                    Select repositories to import
-                  </p>
-                </div>
-              </div>
+        <DialogContent className="w-full max-w-[500px] p-6 border-none shadow-2xl rounded-xl bg-white dark:bg-neutral-950">
+          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-neutral-100 dark:border-neutral-800">
+            <div className="p-1 rounded-md bg-black text-white dark:bg-white dark:text-black">
+              <IconBrandGithub className="w-3.5 h-3.5" />
             </div>
-            <div className="p-4 md:p-6">
-              <GitHubImportPanel onImported={handleImported} />
-            </div>
+            <h3 className="text-sm font-semibold">GitHub Import</h3>
           </div>
+          <GitHubImportPanel onImported={handleImported} />
         </DialogContent>
       </Dialog>
     </div>

@@ -3,7 +3,10 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useKeyboardShortcut, useEscapeKey } from "@/lib/hooks/use-keyboard-shortcut";
+import {
+  useKeyboardShortcut,
+  useEscapeKey,
+} from "@/lib/hooks/use-keyboard-shortcut";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   IconCommand,
@@ -37,7 +40,6 @@ interface CommandItem {
 
 interface CommandPaletteProps {
   onAddProof?: (type?: string) => void;
-  onAddSkill?: () => void;
   onAddProject?: () => void;
   onImportGithub?: () => void;
   className?: string;
@@ -49,7 +51,6 @@ interface CommandPaletteProps {
 
 export function CommandPalette({
   onAddProof,
-  onAddSkill,
   onAddProject,
   onImportGithub,
   className,
@@ -80,133 +81,124 @@ export function CommandPalette({
   }, [isOpen]);
 
   // Command items
-  const commands = useMemo<CommandItem[]>(() => [
-    // Proof commands
-    {
-      id: "add-proof",
-      label: "Add Proof",
-      description: "Add verifiable proof to your skills",
-      icon: <IconPlus className="w-4 h-4" />,
-      shortcut: "P",
-      action: () => {
-        setIsOpen(false);
-        onAddProof?.();
+  const commands = useMemo<CommandItem[]>(
+    () => [
+      // Proof commands
+      {
+        id: "add-proof",
+        label: "Add Proof",
+        description: "Add verifiable proof to your skills",
+        icon: <IconPlus className="w-4 h-4" />,
+        shortcut: "P",
+        action: () => {
+          setIsOpen(false);
+          onAddProof?.();
+        },
+        category: "proof",
       },
-      category: "proof",
-    },
-    {
-      id: "add-link",
-      label: "Add Link Proof",
-      description: "Paste a URL as proof",
-      icon: <IconLink className="w-4 h-4" />,
-      action: () => {
-        setIsOpen(false);
-        onAddProof?.("LINK");
+      {
+        id: "add-link",
+        label: "Add Link Proof",
+        description: "Paste a URL as proof",
+        icon: <IconLink className="w-4 h-4" />,
+        action: () => {
+          setIsOpen(false);
+          onAddProof?.("LINK");
+        },
+        category: "proof",
       },
-      category: "proof",
-    },
-    {
-      id: "add-code",
-      label: "Add Code Snippet",
-      description: "Paste code as proof",
-      icon: <IconCode className="w-4 h-4" />,
-      action: () => {
-        setIsOpen(false);
-        onAddProof?.("CODE_SNIPPET");
+      {
+        id: "add-code",
+        label: "Add Code Snippet",
+        description: "Paste code as proof",
+        icon: <IconCode className="w-4 h-4" />,
+        action: () => {
+          setIsOpen(false);
+          onAddProof?.("CODE_SNIPPET");
+        },
+        category: "proof",
       },
-      category: "proof",
-    },
-    {
-      id: "add-screenshot",
-      label: "Add Screenshot",
-      description: "Upload a screenshot as proof",
-      icon: <IconPhoto className="w-4 h-4" />,
-      action: () => {
-        setIsOpen(false);
-        onAddProof?.("SCREENSHOT");
+      {
+        id: "add-screenshot",
+        label: "Add Screenshot",
+        description: "Upload a screenshot as proof",
+        icon: <IconPhoto className="w-4 h-4" />,
+        action: () => {
+          setIsOpen(false);
+          onAddProof?.("SCREENSHOT");
+        },
+        category: "proof",
       },
-      category: "proof",
-    },
-    {
-      id: "add-metric",
-      label: "Add Metric",
-      description: "Add measurable achievement",
-      icon: <IconChartBar className="w-4 h-4" />,
-      action: () => {
-        setIsOpen(false);
-        onAddProof?.("METRIC");
+      {
+        id: "add-metric",
+        label: "Add Metric",
+        description: "Add measurable achievement",
+        icon: <IconChartBar className="w-4 h-4" />,
+        action: () => {
+          setIsOpen(false);
+          onAddProof?.("METRIC");
+        },
+        category: "proof",
       },
-      category: "proof",
-    },
-    // Create commands
-    {
-      id: "add-skill",
-      label: "Add Skill",
-      description: "Add a new skill to your profile",
-      icon: <IconBolt className="w-4 h-4" />,
-      shortcut: "S",
-      action: () => {
-        setIsOpen(false);
-        onAddSkill?.();
+      // Create commands
+      {
+        id: "add-project",
+        label: "Add Project",
+        description: "Create a new project",
+        icon: <IconFolderPlus className="w-4 h-4" />,
+        action: () => {
+          setIsOpen(false);
+          onAddProject?.();
+        },
+        category: "create",
       },
-      category: "create",
-    },
-    {
-      id: "add-project",
-      label: "Add Project",
-      description: "Create a new project",
-      icon: <IconFolderPlus className="w-4 h-4" />,
-      action: () => {
-        setIsOpen(false);
-        onAddProject?.();
+      {
+        id: "import-github",
+        label: "Import from GitHub",
+        description: "Import repository as project",
+        icon: <IconBrandGithub className="w-4 h-4" />,
+        action: () => {
+          setIsOpen(false);
+          onImportGithub?.();
+        },
+        category: "create",
       },
-      category: "create",
-    },
-    {
-      id: "import-github",
-      label: "Import from GitHub",
-      description: "Import repository as project",
-      icon: <IconBrandGithub className="w-4 h-4" />,
-      action: () => {
-        setIsOpen(false);
-        onImportGithub?.();
+      // Navigate commands
+      {
+        id: "go-profile",
+        label: "Go to Profile",
+        description: "Edit your profile",
+        icon: <IconUser className="w-4 h-4" />,
+        action: () => {
+          setIsOpen(false);
+          router.push("/dashboard/profile");
+        },
+        category: "navigate",
       },
-      category: "create",
-    },
-    // Navigate commands
-    {
-      id: "go-profile",
-      label: "Go to Profile",
-      description: "Edit your profile",
-      icon: <IconUser className="w-4 h-4" />,
-      action: () => {
-        setIsOpen(false);
-        router.push("/dashboard/profile");
+      {
+        id: "go-analytics",
+        label: "Go to Analytics",
+        description: "View your analytics",
+        icon: <IconChartLine className="w-4 h-4" />,
+        action: () => {
+          setIsOpen(false);
+          router.push("/dashboard/analytics");
+        },
+        category: "navigate",
       },
-      category: "navigate",
-    },
-    {
-      id: "go-analytics",
-      label: "Go to Analytics",
-      description: "View your analytics",
-      icon: <IconChartLine className="w-4 h-4" />,
-      action: () => {
-        setIsOpen(false);
-        router.push("/dashboard/analytics");
-      },
-      category: "navigate",
-    },
-  ], [onAddProof, onAddSkill, onAddProject, onImportGithub, router]);
+    ],
+    [onAddProof, onAddProject, onImportGithub, router],
+  );
 
   // Filter commands based on search
   const filteredCommands = useMemo(() => {
     if (!search) return commands;
-    
+
     const query = search.toLowerCase();
     return commands.filter(
       (cmd) =>
         cmd.label.toLowerCase().includes(query) ||
-        cmd.description?.toLowerCase().includes(query)
+        cmd.description?.toLowerCase().includes(query),
     );
   }, [commands, search]);
 
@@ -218,11 +210,11 @@ export function CommandPalette({
       navigate: [],
       quick: [],
     };
-    
+
     filteredCommands.forEach((cmd) => {
       groups[cmd.category].push(cmd);
     });
-    
+
     return groups;
   }, [filteredCommands]);
 
@@ -233,13 +225,13 @@ export function CommandPalette({
         case "ArrowDown":
           e.preventDefault();
           setSelectedIndex((prev) =>
-            prev < filteredCommands.length - 1 ? prev + 1 : 0
+            prev < filteredCommands.length - 1 ? prev + 1 : 0,
           );
           break;
         case "ArrowUp":
           e.preventDefault();
           setSelectedIndex((prev) =>
-            prev > 0 ? prev - 1 : filteredCommands.length - 1
+            prev > 0 ? prev - 1 : filteredCommands.length - 1,
           );
           break;
         case "Enter":
@@ -250,7 +242,7 @@ export function CommandPalette({
           break;
       }
     },
-    [filteredCommands, selectedIndex]
+    [filteredCommands, selectedIndex],
   );
 
   // Reset selected index when filtered results change
@@ -276,7 +268,7 @@ export function CommandPalette({
         onClick={() => setIsOpen(true)}
         className={cn(
           "hidden sm:flex items-center gap-2 px-3 py-1.5 text-xs text-neutral-500 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors",
-          className
+          className,
         )}
       >
         <IconSearch className="w-3.5 h-3.5" />
@@ -316,7 +308,7 @@ export function CommandPalette({
               ) : (
                 Object.entries(groupedCommands).map(([category, items]) => {
                   if (items.length === 0) return null;
-                  
+
                   return (
                     <div key={category} className="mb-2">
                       <div className="px-2 py-1.5 text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">
@@ -326,7 +318,7 @@ export function CommandPalette({
                         {items.map((item) => {
                           globalIndex++;
                           const isSelected = globalIndex === selectedIndex;
-                          
+
                           return (
                             <button
                               key={item.id}
@@ -336,15 +328,17 @@ export function CommandPalette({
                                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors",
                                 isSelected
                                   ? "bg-neutral-100 dark:bg-neutral-800"
-                                  : "hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+                                  : "hover:bg-neutral-50 dark:hover:bg-neutral-800/50",
                               )}
                             >
-                              <div className={cn(
-                                "p-1.5 rounded-md",
-                                isSelected
-                                  ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
-                                  : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
-                              )}>
+                              <div
+                                className={cn(
+                                  "p-1.5 rounded-md",
+                                  isSelected
+                                    ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+                                    : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
+                                )}
+                              >
                                 {item.icon}
                               </div>
                               <div className="flex-1 min-w-0">
@@ -379,15 +373,21 @@ export function CommandPalette({
             <div className="flex items-center justify-between px-4 py-2 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900">
               <div className="flex items-center gap-3 text-[10px] text-neutral-400">
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-[9px]">↑↓</kbd>
+                  <kbd className="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-[9px]">
+                    ↑↓
+                  </kbd>
                   Navigate
                 </span>
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-[9px]">↵</kbd>
+                  <kbd className="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-[9px]">
+                    ↵
+                  </kbd>
                   Select
                 </span>
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-[9px]">esc</kbd>
+                  <kbd className="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-[9px]">
+                    esc
+                  </kbd>
                   Close
                 </span>
               </div>

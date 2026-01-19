@@ -40,7 +40,7 @@ export interface ReferrerBreakdownItem {
 }
 
 /**
- * Top items (skills/projects) for ranking lists
+ * Top items (projects) for ranking lists
  */
 export interface TopItem {
   id: string;
@@ -53,7 +53,6 @@ export interface TopItem {
 export interface AnalyticsData {
   summary: AnalyticsSummary;
   history: HistoryItem[];
-  topSkills: TopItem[];
   topProjects: TopItem[];
   deviceBreakdown: DeviceBreakdownItem[];
   referrerBreakdown: ReferrerBreakdownItem[];

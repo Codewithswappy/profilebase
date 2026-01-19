@@ -73,7 +73,6 @@ export function CreateProfileWizard() {
                   name="slug"
                   required
                   placeholder="your-username"
-                  pattern="[a-z0-9-]+"
                   className="font-mono"
                   onChange={(e) => setSlugInput(e.target.value)} // Added to simulate watchSlug
                 />

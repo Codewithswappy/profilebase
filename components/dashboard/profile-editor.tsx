@@ -7,6 +7,7 @@ import {
   updateProfileSettings,
   FullProfile,
 } from "@/lib/actions/profile";
+import { updateSocials } from "@/lib/actions/socials";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,28 +44,60 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
   );
 
   // We keep imageUrl state for form submission, updated by upload success
+  // We keep imageUrl state for form submission, updated by upload success
   const [imageUrl, setImageUrl] = useState<string>(profile.image || "");
+  const [coverImageUrl, setCoverImageUrl] = useState<string>(
+    profile.coverImage || "",
+  );
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
+    profile.coverImage || null,
+  );
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
     setError(null);
+    setUploadError(null);
     setSuccess(false);
 
     const slug = formData.get("slug") as string;
     const headline = formData.get("headline") as string;
     const summary = formData.get("summary") as string;
 
+    // Extract social links
+    const socialLinks = [
+      { platform: "github", url: formData.get("social_github") as string },
+      { platform: "linkedin", url: formData.get("social_linkedin") as string },
+      { platform: "twitter", url: formData.get("social_twitter") as string },
+      {
+        platform: "instagram",
+        url: formData.get("social_instagram") as string,
+      },
+      { platform: "website", url: formData.get("social_website") as string },
+    ].filter((link) => link.url && link.url.trim() !== "");
+
+    // Update profile
     const result = await updateProfile({
       slug,
       headline,
       summary,
-      image: imageUrl || undefined,
+      image: imageUrl,
+      coverImage: coverImageUrl,
     });
 
     if (result.success) {
-      setSuccess(true);
-      router.refresh();
-      setTimeout(() => setSuccess(false), 3000);
+      // Update socials if profile update succeeded
+      // We don't block on this, but maybe we should awaiting it to show error if it fails
+      try {
+        await updateSocials(socialLinks);
+        setSuccess(true);
+        router.refresh();
+        setTimeout(() => setSuccess(false), 3000);
+      } catch (err) {
+        console.error(err);
+        setError("Profile saved, but failed to save social links");
+      }
     } else {
       setError(result.error);
     }
@@ -89,6 +122,16 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
   function handleRemoveImage() {
     setImageUrl("");
     setImagePreview(null);
+  }
+
+  function handleCoverImageUrlChange(url: string) {
+    setCoverImageUrl(url);
+    setCoverImagePreview(url);
+  }
+
+  function handleRemoveCoverImage() {
+    setCoverImageUrl("");
+    setCoverImagePreview(null);
   }
 
   return (
@@ -139,89 +182,198 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
         </div>
 
         <form action={handleSubmit}>
-          {/* Avatar Row */}
-          <div className="flex flex-col md:flex-row gap-6 items-center p-5 border-b border-neutral-200 dark:border-neutral-800">
-            {/* Avatar */}
-            <div className="relative group">
+          {/* Cover & Avatar Section */}
+          <div className="relative border-b border-neutral-200 dark:border-neutral-800">
+            {/* Cover Image Area */}
+            {/* Cover Image Area */}
+            <div className="relative w-full h-32 md:h-48 bg-neutral-50 dark:bg-neutral-950/30 group overflow-hidden">
+              {/* Grid pattern for empty state */}
+              {!coverImagePreview && (
+                <div className="absolute inset-0 opacity-[0.03] pattern-grid-lg" />
+              )}
+
+              {coverImagePreview ? (
+                <img
+                  src={coverImagePreview}
+                  alt="Cover"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              ) : null}
+
+              {/* Cover Actions - Always visible when empty, visible on hover when filled */}
               <div
                 className={cn(
-                  "relative w-20 h-20 rounded-sm overflow-hidden bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center transition-all duration-500 border border-neutral-200 dark:border-neutral-700",
-                  isUploadingImage && "ring-2 ring-indigo-500/30 scale-105",
+                  "absolute inset-0 flex flex-col items-center justify-center gap-2 transition-all duration-200",
+                  coverImagePreview
+                    ? "opacity-0 group-hover:opacity-100 bg-black/10 backdrop-blur-[2px]"
+                    : "opacity-100",
                 )}
               >
-                {isUploadingImage && (
-                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-[2px] animate-in fade-in">
-                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+                <div className="flex gap-2">
+                  {/* Remove Button (Only if filled) */}
+                  {coverImagePreview && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoverImage}
+                      className="h-8 px-3 bg-white/90 dark:bg-neutral-900/90 text-red-500 hover:text-red-600 hover:bg-white dark:hover:bg-neutral-900 text-[10px] font-semibold rounded-sm shadow-sm transition-all flex items-center gap-1.5"
+                    >
+                      <X className="w-3.5 h-3.5" /> Remove
+                    </button>
+                  )}
+
+                  {/* Upload/Change Button */}
+                  <div className="relative">
+                    <UploadButton
+                      endpoint="imageUploader"
+                      appearance={{
+                        button: cn(
+                          "text-[10px] font-semibold h-8 px-4 rounded-sm shadow-sm transition-all flex items-center gap-1.5 !text-neutral-900 dark:!text-neutral-100",
+                          coverImagePreview
+                            ? "bg-white/95 dark:bg-neutral-900/95 hover:bg-white dark:hover:bg-neutral-900 border border-neutral-200 dark:border-neutral-700"
+                            : "bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-700/50",
+                        ),
+                        allowedContent: "hidden",
+                      }}
+                      content={{
+                        button({ ready }) {
+                          if (!ready) return "Loading...";
+                          return (
+                            <span className="flex items-center gap-1.5">
+                              <ImageIcon className="w-3.5 h-3.5" />
+                              {isUploadingCover
+                                ? "Uploading..."
+                                : coverImagePreview
+                                  ? "Change Cover"
+                                  : "Add Cover Image"}
+                            </span>
+                          );
+                        },
+                      }}
+                      onUploadBegin={() => {
+                        setIsUploadingCover(true);
+                        setUploadError(null);
+                      }}
+                      onClientUploadComplete={(res) => {
+                        setIsUploadingCover(false);
+                        if (res && res[0]) {
+                          handleCoverImageUrlChange(res[0].url);
+                        }
+                      }}
+                      onUploadError={(error: Error) => {
+                        setIsUploadingCover(false);
+                        let msg = error.message;
+                        if (msg.includes("File size"))
+                          msg = "Image too large (max 4MB)";
+                        else if (msg.includes("Invalid file type"))
+                          msg = "Unsupported file type";
+                        setUploadError(msg);
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Shared Upload Error (visible on hover or if no cover) */}
+                {uploadError && !isUploadingImage && (
+                  <div className="px-3 py-1 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-[10px] font-medium rounded-full shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                    {uploadError}
                   </div>
                 )}
-                {imagePreview ? (
-                  <Image
-                    src={imagePreview}
-                    alt="Profile preview"
-                    width={80}
-                    height={80}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="w-8 h-8 text-neutral-300" />
-                )}
               </div>
-              {imagePreview && !isUploadingImage && (
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-sm flex items-center justify-center hover:scale-110 transition-transform shadow-lg z-10"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              )}
             </div>
 
-            {/* Upload Button */}
-            <div className="flex-1 space-y-2 w-full max-w-sm">
-              <div className="relative w-max mx-auto md:mx-0">
-                <UploadButton
-                  endpoint="imageUploader"
-                  appearance={{
-                    button: cn(
-                      "bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-sm text-[10px] font-semibold tracking-wide h-8 px-4 w-auto shadow-none transition-all hover:opacity-90",
-                      isUploadingImage &&
-                        "opacity-80 cursor-wait pointer-events-none",
-                    ),
-                    allowedContent: "hidden",
-                  }}
-                  content={{
-                    button({ ready }) {
-                      if (ready) {
-                        return isUploadingImage ? (
-                          <span className="flex items-center gap-1.5">
-                            Processing...
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-1.5">
-                            <ImageIcon className="w-3.5 h-3.5" /> Change Photo
-                          </span>
-                        );
-                      }
-                      return "Loading...";
-                    },
-                  }}
-                  onUploadBegin={() => setIsUploadingImage(true)}
-                  onClientUploadComplete={(res) => {
-                    setIsUploadingImage(false);
-                    if (res && res[0]) {
-                      handleImageUrlChange(res[0].url);
-                    }
-                  }}
-                  onUploadError={(error: Error) => {
-                    setIsUploadingImage(false);
-                    alert(`ERROR! ${error.message}`);
-                  }}
-                />
+            {/* Avatar Row (Overlapping) */}
+            <div className="flex px-5 pb-5 -mt-10 relative z-10 pointer-events-none">
+              <div className="pointer-events-auto flex flex-col gap-2">
+                <div className="flex items-end gap-4">
+                  {/* Avatar */}
+                  <div className="relative group">
+                    <div
+                      className={cn(
+                        "relative w-20 h-20 rounded-sm overflow-hidden bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center transition-all duration-500 border-4 border-white dark:border-neutral-900 shadow-sm",
+                        isUploadingImage && "ring-2 ring-indigo-500/30",
+                      )}
+                    >
+                      {isUploadingImage && (
+                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-[2px] animate-in fade-in">
+                          <Loader2 className="w-6 h-6 text-white animate-spin" />
+                        </div>
+                      )}
+                      {imagePreview ? (
+                        <Image
+                          src={imagePreview}
+                          alt="Profile preview"
+                          width={80}
+                          height={80}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-8 h-8 text-neutral-300" />
+                      )}
+                    </div>
+                    {/* Avatar Upload Trigger */}
+                    <div className="absolute -bottom-2 -right-2 flex gap-1">
+                      {imagePreview && !isUploadingImage && (
+                        <button
+                          type="button"
+                          onClick={handleRemoveImage}
+                          className="w-6 h-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors shadow-sm border border-white dark:border-neutral-900"
+                          title="Remove avatar"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+
+                      <div className="w-6 h-6 overflow-hidden relative rounded-full bg-neutral-900 text-white hover:bg-neutral-800 transition-colors shadow-sm border border-white dark:border-neutral-900 flex items-center justify-center cursor-pointer">
+                        <UploadButton
+                          endpoint="imageUploader"
+                          appearance={{
+                            button:
+                              "w-full h-full bg-transparent opacity-0 absolute inset-0 z-10 cursor-pointer", // Invisible overlay
+                            allowedContent: "hidden",
+                            container: "w-full h-full absolute inset-0",
+                          }}
+                          onUploadBegin={() => {
+                            setIsUploadingImage(true);
+                            setUploadError(null);
+                          }}
+                          onClientUploadComplete={(res) => {
+                            setIsUploadingImage(false);
+                            if (res && res[0]) {
+                              handleImageUrlChange(res[0].url);
+                            }
+                          }}
+                          onUploadError={(error: Error) => {
+                            setIsUploadingImage(false);
+                            let msg = error.message;
+                            if (msg.includes("File size"))
+                              msg = "Image too large (max 4MB)";
+                            else if (msg.includes("Invalid file type"))
+                              msg = "Unsupported file type";
+                            setUploadError(msg);
+                          }}
+                        />
+                        <ImageIcon className="w-3 h-3" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Upload Error Message */}
+                {uploadError && (
+                  <div className="animate-in fade-in slide-in-from-top-1 px-3 py-1.5 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-md flex items-center gap-1.5 max-w-[200px]">
+                    <AlertCircle className="w-3 h-3 text-red-600 dark:text-red-400 shrink-0" />
+                    <p className="text-[10px] font-medium text-red-600 dark:text-red-400 leading-tight">
+                      {uploadError}
+                    </p>
+                  </div>
+                )}
               </div>
-              <p className="text-[10px] text-neutral-400 text-center md:text-left">
-                JPG, PNG (Max 4MB)
-              </p>
+
+              <div className="flex-1 ml-4 pt-10 pointer-events-auto">
+                <p className="text-xs text-neutral-500">
+                  Recommended: Square for avatar, 1200x480 for cover (max 4MB).
+                </p>
+              </div>
             </div>
           </div>
 
@@ -239,7 +391,6 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
                   name="slug"
                   defaultValue={profile.slug}
                   required
-                  pattern="[a-z0-9-]+"
                   className="border-none shadow-none bg-transparent h-10 px-0 focus-visible:ring-0 font-medium text-neutral-800 dark:text-neutral-200"
                 />
               </div>
@@ -267,6 +418,90 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
                 className="border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/50 rounded-sm shadow-none focus-visible:ring-1 focus-visible:ring-neutral-300 dark:focus-visible:ring-neutral-700 resize-none p-4"
               />
             </div>
+          </div>
+
+          {/* Social Links */}
+          <div className="p-5 border-t border-neutral-200 dark:border-neutral-800 space-y-5">
+            <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
+              Social Links
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[11px] uppercase text-neutral-400">
+                  GitHub
+                </Label>
+                <Input
+                  name="social_github"
+                  defaultValue={
+                    data.socialLinks?.find((l) => l.platform === "github")
+                      ?.url ?? ""
+                  }
+                  placeholder="https://github.com/..."
+                  className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[11px] uppercase text-neutral-400">
+                  LinkedIn
+                </Label>
+                <Input
+                  name="social_linkedin"
+                  defaultValue={
+                    data.socialLinks?.find((l) => l.platform === "linkedin")
+                      ?.url ?? ""
+                  }
+                  placeholder="https://linkedin.com/in/..."
+                  className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[11px] uppercase text-neutral-400">
+                  X (Twitter)
+                </Label>
+                <Input
+                  name="social_twitter"
+                  defaultValue={
+                    data.socialLinks?.find((l) => l.platform === "twitter")
+                      ?.url ?? ""
+                  }
+                  placeholder="https://x.com/..."
+                  className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[11px] uppercase text-neutral-400">
+                  Instagram
+                </Label>
+                <Input
+                  name="social_instagram"
+                  defaultValue={
+                    data.socialLinks?.find((l) => l.platform === "instagram")
+                      ?.url ?? ""
+                  }
+                  placeholder="https://instagram.com/..."
+                  className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label className="text-[11px] uppercase text-neutral-400">
+                  Website / Portfolio
+                </Label>
+                <Input
+                  name="social_website"
+                  defaultValue={
+                    data.socialLinks?.find((l) => l.platform === "website")
+                      ?.url ?? ""
+                  }
+                  placeholder="https://..."
+                  className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                />
+              </div>
+            </div>
+
+            {/* Custom Links could be added here, but keeping it simple for now as requested by user "give fields in profile page" which implies simpler fixed fields often, but let's stick to standard first. 
+                If they want custom, I should add a dynamic list.
+                For now, let's stick to these core 5.
+            */}
           </div>
 
           {/* Footer Row */}

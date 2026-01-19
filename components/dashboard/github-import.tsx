@@ -2,728 +2,311 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { signIn } from "next-auth/react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   checkGitHubConnection,
   getGitHubRepos,
-  analyzeGitHubRepo,
   importGitHubRepo,
-  createSkillsFromDetected,
   RepoListItem,
   GitHubConnectionStatus,
 } from "@/lib/actions/github";
-import { GitHubAnalysis, DetectedSkill, SuggestedEvidence } from "@/lib/github";
 import {
   IconBrandGithub,
   IconRefresh,
   IconCheck,
-  IconX,
   IconStar,
   IconLock,
-  IconWorld,
-  IconSparkles,
   IconDownload,
-  IconChevronRight,
   IconLoader2,
+  IconExternalLink,
+  IconX,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
 // ============================================
-// GITHUB CONNECTION CARD
+// COMPACT GITHUB IMPORT PANEL
 // ============================================
 
-interface GitHubConnectionCardProps {
-  onConnected?: () => void;
+interface GitHubImportPanelProps {
+  onImported?: () => void;
+  onClose?: () => void;
 }
 
-export function GitHubConnectionCard({
-  onConnected,
-}: GitHubConnectionCardProps) {
+type ViewState = "loading" | "connect" | "repos" | "importing";
+
+export function GitHubImportPanel({
+  onImported,
+  onClose,
+}: GitHubImportPanelProps) {
+  const [view, setView] = useState<ViewState>("loading");
   const [status, setStatus] = useState<GitHubConnectionStatus | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [connecting, setConnecting] = useState(false);
+  const [repos, setRepos] = useState<RepoListItem[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [importingRepo, setImportingRepo] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
-  const checkConnection = async () => {
-    setLoading(true);
-    const result = await checkGitHubConnection();
-    if (result.success) {
-      setStatus(result.data);
-      if (result.data.isConnected && onConnected) {
-        onConnected();
-      }
-    }
-    setLoading(false);
-  };
-
+  // Check connection and load repos on mount
   useEffect(() => {
-    checkConnection();
+    const init = async () => {
+      const connResult = await checkGitHubConnection();
+      if (connResult.success && connResult.data.isConnected) {
+        setStatus(connResult.data);
+        // Automatically load repos
+        const reposResult = await getGitHubRepos();
+        if (reposResult.success) {
+          setRepos(reposResult.data);
+        }
+        setView("repos");
+      } else {
+        setView("connect");
+      }
+    };
+    init();
   }, []);
 
   const handleConnect = async () => {
-    setConnecting(true);
     await signIn("github", {
       callbackUrl: "/dashboard/projects?github=connected",
     });
   };
 
-  if (loading) {
-    return (
-      <Card>
-        <CardContent className="py-8 text-center">
-          <IconLoader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
-          <p className="text-sm text-muted-foreground mt-2">
-            Checking GitHub connection...
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (status?.isConnected) {
-    return (
-      <Card className="border-green-200 bg-green-50/50">
-        <CardContent className="py-4">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              {status.avatarUrl ? (
-                <img
-                  src={status.avatarUrl}
-                  alt={status.username}
-                  className="w-12 h-12 rounded-full"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                  <IconBrandGithub className="w-6 h-6" />
-                </div>
-              )}
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                <IconCheck className="w-3 h-3 text-white" />
-              </div>
-            </div>
-            <div className="flex-1">
-              <p className="font-medium">GitHub Connected</p>
-              <p className="text-sm text-muted-foreground">
-                @{status.username}
-              </p>
-            </div>
-            <Button variant="outline" size="sm" onClick={checkConnection}>
-              <IconRefresh className="w-4 h-4" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <IconBrandGithub className="w-5 h-5" />
-          Connect GitHub
-        </CardTitle>
-        <CardDescription>
-          Import your repositories and auto-detect skills from your code.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-start gap-3 text-sm">
-            <IconSparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium">Auto-detect skills</p>
-              <p className="text-muted-foreground">
-                We analyze your tech stack from languages, dependencies, and
-                topics.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 text-sm">
-            <IconDownload className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium">Generate evidence</p>
-              <p className="text-muted-foreground">
-                Create proof items from your repos with one click.
-              </p>
-            </div>
-          </div>
-          <Button
-            onClick={handleConnect}
-            disabled={connecting}
-            className="w-full"
-          >
-            {connecting ? (
-              <>
-                <IconLoader2 className="w-4 h-4 mr-2 animate-spin" />
-                Connecting...
-              </>
-            ) : (
-              <>
-                <IconBrandGithub className="w-4 h-4 mr-2" />
-                Connect with GitHub
-              </>
-            )}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ============================================
-// REPOSITORY LIST
-// ============================================
-
-interface RepoListProps {
-  onSelectRepo: (repo: RepoListItem) => void;
-}
-
-type VisibilityFilter = "all" | "public";
-
-export function RepoList({ onSelectRepo }: RepoListProps) {
-  const [repos, setRepos] = useState<RepoListItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [visibilityFilter, setVisibilityFilter] =
-    useState<VisibilityFilter>("all");
-
-  useEffect(() => {
-    const fetchRepos = async () => {
-      setLoading(true);
-      setError(null);
-      const result = await getGitHubRepos();
-      if (result.success) {
-        setRepos(result.data);
-      } else {
-        setError(result.error);
-      }
-      setLoading(false);
-    };
-    fetchRepos();
-  }, []);
-
-  // Filter repos based on visibility setting
-  const filteredRepos =
-    visibilityFilter === "public"
-      ? repos.filter((repo) => !repo.isPrivate)
-      : repos;
-
-  const publicCount = repos.filter((r) => !r.isPrivate).length;
-  const privateCount = repos.filter((r) => r.isPrivate).length;
-
-  if (loading) {
-    return (
-      <div className="space-y-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
-        ))}
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card className="border-red-200 bg-red-50">
-        <CardContent className="py-4 text-center">
-          <p className="text-sm text-red-600">{error}</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (repos.length === 0) {
-    return (
-      <Card>
-        <CardContent className="py-8 text-center">
-          <p className="text-muted-foreground">No repositories found.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      {/* Visibility Filter */}
-      <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
-        <span className="text-xs text-muted-foreground mr-2">Show:</span>
-        <button
-          onClick={() => setVisibilityFilter("all")}
-          className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
-            visibilityFilter === "all"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          <IconWorld className="w-3.5 h-3.5" />
-          All ({repos.length})
-        </button>
-        <button
-          onClick={() => setVisibilityFilter("public")}
-          className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
-            visibilityFilter === "public"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          <IconWorld className="w-3.5 h-3.5" />
-          Public Only ({publicCount})
-        </button>
-        {privateCount > 0 && visibilityFilter === "all" && (
-          <span className="text-xs text-muted-foreground ml-auto flex items-center gap-1">
-            <IconLock className="w-3 h-3" />
-            {privateCount} private
-          </span>
-        )}
-      </div>
-
-      {/* Repo List */}
-      <div className="space-y-2">
-        {filteredRepos.map((repo) => (
-          <button
-            key={repo.id}
-            onClick={() => onSelectRepo(repo)}
-            disabled={repo.isImported}
-            className={cn(
-              "w-full text-left p-4 rounded-lg border transition-all",
-              repo.isImported
-                ? "bg-muted/50 opacity-60 cursor-not-allowed"
-                : "hover:border-primary hover:bg-accent cursor-pointer",
-            )}
-          >
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  {repo.isPrivate ? (
-                    <IconLock className="w-4 h-4 text-amber-500 shrink-0" />
-                  ) : (
-                    <IconWorld className="w-4 h-4 text-muted-foreground shrink-0" />
-                  )}
-                  <span className="font-medium truncate">{repo.name}</span>
-                  {repo.isPrivate && (
-                    <Badge
-                      variant="outline"
-                      className="text-xs text-amber-600 border-amber-300"
-                    >
-                      Private
-                    </Badge>
-                  )}
-                  {repo.isImported && (
-                    <Badge variant="secondary" className="text-xs">
-                      Imported
-                    </Badge>
-                  )}
-                </div>
-                {repo.description && (
-                  <p className="text-sm text-muted-foreground truncate mt-1">
-                    {repo.description}
-                  </p>
-                )}
-                <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                  {repo.language && (
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-primary" />
-                      {repo.language}
-                    </span>
-                  )}
-                  {repo.stars > 0 && (
-                    <span className="flex items-center gap-1">
-                      <IconStar className="w-3 h-3" />
-                      {repo.stars}
-                    </span>
-                  )}
-                </div>
-              </div>
-              {!repo.isImported && (
-                <IconChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
-              )}
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {filteredRepos.length === 0 && visibilityFilter === "public" && (
-        <Card>
-          <CardContent className="py-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              No public repositories found.
-            </p>
-            <Button
-              variant="link"
-              size="sm"
-              onClick={() => setVisibilityFilter("all")}
-              className="mt-2"
-            >
-              Show all repositories
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// REPO ANALYSIS VIEW
-// ============================================
-
-interface RepoAnalysisProps {
-  repo: RepoListItem;
-  onBack: () => void;
-  onImported: () => void;
-}
-
-export function RepoAnalysis({ repo, onBack, onImported }: RepoAnalysisProps) {
-  const [analysis, setAnalysis] = useState<GitHubAnalysis | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedSkills, setSelectedSkills] = useState<Set<string>>(new Set());
-  const [selectedEvidence, setSelectedEvidence] = useState<Set<number>>(
-    new Set(),
-  );
-  const [importing, startImport] = useTransition();
-
-  useEffect(() => {
-    const analyze = async () => {
-      setLoading(true);
-      setError(null);
-      const result = await analyzeGitHubRepo(repo.fullName);
-      if (result.success) {
-        setAnalysis(result.data);
-        // Auto-select high confidence skills
-        const autoSelected = new Set(
-          result.data.detectedSkills
-            .filter((s) => s.confidence >= 80)
-            .map((s) => s.name),
-        );
-        setSelectedSkills(autoSelected);
-        // Auto-select high confidence evidence
-        const autoEvidence = new Set(
-          result.data.suggestedEvidence
-            .map((_, i) => i)
-            .filter(
-              (_, i) => result.data.suggestedEvidence[i].confidence >= 80,
-            ),
-        );
-        setSelectedEvidence(autoEvidence);
-      } else {
-        setError(result.error);
-      }
-      setLoading(false);
-    };
-    analyze();
-  }, [repo.fullName]);
-
-  const toggleSkill = (name: string) => {
-    const newSet = new Set(selectedSkills);
-    if (newSet.has(name)) {
-      newSet.delete(name);
-    } else {
-      newSet.add(name);
+  const handleRefresh = async () => {
+    setView("loading");
+    const reposResult = await getGitHubRepos();
+    if (reposResult.success) {
+      setRepos(reposResult.data);
     }
-    setSelectedSkills(newSet);
+    setView("repos");
   };
 
-  const toggleEvidence = (index: number) => {
-    const newSet = new Set(selectedEvidence);
-    if (newSet.has(index)) {
-      newSet.delete(index);
-    } else {
-      newSet.add(index);
-    }
-    setSelectedEvidence(newSet);
-  };
+  const handleQuickImport = async (repo: RepoListItem) => {
+    setImportingRepo(repo.fullName);
+    setError(null);
 
-  const handleImport = () => {
-    if (!analysis) return;
-
-    startImport(async () => {
-      // First create skills
-      const skillsToCreate = analysis.detectedSkills
-        .filter((s) => selectedSkills.has(s.name))
-        .map((s) => ({ name: s.name, category: s.category }));
-
-      const skillResult = await createSkillsFromDetected(skillsToCreate);
-
-      if (!skillResult.success) {
-        setError(skillResult.error);
-        return;
-      }
-
-      // Then import repo with evidence
-      const evidenceToImport = analysis.suggestedEvidence.filter((_, i) =>
-        selectedEvidence.has(i),
-      );
-
-      const importResult = await importGitHubRepo({
+    startTransition(async () => {
+      // Quick import with defaults - user can edit after
+      const result = await importGitHubRepo({
         repoFullName: repo.fullName,
-        selectedSkills: skillResult.data,
-        selectedEvidence: evidenceToImport,
+        techStack: [], // Will be empty, user can add later
+        status: "complete",
       });
 
-      if (importResult.success) {
-        onImported();
+      if (result.success) {
+        // Mark as imported in local state
+        setRepos(
+          repos.map((r) =>
+            r.fullName === repo.fullName ? { ...r, isImported: true } : r,
+          ),
+        );
+        onImported?.();
       } else {
-        setError(importResult.error);
+        setError(result.error || "Failed to import");
       }
+      setImportingRepo(null);
     });
   };
 
-  if (loading) {
+  // Loading state
+  if (view === "loading") {
     return (
-      <div className="space-y-4">
-        <Button variant="ghost" onClick={onBack} size="sm">
-          ← Back to repositories
-        </Button>
-        <Card>
-          <CardContent className="py-12 text-center">
-            <IconLoader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
-            <p className="mt-4 font-medium">Analyzing {repo.name}...</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Detecting skills and generating evidence suggestions
-            </p>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-center py-6 text-neutral-400">
+        <IconLoader2 className="w-4 h-4 animate-spin mr-2 opacity-50" />
+        <span className="text-xs font-medium">Synced...</span>
       </div>
     );
   }
 
-  if (error) {
+  // Connect GitHub state
+  if (view === "connect") {
     return (
-      <div className="space-y-4">
-        <Button variant="ghost" onClick={onBack} size="sm">
-          ← Back to repositories
-        </Button>
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="py-8 text-center">
-            <IconX className="w-8 h-8 text-red-500 mx-auto" />
-            <p className="mt-2 text-red-600">{error}</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!analysis) return null;
-
-  return (
-    <div className="space-y-6">
-      <Button variant="ghost" onClick={onBack} size="sm">
-        ← Back to repositories
-      </Button>
-
-      {/* Repo Header */}
-      <Card>
-        <CardContent className="py-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
-              <IconBrandGithub className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-lg font-semibold">{analysis.repo.name}</h2>
-              <p className="text-sm text-muted-foreground">
-                {analysis.summary}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {analysis.repo.stars > 0 && (
-                <Badge variant="secondary">
-                  <IconStar className="w-3 h-3 mr-1" />
-                  {analysis.repo.stars}
-                </Badge>
-              )}
-              {analysis.repo.language && (
-                <Badge>{analysis.repo.language}</Badge>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Detected Skills */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <IconSparkles className="w-4 h-4 text-primary" />
-            Detected Skills
-          </CardTitle>
-          <CardDescription>
-            Select skills to add to your profile ({selectedSkills.size}{" "}
-            selected)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {analysis.detectedSkills.map((skill) => (
-              <button
-                key={skill.name}
-                onClick={() => toggleSkill(skill.name)}
-                className={cn(
-                  "px-3 py-1.5 rounded-full border text-sm transition-all",
-                  selectedSkills.has(skill.name)
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "hover:border-primary hover:bg-accent",
-                )}
-              >
-                {skill.name}
-                <span className="ml-1 opacity-60">{skill.confidence}%</span>
-              </button>
-            ))}
-          </div>
-          {analysis.detectedSkills.length === 0 && (
-            <p className="text-sm text-muted-foreground">No skills detected.</p>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Suggested Evidence */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <IconDownload className="w-4 h-4 text-primary" />
-            Suggested Evidence
-          </CardTitle>
-          <CardDescription>
-            Select evidence items to import ({selectedEvidence.size} selected)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {analysis.suggestedEvidence.map((evidence, index) => (
-            <button
-              key={index}
-              onClick={() => toggleEvidence(index)}
-              className={cn(
-                "w-full text-left p-3 rounded-lg border transition-all",
-                selectedEvidence.has(index)
-                  ? "bg-primary/10 border-primary"
-                  : "hover:border-primary hover:bg-accent",
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div
-                    className={cn(
-                      "w-5 h-5 rounded border flex items-center justify-center",
-                      selectedEvidence.has(index)
-                        ? "bg-primary border-primary text-primary-foreground"
-                        : "border-border",
-                    )}
-                  >
-                    {selectedEvidence.has(index) && (
-                      <IconCheck className="w-3 h-3" />
-                    )}
-                  </div>
-                  <span className="font-medium text-sm">{evidence.title}</span>
-                </div>
-                <Badge variant="outline" className="text-xs">
-                  {evidence.type}
-                </Badge>
-              </div>
-              {evidence.content && (
-                <p className="text-xs text-muted-foreground mt-2 line-clamp-2 ml-7">
-                  {evidence.content}
-                </p>
-              )}
-              {evidence.url && (
-                <p className="text-xs text-blue-600 mt-1 ml-7 truncate">
-                  {evidence.url}
-                </p>
-              )}
-            </button>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Import Button */}
-      <div className="flex gap-3">
-        <Button variant="outline" onClick={onBack} className="flex-1">
-          Cancel
-        </Button>
-        <Button
-          onClick={handleImport}
-          disabled={
-            importing ||
-            (selectedSkills.size === 0 && selectedEvidence.size === 0)
-          }
-          className="flex-1"
-        >
-          {importing ? (
-            <>
-              <IconLoader2 className="w-4 h-4 mr-2 animate-spin" />
-              Importing...
-            </>
-          ) : (
-            <>
-              <IconDownload className="w-4 h-4 mr-2" />
-              Import to Profile
-            </>
-          )}
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-// ============================================
-// MAIN GITHUB IMPORT PANEL
-// ============================================
-
-interface GitHubImportPanelProps {
-  onImported?: () => void;
-}
-
-export function GitHubImportPanel({ onImported }: GitHubImportPanelProps) {
-  const [isConnected, setIsConnected] = useState(false);
-  const [selectedRepo, setSelectedRepo] = useState<RepoListItem | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const handleImported = () => {
-    setSelectedRepo(null);
-    setRefreshKey((k) => k + 1);
-    onImported?.();
-  };
-
-  if (!isConnected) {
-    return <GitHubConnectionCard onConnected={() => setIsConnected(true)} />;
-  }
-
-  if (selectedRepo) {
-    return (
-      <RepoAnalysis
-        repo={selectedRepo}
-        onBack={() => setSelectedRepo(null)}
-        onImported={handleImported}
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="font-semibold">Import from GitHub</h3>
-          <p className="text-sm text-muted-foreground">
-            Select a repository to analyze and import
+      <div className="text-center py-6 relative">
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="absolute -top-2 -right-2 h-6 w-6 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+          >
+            <IconX className="w-3.5 h-3.5" />
+          </Button>
+        )}
+        <div className="w-10 h-10 mx-auto rounded-xl bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center border border-neutral-200 dark:border-neutral-800 mb-3 shadow-sm">
+          <IconBrandGithub className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
+        </div>
+        <div className="space-y-0.5 mb-4">
+          <p className="font-semibold text-sm tracking-tight text-neutral-900 dark:text-neutral-100">
+            Connect GitHub
+          </p>
+          <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+            Import repositories with one click
           </p>
         </div>
         <Button
-          variant="outline"
+          onClick={handleConnect}
           size="sm"
-          onClick={() => setRefreshKey((k) => k + 1)}
+          variant="outline"
+          className="text-xs h-7 px-3 bg-white dark:bg-neutral-950 font-medium"
         >
-          <IconRefresh className="w-4 h-4" />
+          <IconBrandGithub className="w-3.5 h-3.5 mr-2" />
+          Connect Account
         </Button>
       </div>
-      <RepoList key={refreshKey} onSelectRepo={setSelectedRepo} />
+    );
+  }
+
+  // Repos list state
+  const notImported = repos.filter((r) => !r.isImported);
+  const imported = repos.filter((r) => r.isImported);
+
+  return (
+    <div className="space-y-2">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-2 border-b border-dashed border-neutral-200 dark:border-neutral-800">
+        <div className="flex items-center gap-2">
+          {status?.avatarUrl ? (
+            <img
+              src={status.avatarUrl}
+              alt=""
+              className="w-5 h-5 rounded-md ring-1 ring-neutral-200 dark:ring-neutral-800"
+            />
+          ) : (
+            <div className="w-5 h-5 rounded-md bg-neutral-100 dark:bg-neutral-800" />
+          )}
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 leading-none">
+              @{status?.username}
+            </span>
+            <span className="text-[9px] text-neutral-400 font-medium leading-none mt-0.5 uppercase tracking-wide">
+              GitHub Connected
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleRefresh}
+            className="h-6 w-6 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+            title="Refresh Repositories"
+          >
+            <IconRefresh className="w-3 h-3" />
+          </Button>
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-6 w-6 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+              title="Close"
+            >
+              <IconX className="w-3.5 h-3.5" />
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {error && (
+        <div className="text-[10px] font-medium text-red-600 bg-red-50 dark:bg-red-900/10 px-2.5 py-1.5 rounded border border-red-100 dark:border-red-900/20">
+          {error}
+        </div>
+      )}
+
+      {/* Lists Container - Scrollable if long */}
+      <div className="space-y-3 max-h-full overflow-y-auto pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+        {/* Already Imported */}
+        {imported.length > 0 && (
+          <div className="space-y-1">
+            <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest pl-1">
+              Imported
+            </p>
+            <div className="space-y-1">
+              {imported.map((repo) => (
+                <div
+                  key={repo.id}
+                  className="flex items-center gap-2 px-2 py-1 rounded-md text-neutral-500 bg-neutral-50/50 dark:bg-neutral-900/20 border border-transparent"
+                >
+                  <IconCheck className="w-3 h-3 text-emerald-500/70 shrink-0" />
+                  <span className="text-[11px] font-medium truncate opacity-70 decoration-neutral-400 decoration-1">
+                    {repo.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Available to Import */}
+        {notImported.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest pl-1">
+              Available
+            </p>
+            <div className="relative overflow-hidden bg-neutral-50/50 dark:bg-neutral-900/50">
+              <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white dark:from-neutral-950 to-transparent pointer-events-none z-10" />
+              <div className="max-h-[340px] overflow-y-auto p-2 space-y-1 pr-1 pb-10 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+                {notImported.map((repo) => (
+                  <div
+                    key={repo.id}
+                    className="group flex items-center justify-between px-2.5 py-2 rounded-md border border-neutral-100 dark:border-neutral-800/60 hover:border-neutral-300 dark:hover:border-neutral-700 bg-white dark:bg-neutral-950 hover:shadow-sm transition-all duration-200 min-h-[40px]"
+                  >
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      {repo.isPrivate ? (
+                        <IconLock className="w-3 h-3 text-neutral-400 shrink-0" />
+                      ) : (
+                        <div className="w-1.5 h-1.5 rounded-full bg-neutral-300 dark:bg-neutral-700 shrink-0" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 truncate group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+                            {repo.name}
+                          </span>
+                          {repo.stars > 0 && (
+                            <span className="flex items-center gap-0.5 text-[9px] text-neutral-400 font-medium bg-neutral-50 dark:bg-neutral-900 px-1 py-0.5 rounded-sm">
+                              <IconStar className="w-2.5 h-2.5" />
+                              {repo.stars}
+                            </span>
+                          )}
+                        </div>
+                        {repo.description && (
+                          <p className="text-[10px] text-neutral-400 truncate mt-0.5 font-medium leading-tight max-w-[95%]">
+                            {repo.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-5 px-1.5 opacity-0 group-hover:opacity-100 transition-opacity bg-neutral-900 dark:bg-white text-white dark:text-black text-[9px] font-bold tracking-wide rounded-[3px] ml-2"
+                      onClick={() => handleQuickImport(repo)}
+                      disabled={importingRepo === repo.fullName || isPending}
+                    >
+                      {importingRepo === repo.fullName ? (
+                        <IconLoader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <span className="flex items-center">IMPORT</span>
+                      )}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {notImported.length === 0 && imported.length === 0 && (
+          <div className="text-center py-6">
+            <p className="text-xs text-neutral-400 font-medium">
+              No repositories found.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
+// Export for backwards compatibility
+export { GitHubImportPanel as GitHubConnectionCard };

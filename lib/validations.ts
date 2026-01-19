@@ -1,28 +1,6 @@
 import { z } from "zod";
 
 // ============================================
-// ENUMS
-// ============================================
-
-export const EvidenceTypeSchema = z.enum([
-  "SCREENSHOT",
-  "LINK",
-  "CODE_SNIPPET",
-  "DESCRIPTION",
-  "METRIC",
-]);
-
-export const SkillCategorySchema = z.enum([
-  "LANGUAGE",
-  "FRAMEWORK",
-  "TOOL",
-  "DATABASE",
-  "CONCEPT",
-  "SOFT_SKILL",
-  "OTHER",
-]);
-
-// ============================================
 // AUTH SCHEMAS
 // ============================================
 
@@ -65,38 +43,12 @@ export const UpdateProfileSchema = z.object({
   headline: z.string().max(100, "Headline must be at most 100 characters").optional(),
   summary: z.string().max(2000, "Summary must be at most 2000 characters").optional(),
   image: z.string().url("Invalid image URL").optional().or(z.literal("")),
+  coverImage: z.string().url("Invalid cover image URL").optional().or(z.literal("")),
 });
 
 export const UpdateProfileSettingsSchema = z.object({
   isPublic: z.boolean().optional(),
   showEmail: z.boolean().optional(),
-  showUnprovenSkills: z.boolean().optional(),
-});
-
-// ============================================
-// SKILL SCHEMAS
-// ============================================
-
-export const CreateSkillSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Skill name is required")
-    .max(50, "Skill name must be at most 50 characters"),
-  category: SkillCategorySchema.optional(),
-});
-
-export const UpdateSkillSchema = z.object({
-  skillId: z.string().cuid(),
-  name: z.string().min(1).max(50).optional(),
-  category: SkillCategorySchema.optional(),
-});
-
-export const ReorderSkillsSchema = z.object({
-  skillIds: z.array(z.string().cuid()),
-});
-
-export const DeleteSkillSchema = z.object({
-  skillId: z.string().cuid(),
 });
 
 // ============================================
@@ -110,8 +62,17 @@ export const CreateProjectSchema = z.object({
     .max(100, "Project title must be at most 100 characters"),
   description: z.string().max(2000).optional(),
   url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  repoUrl: z.string().url("Invalid repository URL").optional().or(z.literal("")),
+  demoUrl: z.string().url("Invalid demo URL").optional().or(z.literal("")),
+  thumbnail: z.string().url("Invalid thumbnail URL").optional().or(z.literal("")),
+  techStack: z.array(z.string()).optional(),
+  role: z.string().max(100).optional(),
+  highlights: z.array(z.string()).optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
+  status: z.enum(["planning", "in_progress", "complete", "archived"]).optional(),
+  isFeatured: z.boolean().optional(),
+  isPublic: z.boolean().optional(),
 });
 
 export const UpdateProjectSchema = z.object({
@@ -119,8 +80,17 @@ export const UpdateProjectSchema = z.object({
   title: z.string().min(1).max(100).optional(),
   description: z.string().max(2000).optional(),
   url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  repoUrl: z.string().url("Invalid repository URL").optional().or(z.literal("")),
+  demoUrl: z.string().url("Invalid demo URL").optional().or(z.literal("")),
+  thumbnail: z.string().url("Invalid thumbnail URL").optional().or(z.literal("")),
+  techStack: z.array(z.string()).optional(),
+  role: z.string().max(100).optional(),
+  highlights: z.array(z.string()).optional(),
   startDate: z.coerce.date().optional().nullable(),
   endDate: z.coerce.date().optional().nullable(),
+  status: z.enum(["planning", "in_progress", "complete", "archived"]).optional(),
+  isFeatured: z.boolean().optional(),
+  isPublic: z.boolean().optional(),
 });
 
 export const ReorderProjectsSchema = z.object({
@@ -132,35 +102,6 @@ export const DeleteProjectSchema = z.object({
 });
 
 // ============================================
-// EVIDENCE SCHEMAS
-// ============================================
-
-export const CreateEvidenceSchema = z.object({
-  skillIds: z.array(z.string().cuid()).min(1, "At least one skill is required"),
-  projectId: z.string().cuid(),
-  title: z
-    .string()
-    .min(1, "Evidence title is required")
-    .max(150, "Evidence title must be at most 150 characters"),
-  type: EvidenceTypeSchema.optional(),
-  content: z.string().max(20000).optional(),
-  url: z.string().url("Invalid URL").optional().or(z.literal("")),
-});
-
-export const UpdateEvidenceSchema = z.object({
-  evidenceId: z.string().cuid(),
-  title: z.string().min(1).max(150).optional(),
-  type: EvidenceTypeSchema.optional(),
-  content: z.string().max(20000).optional(),
-  url: z.string().url("Invalid URL").optional().or(z.literal("")),
-  skillIds: z.array(z.string().cuid()).optional(),
-});
-
-export const DeleteEvidenceSchema = z.object({
-  evidenceId: z.string().cuid(),
-});
-
-// ============================================
 // TYPE EXPORTS
 // ============================================
 
@@ -169,16 +110,8 @@ export type LoginInput = z.infer<typeof LoginSchema>;
 export type CreateProfileInput = z.infer<typeof CreateProfileSchema>;
 export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
 export type UpdateProfileSettingsInput = z.infer<typeof UpdateProfileSettingsSchema>;
-export type CreateSkillInput = z.infer<typeof CreateSkillSchema>;
-export type UpdateSkillInput = z.infer<typeof UpdateSkillSchema>;
-export type ReorderSkillsInput = z.infer<typeof ReorderSkillsSchema>;
-export type DeleteSkillInput = z.infer<typeof DeleteSkillSchema>;
 export type CreateProjectInput = z.infer<typeof CreateProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof UpdateProjectSchema>;
 export type ReorderProjectsInput = z.infer<typeof ReorderProjectsSchema>;
 export type DeleteProjectInput = z.infer<typeof DeleteProjectSchema>;
-export type CreateEvidenceInput = z.infer<typeof CreateEvidenceSchema>;
-export type UpdateEvidenceInput = z.infer<typeof UpdateEvidenceSchema>;
-export type DeleteEvidenceInput = z.infer<typeof DeleteEvidenceSchema>;
-export type EvidenceType = z.infer<typeof EvidenceTypeSchema>;
-export type SkillCategory = z.infer<typeof SkillCategorySchema>;
+

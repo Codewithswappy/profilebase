@@ -131,8 +131,8 @@ export async function trackVisit(slug: string, options: TrackVisitOptions = {}) 
   }
 }
 
-// 2. Track Interaction (Clicking links, etc)
-export async function trackInteraction(slug: string, type: "skill" | "project", itemId: string) {
+// 2. Track Interaction (Project clicks)
+export async function trackInteraction(slug: string, type: "project", itemId: string) {
   try {
     const profile = await db.profile.findUnique({ where: { slug } });
     if (!profile) return;
@@ -140,33 +140,22 @@ export async function trackInteraction(slug: string, type: "skill" | "project", 
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
-    // We can't easily deep update JSONB in Prisma without raw query or fetching.
-    // Fetching is safer for now.
     const record = await db.dailyAnalytics.findUnique({
       where: { profileId_date: { profileId: profile.id, date: today } },
     });
 
-    if (!record) return; // Should exist from visit
+    if (!record) return;
 
-    if (type === "skill") {
-        const stats = (record.skillInteractions as Record<string, number>) || {};
-        stats[itemId] = (stats[itemId] || 0) + 1;
-        await db.dailyAnalytics.update({
-            where: { id: record.id },
-            data: { skillInteractions: stats }
-        });
-    } else if (type === "project") {
-        const stats = (record.projectInteractions as Record<string, number>) || {};
-        stats[itemId] = (stats[itemId] || 0) + 1;
-        await db.dailyAnalytics.update({
-            where: { id: record.id },
-            data: { projectInteractions: stats }
-        });
-    }
+    const stats = (record.projectInteractions as Record<string, number>) || {};
+    stats[itemId] = (stats[itemId] || 0) + 1;
+    await db.dailyAnalytics.update({
+      where: { id: record.id },
+      data: { projectInteractions: stats }
+    });
 
     return { success: true };
   } catch (error) { 
-      return { success: false };
+    return { success: false };
   }
 }
 
@@ -227,7 +216,6 @@ export async function getAnalytics(profileId: string, days: number = 7) {
         const allVisitorHashes = new Set<string>();
         const deviceAggregates: Record<string, number> = {};
         const referrerAggregates: Record<string, number> = {};
-        const skillCounts: Record<string, number> = {};
         const projectCounts: Record<string, number> = {};
         
         // Bounce rate: visitors who spent < 10 seconds
@@ -252,13 +240,8 @@ export async function getAnalytics(profileId: string, days: number = 7) {
                 referrerAggregates[ref] = (referrerAggregates[ref] || 0) + count;
             });
             
-            // Aggregate skill/project interactions
-            const sMetrics = (r.skillInteractions as Record<string, number>) || {};
+            // Aggregate project interactions
             const pMetrics = (r.projectInteractions as Record<string, number>) || {};
-            
-            Object.entries(sMetrics).forEach(([k, v]) => {
-                skillCounts[k] = (skillCounts[k] || 0) + v;
-            });
             Object.entries(pMetrics).forEach(([k, v]) => {
                 projectCounts[k] = (projectCounts[k] || 0) + v;
             });
@@ -286,12 +269,7 @@ export async function getAnalytics(profileId: string, days: number = 7) {
         // Bounce rate
         const bounceRate = totalViews > 0 ? Math.round((bounceCount / totalViews) * 100) : 0;
 
-        // Sort Top 5
-        const topSkills = Object.entries(skillCounts)
-            .sort((a,b) => b[1] - a[1])
-            .slice(0, 5)
-            .map(([id, count]) => ({ id, count }));
-            
+        // Sort Top 5 projects
         const topProjects = Object.entries(projectCounts)
             .sort((a,b) => b[1] - a[1])
             .slice(0, 5)
@@ -317,7 +295,7 @@ export async function getAnalytics(profileId: string, days: number = 7) {
                 bounceRate,
             },
             history,
-            topSkills,
+
             topProjects,
             deviceBreakdown,
             referrerBreakdown,

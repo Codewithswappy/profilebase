@@ -4,48 +4,21 @@ import { useState } from "react";
 import Link from "next/link";
 import { FullProfile } from "@/lib/actions/profile";
 import { ProfileHeader } from "@/components/dashboard/profile-header";
-import { AddProofModal } from "@/components/dashboard/add-proof-modal";
 import { CommandPalette } from "@/components/dashboard/command-palette";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import {
-  CheckCircle,
-  Plus,
-  ArrowUpRight,
-  Layers,
-} from "lucide-react";
-import { IconBolt, IconShieldCheck } from "@tabler/icons-react";
+import { Plus, ArrowUpRight, Layers, Code2 } from "lucide-react";
+import { IconFolderCode } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import { SkillForm } from "@/components/dashboard/skills/skill-form";
 
 interface DashboardOverviewProps {
   data: FullProfile;
 }
 
 export function DashboardOverview({ data }: DashboardOverviewProps) {
-  const { skills, projects, evidence } = data;
-  const [showAddProof, setShowAddProof] = useState(false);
-  const [showAddSkill, setShowAddSkill] = useState(false);
-  const [selectedSkillId, setSelectedSkillId] = useState<string | undefined>(
-    undefined,
-  );
+  const { projects } = data;
 
-  const provenSkillsCount = skills.filter((s) => s.evidenceCount > 0).length;
-
-  // Get existing URLs for duplicate detection
-  const existingUrls = (evidence || [])
-    .map((e) => e.url)
-    .filter((url): url is string => !!url);
-
-  const handleProveSkill = (skillId: string) => {
-    setSelectedSkillId(skillId);
-    setShowAddProof(true);
-  };
-
-  const handleAddProof = () => {
-    setSelectedSkillId(undefined);
-    setShowAddProof(true);
-  };
+  // Get all unique tech from projects
+  const allTech = [...new Set(projects.flatMap((p) => p.techStack || []))];
 
   return (
     <div className="min-h-screen space-y-6 animate-in fade-in duration-500">
@@ -54,95 +27,69 @@ export function DashboardOverview({ data }: DashboardOverviewProps) {
       {/* Floating Toolbar with Command Palette */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center p-1 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleAddProof}
-            disabled={projects.length === 0}
-            className="rounded-md h-8 px-4 text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all"
-          >
-            <Plus className="w-3.5 h-3.5 mr-2 opacity-60" />
-            Add Proof
-          </Button>
+          <Link href="/dashboard?tab=portfolio">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-md h-8 px-4 text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all"
+            >
+              <Plus className="w-3.5 h-3.5 mr-2 opacity-60" />
+              Add Project
+            </Button>
+          </Link>
           <div className="w-px h-4 bg-neutral-200 dark:bg-neutral-700 mx-1" />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowAddSkill(true)}
-            className="rounded-md h-8 px-4 text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all"
-          >
-            <IconBolt className="w-3.5 h-3.5 mr-2 opacity-60" />
-            New Skill
-          </Button>
+          <Link href="/dashboard?tab=portfolio">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-md h-8 px-4 text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all"
+            >
+              <IconFolderCode className="w-3.5 h-3.5 mr-2 opacity-60" />
+              Manage Portfolio
+            </Button>
+          </Link>
         </div>
 
         {/* Command Palette Trigger */}
-        <CommandPalette
-          onAddProof={handleAddProof}
-          onAddSkill={() => setShowAddSkill(true)}
-        />
+        <CommandPalette />
       </div>
 
-      {/* BENTO GRID - Skills + Projects */}
+      {/* BENTO GRID - Tech Stack + Projects */}
       <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden shadow-sm">
         <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-neutral-200 dark:divide-neutral-800">
-          {/* SKILLS COLUMN */}
+          {/* TECH STACK COLUMN */}
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
                 Tech Stack
               </p>
               <span className="flex items-center gap-1.5 text-[10px] bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full text-neutral-500 font-medium">
-                <IconShieldCheck className="w-3 h-3 text-emerald-500" />
-                {provenSkillsCount}/{skills.length} Proven
+                <Code2 className="w-3 h-3 text-blue-500" />
+                {allTech.length} Technologies
               </span>
             </div>
 
-            {skills.length === 0 ? (
+            {allTech.length === 0 ? (
               <div className="h-[200px] flex flex-col items-center justify-center text-center space-y-3 opacity-60">
                 <Layers className="w-8 h-8 text-neutral-300" />
-                <p className="text-sm text-neutral-500">No skills yet.</p>
-                <Button
-                  variant="link"
-                  size="sm"
-                  onClick={() => setShowAddSkill(true)}
-                >
-                  Add your first skill
-                </Button>
+                <p className="text-sm text-neutral-500">
+                  No tech detected yet.
+                </p>
+                <p className="text-xs text-neutral-400">
+                  Add projects with tech stack to see them here.
+                </p>
               </div>
             ) : (
               <div className="flex flex-wrap content-start gap-2">
-                {skills.map((skill) => (
-                  <button
-                    key={skill.id}
-                    onClick={() => handleProveSkill(skill.id)}
-                    title={skill.evidenceCount > 0 ? `${skill.evidenceCount} proof(s)` : "Click to add proof"}
-                    className={cn(
-                      "group flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border",
-                      skill.evidenceCount > 0
-                        ? "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-sm"
-                        : "bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300",
-                    )}
+                {allTech.map((tech) => (
+                  <div
+                    key={tech}
+                    className="flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-full text-xs font-medium bg-neutral-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700"
                   >
-                    {skill.evidenceCount > 0 ? (
-                      <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                    ) : (
-                      <div className="w-1.5 h-1.5 rounded-full bg-neutral-300 dark:bg-neutral-600 group-hover:bg-neutral-400" />
-                    )}
-                    {skill.name}
-                    {skill.evidenceCount > 0 && (
-                      <span className="ml-1 text-[10px] text-emerald-600 dark:text-emerald-400 opacity-75">
-                        {skill.evidenceCount}
-                      </span>
-                    )}
-                  </button>
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                    {tech}
+                  </div>
                 ))}
-                <button
-                  onClick={() => setShowAddSkill(true)}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium text-neutral-400 border border-dashed border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800 transition-colors"
-                >
-                  <Plus className="w-3 h-3" /> Add
-                </button>
               </div>
             )}
           </div>
@@ -151,108 +98,86 @@ export function DashboardOverview({ data }: DashboardOverviewProps) {
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
-                Recent Work
+                Projects
               </p>
-              <Link
-                href="/dashboard/portfolio"
-                className="text-[10px] font-medium text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors"
-              >
-                VIEW ALL
-              </Link>
+              <span className="flex items-center gap-1.5 text-[10px] bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full text-neutral-500 font-medium">
+                <IconFolderCode className="w-3 h-3 text-emerald-500" />
+                {projects.length} Total
+              </span>
             </div>
 
-            <div className="space-y-3">
-              {projects.slice(0, 4).map((project) => (
-                <div
-                  key={project.id}
-                  className="group relative bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-lg border border-neutral-100 dark:border-neutral-700/50 hover:border-neutral-200 dark:hover:border-neutral-600 transition-all duration-300"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
-                        {project.title}
-                      </h4>
-                      {project.description && (
-                        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-1">
-                          {project.description}
-                        </p>
-                      )}
-                    </div>
-                    {project.url && (
-                      <a
-                        href={project.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md"
-                      >
-                        <ArrowUpRight className="w-3.5 h-3.5 text-neutral-400 hover:text-neutral-900" />
-                      </a>
-                    )}
-                  </div>
-                  <div className="mt-3 flex items-center gap-2">
-                    <div className="px-2 py-0.5 rounded-full bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700/50">
-                      <span className="text-[10px] font-medium text-neutral-500">
-                        {project.evidenceCount} Proof{project.evidenceCount !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {projects.length === 0 && (
-                <div className="h-[200px] flex items-center justify-center text-center rounded-lg border border-dashed border-neutral-200 dark:border-neutral-800">
-                  <p className="text-xs text-neutral-400">No projects yet.</p>
-                </div>
-              )}
-
-              {projects.length > 0 && (
-                <div className="text-center pt-2">
+            {projects.length === 0 ? (
+              <div className="h-[200px] flex flex-col items-center justify-center text-center space-y-3 opacity-60">
+                <IconFolderCode className="w-8 h-8 text-neutral-300" />
+                <p className="text-sm text-neutral-500">No projects yet.</p>
+                <Link href="/dashboard?tab=portfolio">
+                  <Button variant="link" size="sm">
+                    Create your first project
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {projects.slice(0, 5).map((project) => (
                   <Link
-                    href="/dashboard/portfolio"
-                    className="text-xs font-medium text-neutral-400 hover:text-neutral-600 transition-colors"
+                    key={project.id}
+                    href="/dashboard?tab=portfolio"
+                    className={cn(
+                      "w-full flex items-center justify-between p-3 rounded-lg text-left transition-all duration-200 border",
+                      "bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600",
+                    )}
                   >
-                    Manage Projects &rarr;
+                    <div className="flex items-center gap-3 min-w-0">
+                      <IconFolderCode className="w-4 h-4 text-neutral-400 shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200 truncate block">
+                          {project.title}
+                        </span>
+                        {project.techStack && project.techStack.length > 0 && (
+                          <span className="text-[10px] text-neutral-400 truncate block">
+                            {project.techStack.slice(0, 3).join(", ")}
+                            {project.techStack.length > 3 &&
+                              ` +${project.techStack.length - 3}`}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </Link>
-                </div>
-              )}
-            </div>
+                ))}
+                {projects.length > 5 && (
+                  <Link
+                    href="/dashboard?tab=portfolio"
+                    className="flex items-center justify-center gap-1 py-2 text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+                  >
+                    View all {projects.length} projects
+                    <ArrowUpRight className="w-3 h-3" />
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Add Proof Modal (New Simplified Version) */}
-      <Dialog open={showAddProof} onOpenChange={setShowAddProof}>
-        <DialogContent className="max-w-2xl h-[85vh] p-0 overflow-hidden rounded-xl border-none shadow-2xl">
-          <AddProofModal
-            projects={projects.map((p) => ({
-              id: p.id,
-              title: p.title,
-              description: p.description,
-            }))}
-            skills={skills.map((s) => ({
-              id: s.id,
-              name: s.name,
-              category: s.category,
-            }))}
-            preselectedSkillId={selectedSkillId}
-            existingUrls={existingUrls}
-            onCancel={() => setShowAddProof(false)}
-            onSuccess={() => {
-              setShowAddProof(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Add Skill Modal */}
-      <Dialog open={showAddSkill} onOpenChange={setShowAddSkill}>
-        <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-xl border-none shadow-2xl">
-          <SkillForm
-            onCancel={() => setShowAddSkill(false)}
-            onSuccess={() => setShowAddSkill(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Quick Stats Row */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-4 text-center">
+          <p className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+            {projects.length}
+          </p>
+          <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider mt-1">
+            Projects
+          </p>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-4 text-center">
+          <p className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+            {allTech.length}
+          </p>
+          <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider mt-1">
+            Technologies
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

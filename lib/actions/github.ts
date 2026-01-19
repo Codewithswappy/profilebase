@@ -9,7 +9,6 @@ import {
   GitHubRepo,
   GitHubAnalysis,
   DetectedSkill,
-  SuggestedEvidence,
 } from "@/lib/github";
 import { ActionResult } from "./profile";
 
@@ -223,27 +222,8 @@ export async function analyzeGitHubRepo(
             }
           }
           
-          // Add AI-suggested evidence
-          const existingEvidenceTitles = new Set(
-            analysis.suggestedEvidence.map(e => e.title.toLowerCase())
-          );
-          
-          for (const aiEvidence of aiResult.evidence) {
-            if (!existingEvidenceTitles.has(aiEvidence.title.toLowerCase())) {
-              analysis.suggestedEvidence.push({
-                title: aiEvidence.title,
-                type: aiEvidence.type as any,
-                content: aiEvidence.content,
-                skills: aiEvidence.suggestedSkills,
-                confidence: 75, // AI suggestions get good confidence
-              });
-            }
-          }
-          
-          // Update summary with AI insights
-          if (aiResult.summary && aiResult.summary.length > analysis.summary.length) {
-            analysis.summary = `${aiResult.summary} [AI-enhanced: ${aiResult.projectType}, ${aiResult.complexity} complexity]`;
-          }
+          // Sort skills by confidence
+          analysis.detectedSkills.sort((a, b) => b.confidence - a.confidence);
         }
       } catch (aiError) {
         console.warn("AI analysis failed, using GitHub-only analysis:", aiError);
@@ -267,13 +247,15 @@ export async function analyzeGitHubRepo(
 
 export interface ImportRepoInput {
   repoFullName: string;
-  selectedSkills: string[]; // Skill IDs to link
-  selectedEvidence: SuggestedEvidence[];
+  techStack: string[];
+  thumbnail?: string;
+  demoUrl?: string;
+  status?: "planning" | "in_progress" | "complete" | "archived";
 }
 
 export async function importGitHubRepo(
   input: ImportRepoInput
-): Promise<ActionResult<{ projectId: string; evidenceCount: number }>> {
+): Promise<ActionResult<{ projectId: string }>> {
   try {
     const session = await auth();
     
@@ -312,134 +294,32 @@ export async function importGitHubRepo(
       where: { profileId: profile.id },
     });
     
-    // Create project
+    // Create project with all fields (use null for optional fields, not undefined)
     const project = await db.project.create({
       data: {
         profileId: profile.id,
         title: repoData.name,
-        description: repoData.description || undefined,
+        description: repoData.description || null,
         url: repoData.html_url,
-        startDate: repoData.created_at ? new Date(repoData.created_at) : undefined,
+        repoUrl: repoData.html_url,
+        demoUrl: input.demoUrl || repoData.homepage || null,
+        thumbnail: input.thumbnail || null,
+        techStack: (input.techStack && input.techStack.length > 0) ? input.techStack : (repoData.topics || []),
+        status: input.status || "complete",
+        startDate: repoData.created_at ? new Date(repoData.created_at) : null,
         displayOrder: projectCount,
       },
     });
-    
-    // Create evidence items
-    let evidenceCount = 0;
-    
-    for (const evidenceItem of input.selectedEvidence) {
-      // Find skill IDs for this evidence
-      const skillIds = input.selectedSkills.filter(skillId => {
-        // We'll match all selected skills with evidence for now
-        return true;
-      });
-      
-      // Create evidence
-      const evidence = await db.evidence.create({
-        data: {
-          projectId: project.id,
-          title: evidenceItem.title,
-          type: evidenceItem.type,
-          content: evidenceItem.content || undefined,
-          url: evidenceItem.url || undefined,
-          displayOrder: evidenceCount,
-        },
-      });
-      
-      // Create skill-evidence links
-      for (const skillId of skillIds.slice(0, 5)) { // Max 5 skills per evidence
-        await db.evidenceSkill.create({
-          data: {
-            evidenceId: evidence.id,
-            skillId,
-          },
-        }).catch(() => {
-          // Ignore duplicate or invalid skill links
-        });
-      }
-      
-      evidenceCount++;
-    }
     
     return {
       success: true,
       data: {
         projectId: project.id,
-        evidenceCount,
       },
     };
   } catch (error) {
     console.error("importGitHubRepo error:", error);
-    return { success: false, error: "Failed to import repository" };
-  }
-}
-
-// ============================================
-// CREATE SKILLS FROM DETECTED
-// ============================================
-
-export async function createSkillsFromDetected(
-  detectedSkills: Array<{ name: string; category: string }>
-): Promise<ActionResult<string[]>> {
-  try {
-    const session = await auth();
-    
-    if (!session?.user?.id) {
-      return { success: false, error: "Authentication required" };
-    }
-    
-    const profile = await db.profile.findUnique({
-      where: { userId: session.user.id },
-    });
-    
-    if (!profile) {
-      return { success: false, error: "Profile not found" };
-    }
-    
-    // Get existing skills
-    const existingSkills = await db.skill.findMany({
-      where: { profileId: profile.id },
-    });
-    
-    const existingNames = new Set(existingSkills.map(s => s.name.toLowerCase()));
-    
-    // Filter out already existing skills
-    const newSkills = detectedSkills.filter(
-      s => !existingNames.has(s.name.toLowerCase())
-    );
-    
-    // Get current highest order
-    const lastSkill = await db.skill.findFirst({
-      where: { profileId: profile.id },
-      orderBy: { displayOrder: "desc" },
-    });
-    
-    let displayOrder = lastSkill ? lastSkill.displayOrder + 1 : 0;
-    const createdIds: string[] = [];
-    
-    for (const skill of newSkills) {
-      const created = await db.skill.create({
-        data: {
-          profileId: profile.id,
-          name: skill.name,
-          category: skill.category as any,
-          displayOrder: displayOrder++,
-        },
-      });
-      createdIds.push(created.id);
-    }
-    
-    // Also return IDs of existing skills that match
-    const existingMatches = existingSkills
-      .filter(s => detectedSkills.some(d => d.name.toLowerCase() === s.name.toLowerCase()))
-      .map(s => s.id);
-    
-    return {
-      success: true,
-      data: [...createdIds, ...existingMatches],
-    };
-  } catch (error) {
-    console.error("createSkillsFromDetected error:", error);
-    return { success: false, error: "Failed to create skills" };
+    const message = error instanceof Error ? error.message : "Failed to import repository";
+    return { success: false, error: message };
   }
 }

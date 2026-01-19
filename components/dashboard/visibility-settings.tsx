@@ -22,11 +22,9 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
     setError(null);
 
     const showEmail = formData.get("showEmail") === "on";
-    const showUnprovenSkills = formData.get("showUnprovenSkills") === "on";
 
     const result = await updateProfileSettings({
       showEmail,
-      showUnprovenSkills,
     });
 
     if (result.success) {
@@ -74,34 +72,6 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
                 className="peer sr-only"
               />
               <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-300 dark:peer-focus:ring-neutral-800 rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-neutral-900 dark:peer-checked:bg-neutral-100 dark:peer-checked:after:bg-neutral-900"></div>
-            </label>
-          </div>
-
-          {/* Show Unverified Skills */}
-          <div className="flex items-center justify-between p-5">
-            <div className="space-y-1">
-              <Label
-                htmlFor="showUnprovenSkills"
-                className="text-sm font-medium text-neutral-900 dark:text-neutral-100 cursor-pointer"
-              >
-                Show Unverified Skills
-              </Label>
-              <p className="text-xs text-neutral-500">
-                Display skills that don't have proof yet.
-              </p>
-            </div>
-            <label
-              htmlFor="showUnprovenSkills"
-              className="relative inline-flex items-center cursor-pointer"
-            >
-              <input
-                id="showUnprovenSkills"
-                name="showUnprovenSkills"
-                type="checkbox"
-                defaultChecked={profileSettings.showUnprovenSkills}
-                className="peer sr-only"
-              />
-              <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-300 dark:peer-focus:ring-neutral-800 rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-neutral-900 dark:peer-checked:bg-neutral-100"></div>
             </label>
           </div>
         </div>

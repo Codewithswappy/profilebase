@@ -176,7 +176,7 @@ const PACKAGE_DEPS: Record<string, { name: string; category: DetectedSkill["cate
   "vitest": { name: "Vitest", category: "TOOL" },
   "@playwright/test": { name: "Playwright", category: "TOOL" },
   "cypress": { name: "Cypress", category: "TOOL" },
-  "framer-motion": { name: "Framer Motion", category: "TOOL" },
+  "motion": { name: "Framer Motion", category: "TOOL" },
   "three": { name: "Three.js", category: "TOOL" },
   "react-three-fiber": { name: "React Three Fiber", category: "TOOL" },
   "d3": { name: "D3.js", category: "TOOL" },

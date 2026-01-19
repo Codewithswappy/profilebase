@@ -20,8 +20,7 @@ export function MagicLinkInput() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<{
     projectName: string;
-    evidenceTitle: string;
-    skillsCount: number;
+    techStackCount: number;
   } | null>(null);
 
   const handleProcess = async (e: React.FormEvent) => {
@@ -60,8 +59,8 @@ export function MagicLinkInput() {
             Success! Import Complete
           </h4>
           <p className="text-xs text-emerald-700 dark:text-emerald-300 truncate">
-            Added <b>{result.evidenceTitle}</b> to project{" "}
-            <b>{result.projectName}</b> with <b>{result.skillsCount}</b> skills.
+            Created project <b>{result.projectName}</b> with{" "}
+            <b>{result.techStackCount}</b> technologies detected.
           </p>
         </div>
         <Button
