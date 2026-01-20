@@ -18,6 +18,8 @@ import {
   ComposedChart,
   Line,
   Legend,
+  RadialBarChart,
+  RadialBar,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -301,9 +303,9 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
       {/* BENTO GRID - Charts in unified container */}
       <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm overflow-hidden">
         {/* Row 1: Traffic Chart (2 cols) + Devices (1 col) */}
-        <div className="grid lg:grid-cols-3 divide-x divide-neutral-200 dark:divide-neutral-800">
+        <div className="grid lg:grid-cols-4 divide-x divide-neutral-200 dark:divide-neutral-800">
           {/* Traffic Chart */}
-          <div className="lg:col-span-2 p-6 flex flex-col">
+          <div className="lg:col-span-3 p-6 flex flex-col">
             <div className="flex items-start justify-between mb-8">
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -323,7 +325,7 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
                     className={cn(
                       "flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-xs",
                       summary.viewTrend >= 0
-                        ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20"
+                        ? "text-emerald-600  border border-emerald-100 dark:border-emerald-500/20"
                         : "text-rose-600 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20",
                     )}
                   >
@@ -818,7 +820,7 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
           </div>
 
           {/* Traffic Sources */}
-          <div className="p-5">
+          <div className="p-5 lg:col-span-2">
             <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest font-mono mb-4">
               Traffic Sources
             </p>
@@ -918,38 +920,129 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
           </div>
 
           {/* Top Projects */}
-          <div className="p-5">
+          {/* Top Projects - Radial Activity Rings */}
+          <div className="p-5 flex flex-col lg:col-span-2">
             <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest font-mono mb-4">
               Top Projects
             </p>
             {topProjects.length > 0 ? (
-              <div className="space-y-3">
-                {topProjects.map((p: TopItem, i: number) => {
-                  const max = topProjects[0]?.count || 1;
-                  const pct = Math.round((p.count / max) * 100);
-                  return (
-                    <div key={i}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 truncate max-w-[200px]">
-                          {p.id}
-                        </span>
-                        <span className="text-xs font-medium text-neutral-400">
-                          {p.count}
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${pct}%`,
-                            backgroundColor:
-                              REFERRER_COLORS[i % REFERRER_COLORS.length],
-                          }}
-                        />
+              <div className="flex items-center h-[200px] gap-4">
+                {/* Radial Chart */}
+                <div className="w-[42%] h-full relative min-w-[140px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadialBarChart
+                      cx="50%"
+                      cy="50%"
+                      innerRadius="40%"
+                      outerRadius="100%"
+                      barSize={12}
+                      data={topProjects
+                        .map((p, i) => ({
+                          name: p.id,
+                          count: p.count,
+                          fill: [
+                            "#d9f99d",
+                            "#84cc16",
+                            "#22c55e",
+                            "#10b981",
+                            "#14b8a6",
+                          ][i % 5],
+                        }))
+                        .reverse()} // Reverse so #1 is outer
+                      startAngle={90}
+                      endAngle={-270}
+                    >
+                      <RadialBar
+                        background={{ fill: "#f3f4f6" }} // Track color
+                        dataKey="count"
+                        cornerRadius={10}
+                        label={false}
+                      />
+                      <Tooltip
+                        cursor={false}
+                        content={({ active, payload }) => {
+                          if (!active || !payload?.length) return null;
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm text-neutral-900 dark:text-white text-xs rounded-xl py-2 px-3 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-neutral-200 dark:border-neutral-800 z-50">
+                              <p className="font-bold mb-0.5 max-w-[150px] truncate">
+                                {data.name}
+                              </p>
+                              <span
+                                className="font-bold"
+                                style={{ color: data.fill }}
+                              >
+                                {data.count} interactions
+                              </span>
+                            </div>
+                          );
+                        }}
+                      />
+                    </RadialBarChart>
+                  </ResponsiveContainer>
+                  {/* Central Metric */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-2xl font-bold text-neutral-900 dark:text-white tracking-tighter">
+                      {topProjects.reduce((acc, curr) => acc + curr.count, 0)}
+                    </span>
+                    <span className="text-[9px] uppercase font-bold text-neutral-400 tracking-widest">
+                      Total
+                    </span>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="flex-1 flex flex-col justify-center gap-3 pr-0">
+                  {topProjects.slice(0, 5).map((p, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 w-full group"
+                    >
+                      <div
+                        className="w-2.5 h-2.5 rounded-full shrink-0 ring-2 ring-white dark:ring-neutral-900 group-hover:scale-110 transition-transform"
+                        style={{
+                          backgroundColor: [
+                            "#d9f99d",
+                            "#84cc16",
+                            "#22c55e",
+                            "#10b981",
+                            "#14b8a6",
+                          ][i % 5],
+                          boxShadow: `0 0 8px ${["#d9f99d", "#84cc16", "#22c55e", "#10b981", "#14b8a6"][i % 5]}60`,
+                        }}
+                      />
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <div className="flex items-center justify-between w-full">
+                          <span
+                            className="text-xs font-semibold text-neutral-700 dark:text-neutral-200 truncate pr-2"
+                            title={p.id}
+                          >
+                            {p.id}
+                          </span>
+                          <span className="text-xs font-bold text-neutral-900 dark:text-neutral-100">
+                            {p.count}
+                          </span>
+                        </div>
+                        {/* Tiny progress bar for relative scale context */}
+                        <div className="w-full h-0.5 bg-neutral-100 dark:bg-neutral-800 rounded-full mt-1.5 overflow-hidden">
+                          <div
+                            className="h-full rounded-full opacity-70"
+                            style={{
+                              width: `${(p.count / (topProjects[0]?.count || 1)) * 100}%`,
+                              backgroundColor: [
+                                "#d9f99d",
+                                "#84cc16",
+                                "#22c55e",
+                                "#10b981",
+                                "#14b8a6",
+                              ][i % 5],
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-400">
