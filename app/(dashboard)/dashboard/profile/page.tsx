@@ -2,6 +2,8 @@ import { getMyProfile } from "@/lib/actions/profile";
 import { ProfileEditor } from "@/components/dashboard/profile-editor";
 import { VisibilitySettings } from "@/components/dashboard/visibility-settings";
 import { ExperienceForm } from "@/components/dashboard/forms/experience-form";
+import { AchievementsForm } from "@/components/dashboard/forms/achievements-form";
+import { CertificatesForm } from "@/components/dashboard/forms/certificates-form";
 
 export const metadata = {
   title: "Profile Settings — SkillDock",
@@ -28,6 +30,8 @@ export default async function ProfilePage() {
       <div className="space-y-6">
         <ProfileEditor data={data} />
         <ExperienceForm initialData={data.experiences} />
+        <AchievementsForm initialData={data.achievements} />
+        <CertificatesForm initialData={data.certificates} />
         <VisibilitySettings data={data} />
       </div>
     </div>

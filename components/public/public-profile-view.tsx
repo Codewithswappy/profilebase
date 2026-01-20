@@ -11,6 +11,8 @@ import { TechIcons } from "@/components/TechIcons";
 import { ProjectCard } from "@/components/public/project-card";
 import { ViewfinderFrame } from "@/components/ui/viewfinder-frame";
 import { ViewfinderButton } from "@/components/ui/viewfinder-button";
+import { AchievementsSection } from "@/components/public/achievements-section";
+import { CertificatesSection } from "@/components/public/certificates-section";
 
 // Props definition
 
@@ -277,6 +279,22 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                 )}
               </div>
             )}
+            {/* --- ACHIEVEMENTS --- */}
+            <div className="border-t border-neutral-200 dark:border-neutral-800/50 border-dashed pt-8">
+              <AchievementsSection
+                achievements={data.achievements}
+                showAchievements={data.profileSettings.showAchievements}
+              />
+            </div>
+
+            {/* --- CERTIFICATES --- */}
+            {data.profileSettings.showCertificates !== false &&
+              data.certificates &&
+              data.certificates.length > 0 && (
+                <div className="border-t border-neutral-200 dark:border-neutral-800/50 border-dashed pt-8">
+                  <CertificatesSection certificates={data.certificates} />
+                </div>
+              )}
 
             {/* --- TECH STACK MARQUEE --- */}
             {showTechStack && allTech.length > 0 && (

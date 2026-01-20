@@ -11,7 +11,7 @@ import {
   UpdateProfileInput,
   UpdateProfileSettingsInput,
 } from "@/lib/validations";
-import { Profile, ProfileSettings } from "@prisma/client";
+import { Profile, ProfileSettings, Achievement, Certificate } from "@prisma/client";
 
 // Import from centralized types
 import type { ActionResult, FullProfile } from "@/lib/types";
@@ -46,6 +46,12 @@ export async function getMyProfile(): Promise<ActionResult<FullProfile | null>> 
         socialLinks: {
           orderBy: { displayOrder: "asc" },
         },
+        achievements: {
+          orderBy: { displayOrder: "asc" },
+        },
+        certificates: {
+          orderBy: { date: "desc" },
+        },
       },
     });
 
@@ -70,6 +76,8 @@ export async function getMyProfile(): Promise<ActionResult<FullProfile | null>> 
         projects: profile.projects,
         experiences: profile.experiences,
         socialLinks: profile.socialLinks,
+        achievements: profile.achievements as Achievement[],
+        certificates: profile.certificates as Certificate[],
       },
     };
   } catch (error) {

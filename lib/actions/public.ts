@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { ActionResult } from "./profile";
-import { Project, Experience, SocialLink } from "@prisma/client";
+import { Project, Experience, SocialLink, Achievement, Certificate } from "@prisma/client";
 import { getUserVerifications, VerificationData } from "./verification";
 
 // Project data type (simplified without evidence)
@@ -31,9 +31,13 @@ export type PublicProfileData = {
     showProjects: boolean;
     showTechStack: boolean;
     showSummary: boolean;
+    showAchievements: boolean;
+    showCertificates?: boolean;
   };
   projects: ProjectData[];
   experiences: Experience[];
+  achievements: Achievement[];
+  certificates: Certificate[];
   socialLinks: SocialLink[];
   userName?: string | null;
   email?: string | null;
@@ -93,6 +97,12 @@ export async function getPublicProfile(slug: string): Promise<ActionResult<Publi
         socialLinks: {
           orderBy: { displayOrder: "asc" },
         },
+        achievements: {
+          orderBy: { displayOrder: "asc" },
+        },
+        certificates: {
+          orderBy: { date: "desc" },
+        },
       },
     });
 
@@ -138,9 +148,14 @@ export async function getPublicProfile(slug: string): Promise<ActionResult<Publi
         showProjects: profileSettings.showProjects,
         showTechStack: profileSettings.showTechStack,
         showSummary: profileSettings.showSummary,
+        showAchievements: profileSettings.showAchievements,
+        // Default to true for now since schema might not have it yet
+        showCertificates: true, 
       },
       projects: profile.projects,
       experiences: profile.experiences,
+      achievements: profile.achievements as Achievement[],
+      certificates: profile.certificates as Certificate[],
       socialLinks: profile.socialLinks,
       userName: user?.name,
       email: profileSettings.showEmail ? user?.email : undefined,
