@@ -29,8 +29,15 @@ export function MobileSidebar() {
         <Menu className="w-6 h-6" />
         <span className="sr-only">Toggle menu</span>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0 bg-transparent border-none w-72">
-        <DashboardSidebar className="border-none bg-white/95 dark:bg-neutral-900/95" />
+      <SheetContent
+        side="left"
+        className="p-0 bg-transparent border-none w-72"
+        showCloseButton={false}
+      >
+        <DashboardSidebar
+          className="border-none bg-neutral-50 dark:bg-neutral-900"
+          onClose={() => setOpen(false)}
+        />
       </SheetContent>
     </Sheet>
   );

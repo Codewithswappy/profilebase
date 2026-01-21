@@ -12,7 +12,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex h-screen bg-neutral-50 dark:bg-background">
       {/* Sidebar for desktop */}
-      <div className="hidden md:block w-64 h-full">
+      <div className="hidden md:block h-full shrink-0">
         <DashboardSidebar />
       </div>
 
@@ -20,7 +20,18 @@ export default async function DashboardLayout({
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <header className="md:hidden h-16 border-b bg-card flex items-center px-4 justify-between">
           <MobileSidebar />
-          <span className="font-bold">SkillDock</span>
+          <div className="h-8">
+            <img
+              src="/logo/blackLogo.png"
+              alt="SkillDock"
+              className="h-full w-auto object-contain block dark:hidden"
+            />
+            <img
+              src="/logo/lightLogo.png"
+              alt="SkillDock"
+              className="h-full w-auto object-contain hidden dark:block"
+            />
+          </div>
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
