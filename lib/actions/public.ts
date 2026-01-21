@@ -149,8 +149,7 @@ export async function getPublicProfile(slug: string): Promise<ActionResult<Publi
         showTechStack: profileSettings.showTechStack,
         showSummary: profileSettings.showSummary,
         showAchievements: profileSettings.showAchievements,
-        // Default to true for now since schema might not have it yet
-        showCertificates: true, 
+        showCertificates: profileSettings.showCertificates, 
       },
       projects: profile.projects,
       experiences: profile.experiences,

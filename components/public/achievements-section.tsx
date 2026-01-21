@@ -51,7 +51,7 @@ export function AchievementsSection({
   return (
     <section className="space-y-6">
       <div className="flex items-center gap-2">
-        <h2 className="font-bold font-mono text-neutral-400 dark:text-neutral-600 tracking-tight uppercase text-xs">
+        <h2 className="font-bold font-mono text-neutral-400 dark:text-neutral-600 tracking-tight uppercase text-md">
           // Honors & Awards
         </h2>
         <span className="text-[10px] font-medium font-mono text-neutral-500">

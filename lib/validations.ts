@@ -53,6 +53,8 @@ export const UpdateProfileSettingsSchema = z.object({
   showProjects: z.boolean().optional(),
   showTechStack: z.boolean().optional(),
   showSummary: z.boolean().optional(),
+  showAchievements: z.boolean().optional(),
+  showCertificates: z.boolean().optional(),
 });
 
 // ============================================

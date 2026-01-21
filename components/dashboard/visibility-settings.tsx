@@ -66,6 +66,8 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
     const showProjects = formData.get("showProjects") === "on";
     const showTechStack = formData.get("showTechStack") === "on";
     const showSummary = formData.get("showSummary") === "on";
+    const showAchievements = formData.get("showAchievements") === "on";
+    const showCertificates = formData.get("showCertificates") === "on";
 
     const result = await updateProfileSettings({
       showEmail,
@@ -73,6 +75,8 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
       showProjects,
       showTechStack,
       showSummary,
+      showAchievements,
+      showCertificates,
     });
 
     if (result.success) {
@@ -133,6 +137,22 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
             label="Show Summary / About"
             description="Display your bio/summary at the bottom of your profile."
             defaultChecked={profileSettings.showSummary ?? true}
+          />
+
+          {/* Show Achievements */}
+          <ToggleItem
+            id="showAchievements"
+            label="Show Honors & Awards"
+            description="Display your awards, badges, hackathons, and OSS contributions."
+            defaultChecked={profileSettings.showAchievements ?? true}
+          />
+
+          {/* Show Certificates */}
+          <ToggleItem
+            id="showCertificates"
+            label="Show Certifications"
+            description="Display your professional certifications."
+            defaultChecked={profileSettings.showCertificates ?? true}
           />
         </div>
 

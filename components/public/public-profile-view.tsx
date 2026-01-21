@@ -183,10 +183,38 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
             </div>
 
             {/* Socials + Buttons Row */}
-            <div className="flex flex-row items-center justify-between  pt-6">
+            <div className="flex flex-row items-center justify-between pt-6">
               {/* Socials */}
-              <div className="pl-0 ">
+              <div className="flex flex-wrap items-center gap-2">
                 <SocialsSection links={data.socialLinks} />
+
+                {/* Email Display */}
+                {profileSettings.showEmail && data.email && (
+                  <a
+                    href={`mailto:${data.email}`}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors group"
+                  >
+                    <div className="w-4 h-4 flex items-center justify-center rounded-full bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="10"
+                        height="10"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                        <polyline points="22,6 12,13 2,6" />
+                      </svg>
+                    </div>
+                    <span className="text-xs font-mono font-medium text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors">
+                      Email
+                    </span>
+                  </a>
+                )}
               </div>
 
               {/* Resume & Contact Buttons */}
@@ -197,12 +225,25 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                 >
                   Resume
                 </ViewfinderButton>
-                <ViewfinderButton
-                  variant="filled"
-                  className="cursor-pointer rounded-none"
-                >
-                  Contact
-                </ViewfinderButton>
+
+                {profileSettings.showEmail && data.email ? (
+                  <a href={`mailto:${data.email}`}>
+                    <ViewfinderButton
+                      variant="filled"
+                      className="cursor-pointer rounded-none"
+                    >
+                      Contact
+                    </ViewfinderButton>
+                  </a>
+                ) : (
+                  <ViewfinderButton
+                    variant="filled"
+                    className="cursor-pointer rounded-none opacity-50 "
+                    title="Contact info hidden"
+                  >
+                    Contact
+                  </ViewfinderButton>
+                )}
               </div>
             </div>
 
@@ -228,7 +269,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
             {/* --- EXPERIENCE --- */}
             {showExperience && (
               <div className="space-y-6">
-                <h2 className="font-bold font-mono text-neutral-400 dark:text-neutral-600 tracking-tight uppercase text-xs">
+                <h2 className="font-bold font-mono text-neutral-400 dark:text-neutral-600 tracking-tight uppercase text-md">
                   // Experience
                 </h2>
                 <ExperienceSection experiences={data.experiences} />
@@ -242,9 +283,9 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
 
             {/* --- PROJECTS --- */}
             {showProjects && (
-              <div className="space-y-6">
+              <div className="space-y-6 border-t border-neutral-200 dark:border-neutral-800/50 border-dashed pt-8">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-bold font-mono text-neutral-400 dark:text-neutral-600 tracking-tight uppercase text-xs">
+                  <h2 className="font-bold font-mono text-neutral-400 dark:text-neutral-600 tracking-tight uppercase text-md">
                     // Projects
                   </h2>
                   <span className="text-[10px] text-neutral-400 font-mono uppercase tracking-wider">
@@ -298,12 +339,12 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
 
             {/* --- TECH STACK MARQUEE --- */}
             {showTechStack && allTech.length > 0 && (
-              <div className="mt-8">
+              <div className="mt-8 border-t border-neutral-200 dark:border-neutral-800/50 border-dashed pt-8">
                 <div className="flex items-center justify-between mb-6">
-                  <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 font-mono tracking-tight uppercase">
+                  <span className="text-md font-semibold text-neutral-500 dark:text-neutral-400 font-mono tracking-tight uppercase">
                     // Tech Stack
                   </span>
-                  <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800 ml-4 border-b border-dashed border-neutral-300 dark:border-neutral-700/30"></div>
+                  {/* <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800 ml-4 border-b border-dashed border-neutral-300 dark:border-neutral-700/30"></div> */}
                 </div>
 
                 <div className="relative w-full mt-4 overflow-visible">
@@ -338,8 +379,13 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
 
             {/* Summary (About) */}
             {showSummary && profile.summary && (
-              <div className="pt-8 border-t border-neutral-200 dark:border-neutral-800/50 border-dashed text-center">
-                <p className="text-sm font-mono text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-lg mx-auto">
+              <div className="flex flex-col gap-4  text-center border-t border-neutral-200 dark:border-neutral-800/50 border-dashed pt-8">
+                 <div className="flex items-center justify-between">
+                  <h2 className="font-bold font-mono text-neutral-400 dark:text-neutral-600 tracking-tight uppercase text-md">
+                    // About me
+                  </h2>
+                </div>
+                <p className="text-sm text-left text-neutral-500 dark:text-neutral-400 leading-relaxed">
                   {profile.summary}
                 </p>
               </div>
