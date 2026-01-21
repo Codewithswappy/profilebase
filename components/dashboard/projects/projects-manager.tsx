@@ -90,7 +90,7 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
               onClick={() => setShowGithubModal(true)}
               className="h-8 text-[10px] uppercase font-mono font-bold border-dashed border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-sm"
             >
-              <IconBrandGithub className="w-3.5 h-3.5 mr-2" />
+              <IconBrandGithub className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Import GitHub</span>
               <span className="md:hidden">Import</span>
             </Button>
@@ -98,7 +98,7 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
               onClick={() => setShowCreateModal(true)}
               className="h-8 text-[10px] uppercase font-mono font-bold bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 shadow-sm rounded-sm"
             >
-              <Plus className="w-3.5 h-3.5 mr-2" />
+              <Plus className="w-3.5 h-3.5" />
               <span className="hidden md:inline">New Project</span>
               <span className="md:hidden">New</span>
             </Button>

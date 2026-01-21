@@ -162,22 +162,22 @@ export function GitHubImportPanel({
   return (
     <div className="space-y-2">
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-dashed border-neutral-200 dark:border-neutral-800">
+      <div className="flex items-center justify-between pb-3 border-b border-dashed border-neutral-200 dark:border-neutral-800">
         <div className="flex items-center gap-2">
           {status?.avatarUrl ? (
             <img
               src={status.avatarUrl}
               alt=""
-              className="w-5 h-5 rounded-md ring-1 ring-neutral-200 dark:ring-neutral-800"
+              className="w-5 h-5 rounded-sm ring-1 ring-neutral-200 dark:ring-neutral-800"
             />
           ) : (
-            <div className="w-5 h-5 rounded-md bg-neutral-100 dark:bg-neutral-800" />
+            <div className="w-5 h-5 rounded-sm bg-neutral-100 dark:bg-neutral-800" />
           )}
           <div className="flex flex-col">
-            <span className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 leading-none">
+            <span className="text-xs font-bold font-mono text-neutral-900 dark:text-neutral-100 leading-none">
               @{status?.username}
             </span>
-            <span className="text-[9px] text-neutral-400 font-medium leading-none mt-0.5 uppercase tracking-wide">
+            <span className="text-[9px] text-neutral-400 font-mono font-medium leading-none mt-0.5 uppercase tracking-wide">
               GitHub Connected
             </span>
           </div>
@@ -187,17 +187,17 @@ export function GitHubImportPanel({
             variant="ghost"
             size="icon"
             onClick={handleRefresh}
-            className="h-6 w-6 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+            className="h-6 w-6 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 rounded-sm"
             title="Refresh Repositories"
           >
-            <IconRefresh className="w-3 h-3" />
+            <IconRefresh className="w-3.5 h-3.5" />
           </Button>
           {onClose && (
             <Button
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="h-6 w-6 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+              className="h-6 w-6 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 rounded-sm"
               title="Close"
             >
               <IconX className="w-3.5 h-3.5" />
@@ -207,29 +207,30 @@ export function GitHubImportPanel({
       </div>
 
       {error && (
-        <div className="text-[10px] font-medium text-red-600 bg-red-50 dark:bg-red-900/10 px-2.5 py-1.5 rounded border border-red-100 dark:border-red-900/20">
+        <div className="text-[10px] font-mono font-medium text-red-600 bg-red-50 dark:bg-red-900/10 px-3 py-2 rounded-sm border border-red-100 dark:border-red-900/20 flex items-center gap-2">
+          <IconX className="w-3 h-3" />
           {error}
         </div>
       )}
 
       {/* Lists Container - Scrollable if long */}
-      <div className="space-y-3 max-h-full overflow-y-auto pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+      <div className="space-y-4 pt-2 max-h-full overflow-y-auto pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
         {/* Already Imported */}
         {imported.length > 0 && (
-          <div className="space-y-1">
-            <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest pl-1">
-              Imported
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold font-mono text-neutral-400 uppercase tracking-widest pl-1">
+              Imported Repos
             </p>
             <div className="space-y-1">
               {imported.map((repo) => (
                 <div
                   key={repo.id}
-                  className="flex items-center gap-2 px-2 py-1 rounded-md text-neutral-500 bg-neutral-50/50 dark:bg-neutral-900/20 border border-transparent"
+                  className="flex items-center justify-between px-3 py-2 rounded-sm text-neutral-500 bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800"
                 >
-                  <IconCheck className="w-3 h-3 text-emerald-500/70 shrink-0" />
-                  <span className="text-[11px] font-medium truncate opacity-70 decoration-neutral-400 decoration-1">
+                  <span className="text-xs font-mono font-medium truncate opacity-70">
                     {repo.name}
                   </span>
+                  <IconCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                 </div>
               ))}
             </div>
@@ -239,37 +240,36 @@ export function GitHubImportPanel({
         {/* Available to Import */}
         {notImported.length > 0 && (
           <div className="space-y-2">
-            <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest pl-1">
+            <p className="text-[10px] font-bold font-mono text-neutral-400 uppercase tracking-widest pl-1">
               Available
             </p>
-            <div className="relative overflow-hidden bg-neutral-50/50 dark:bg-neutral-900/50">
-              <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white dark:from-neutral-950 to-transparent pointer-events-none z-10" />
-              <div className="max-h-[340px] overflow-y-auto p-2 space-y-1 pr-1 pb-10 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+            <div className="relative overflow-hidden">
+              <div className="max-h-[340px] overflow-y-auto space-y-2 pr-1 pb-4">
                 {notImported.map((repo) => (
                   <div
                     key={repo.id}
-                    className="group flex items-center justify-between px-2.5 py-2 rounded-md border border-neutral-100 dark:border-neutral-800/60 hover:border-neutral-300 dark:hover:border-neutral-700 bg-white dark:bg-neutral-950 hover:shadow-sm transition-all duration-200 min-h-[40px]"
+                    className="group flex items-center justify-between px-3 py-2.5 rounded-sm border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all duration-200"
                   >
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       {repo.isPrivate ? (
-                        <IconLock className="w-3 h-3 text-neutral-400 shrink-0" />
+                        <IconLock className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
                       ) : (
                         <div className="w-1.5 h-1.5 rounded-full bg-neutral-300 dark:bg-neutral-700 shrink-0" />
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 truncate group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+                          <span className="text-xs font-bold font-mono text-neutral-900 dark:text-neutral-100 truncate">
                             {repo.name}
                           </span>
                           {repo.stars > 0 && (
-                            <span className="flex items-center gap-0.5 text-[9px] text-neutral-400 font-medium bg-neutral-50 dark:bg-neutral-900 px-1 py-0.5 rounded-sm">
+                            <span className="flex items-center gap-1 text-[9px] text-neutral-500 font-mono bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded-sm border border-neutral-200 dark:border-neutral-700">
                               <IconStar className="w-2.5 h-2.5" />
                               {repo.stars}
                             </span>
                           )}
                         </div>
                         {repo.description && (
-                          <p className="text-[10px] text-neutral-400 truncate mt-0.5 font-medium leading-tight max-w-[95%]">
+                          <p className="text-[10px] text-neutral-500 font-mono truncate mt-1 leading-tight max-w-[95%]">
                             {repo.description}
                           </p>
                         )}
@@ -279,14 +279,14 @@ export function GitHubImportPanel({
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-5 px-1.5 opacity-0 group-hover:opacity-100 transition-opacity bg-neutral-900 dark:bg-white text-white dark:text-black text-[9px] font-bold tracking-wide rounded-[3px] ml-2"
+                      className="h-6 px-2 opacity-0 group-hover:opacity-100 transition-opacity bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-[9px] font-mono font-bold tracking-wider uppercase rounded-sm ml-2 hover:text-white dark:hover:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200"
                       onClick={() => handleQuickImport(repo)}
                       disabled={importingRepo === repo.fullName || isPending}
                     >
                       {importingRepo === repo.fullName ? (
                         <IconLoader2 className="w-3 h-3 animate-spin" />
                       ) : (
-                        <span className="flex items-center">IMPORT</span>
+                        <span className="flex items-center">Import</span>
                       )}
                     </Button>
                   </div>
@@ -297,8 +297,8 @@ export function GitHubImportPanel({
         )}
 
         {notImported.length === 0 && imported.length === 0 && (
-          <div className="text-center py-6">
-            <p className="text-xs text-neutral-400 font-medium">
+          <div className="text-center py-8 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-sm bg-neutral-50/50 dark:bg-neutral-900/50">
+            <p className="text-xs font-mono text-neutral-500 font-medium">
               No repositories found.
             </p>
           </div>
