@@ -105,11 +105,7 @@ export function DashboardSidebar({
     <motion.div
       initial="expanded"
       animate={isCollapsed ? "collapsed" : "expanded"}
-      variants={onClose ? {} : sidebarVariants} // Disable width animation on mobile container if needed, or keep it. Keeping it "expanded" variants usually fine.
-      // actually if we want 'sidebar animation' on mobile, we might want the initial slide-in.
-      // But the SHEET handles the slide-in. The sidebar content just needs to stagger.
-      // So we keep variants for children but maybe static width for mobile?
-      // "variants={sidebarVariants}" is fine because we force isCollapsed=false.
+      variants={onClose ? {} : sidebarVariants} 
       className={cn(
         "flex flex-col h-full bg-white dark:bg-[#0A0A0A] border-r border-neutral-200 dark:border-neutral-900 z-50 relative",
         className,
@@ -245,7 +241,7 @@ export function DashboardSidebar({
                   {!isCollapsed && isActive && (
                     <motion.div
                       layoutId="active-dot"
-                      className="absolute left-[-13px] w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white shadow-[0_0_8px_rgba(0,0,0,0.2)] dark:shadow-[0_0_8px_rgba(255,255,255,0.2)]"
+                      className="absolute left-[-9px] w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white shadow-[0_0_8px_rgba(0,0,0,0.2)] dark:shadow-[0_0_8px_rgba(255,255,255,0.2)]"
                     />
                   )}
 

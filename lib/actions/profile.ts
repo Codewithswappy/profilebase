@@ -37,6 +37,7 @@ export async function getMyProfile(): Promise<ActionResult<FullProfile | null>> 
     const profile = await db.profile.findUnique({
       where: { userId },
       include: {
+        user: true,
         projects: {
           orderBy: { displayOrder: "asc" },
         },

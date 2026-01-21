@@ -1,13 +1,13 @@
 // Profile-related types (Portfolio Architecture)
 
-import { Profile, ProfileSettings, Project, Experience, SocialLink, Achievement, Certificate } from "@prisma/client";
+import { Profile, ProfileSettings, Project, Experience, SocialLink, Achievement, Certificate, User } from "@prisma/client";
 
 /**
  * Complete profile data including all related entities
  * Used in dashboard and profile management
  */
 export type FullProfile = {
-  profile: Profile;
+  profile: Profile & { user: User };
   profileSettings: ProfileSettings;
   projects: Project[];
   experiences: Experience[];
