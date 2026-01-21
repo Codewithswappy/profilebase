@@ -54,7 +54,7 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-100px)] -mt-4">
+    <div className="flex flex-col h-[calc(100vh-80px)]">
       {/* 
         TOOLBAR
         Mobile: Hidden if project selected.
@@ -62,22 +62,24 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
       */}
       <div
         className={cn(
-          "px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-950 shrink-0",
+          "px-6 py-4 border-b border-dashed border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shrink-0",
           selectedProjectId ? "hidden md:flex" : "flex",
         )}
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between w-full gap-4">
-          <div className="flex items-center gap-4">
-            <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight">
+          <div className="flex items-center gap-4 flex-1">
+            <h2 className="text-xs font-bold font-mono uppercase tracking-widest text-neutral-500 flex items-center gap-2">
+              <IconBoxMultiple className="w-4 h-4" />
               Projects
             </h2>
+            <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-800 hidden md:block" />
             <div className="relative w-full md:w-64">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400" />
               <Input
-                placeholder="Search projects..."
+                placeholder="SEARCH PROJECTS..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-9 pl-9 bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-xs focus-visible:ring-1 focus-visible:ring-neutral-300 dark:focus-visible:ring-neutral-700 w-full"
+                className="h-8 pl-9 bg-neutral-50 dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 text-[10px] font-mono uppercase placeholder:text-neutral-400 focus-visible:ring-0 focus-visible:border-neutral-400 rounded-sm w-full"
               />
             </div>
           </div>
@@ -86,17 +88,17 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
             <Button
               variant="outline"
               onClick={() => setShowGithubModal(true)}
-              className="h-9 text-xs font-medium border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              className="h-8 text-[10px] uppercase font-mono font-bold border-dashed border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-sm"
             >
-              <IconBrandGithub className="w-3.5 h-3.5" />
+              <IconBrandGithub className="w-3.5 h-3.5 mr-2" />
               <span className="hidden md:inline">Import GitHub</span>
               <span className="md:hidden">Import</span>
             </Button>
             <Button
               onClick={() => setShowCreateModal(true)}
-              className="h-9 text-xs font-medium bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 shadow-sm"
+              className="h-8 text-[10px] uppercase font-mono font-bold bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 shadow-sm rounded-sm"
             >
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              <Plus className="w-3.5 h-3.5 mr-2" />
               <span className="hidden md:inline">New Project</span>
               <span className="md:hidden">New</span>
             </Button>
@@ -113,7 +115,7 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
         */}
         <div
           className={cn(
-            "w-full flex-col border-r border-neutral-200 dark:border-neutral-800 bg-neutral-50/30 dark:bg-neutral-900/10 md:w-80",
+            "w-full flex-col border-r border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900 md:w-80",
             selectedProjectId ? "hidden md:flex" : "flex",
           )}
         >
@@ -145,15 +147,15 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
             />
           ) : (
             <div className="h-full w-full flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500">
-              <div className="w-20 h-20 rounded-2xl bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center mb-6 shadow-sm border border-neutral-100 dark:border-neutral-800 rotate-3 transform transition-transform hover:rotate-6">
-                <IconBoxMultiple className="w-10 h-10 text-neutral-300 dark:text-neutral-600" />
+              <div className="w-24 h-24 rounded-full border border-dashed border-neutral-200 dark:border-neutral-800 flex items-center justify-center mb-6 bg-neutral-50/50 dark:bg-neutral-900/50">
+                <IconBoxMultiple className="w-10 h-10 text-neutral-300 dark:text-neutral-700" />
               </div>
-              <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-2">
-                Select a project to manage
+              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-neutral-900 dark:text-neutral-100 mb-2">
+                No Project Selected
               </h3>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm leading-relaxed mb-8">
-                View project details, manage tech stack, or create new projects
-                for your portfolio.
+              <p className="text-xs font-mono text-neutral-500 dark:text-neutral-500 max-w-sm leading-relaxed mb-8">
+                Select a project from the list or create a new one to get
+                started.
               </p>
             </div>
           )}
@@ -162,7 +164,7 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
 
       {/* Create Project Modal */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="w-[95vw] sm:max-w-[500px] max-h-[90vh] p-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] border-none shadow-2xl rounded-xl">
+        <DialogContent className="w-[95vw] sm:max-w-[500px] max-h-[90vh] p-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] border-none shadow-2xl rounded-sm">
           <ProjectForm
             initialData={editingProject}
             onCancel={handleCreateClosed}
@@ -173,12 +175,14 @@ export function ProjectsManager({ data }: ProjectsManagerProps) {
 
       {/* GitHub Import Modal */}
       <Dialog open={showGithubModal} onOpenChange={setShowGithubModal}>
-        <DialogContent className="w-full max-w-[500px] p-6 border-none shadow-2xl rounded-xl bg-white dark:bg-neutral-950">
-          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-neutral-100 dark:border-neutral-800">
-            <div className="p-1 rounded-md bg-black text-white dark:bg-white dark:text-black">
+        <DialogContent className="w-full max-w-[500px] p-6 border-none shadow-2xl rounded-sm bg-white dark:bg-neutral-950">
+          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-dashed border-neutral-200 dark:border-neutral-800">
+            <div className="p-1 rounded-sm bg-black text-white dark:bg-white dark:text-black">
               <IconBrandGithub className="w-3.5 h-3.5" />
             </div>
-            <h3 className="text-sm font-semibold">GitHub Import</h3>
+            <h3 className="text-xs font-bold font-mono uppercase tracking-wider">
+              GitHub Import
+            </h3>
           </div>
           <GitHubImportPanel onImported={handleImported} />
         </DialogContent>
