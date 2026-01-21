@@ -12,16 +12,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Trophy,
-  Loader2,
-  Plus,
-  Trash2,
-  Pencil,
-  ExternalLink,
-  Medal,
-  Award,
-  Star,
-} from "lucide-react";
+  IconTrophy,
+  IconLoader2,
+  IconPlus,
+  IconTrash,
+  IconPencil,
+  IconExternalLink,
+  IconMedal,
+  IconAward,
+  IconStar,
+} from "@tabler/icons-react";
 import { format } from "date-fns";
 import { Achievement } from "@prisma/client";
 import { cn } from "@/lib/utils";
@@ -134,27 +134,27 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
   }
 
   const icons: Record<string, React.ElementType> = {
-    award: Trophy,
-    badge: Medal,
-    hackathon: Award,
-    oss: Star,
+    award: IconTrophy,
+    badge: IconMedal,
+    hackathon: IconAward,
+    oss: IconStar,
   };
 
   return (
-    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm overflow-hidden mt-6">
-      <div className="flex items-center justify-between p-5 border-b border-neutral-200 dark:border-neutral-800">
-        <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-          <Trophy className="w-3.5 h-3.5" />
+    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm overflow-hidden">
+      <div className="flex items-center justify-between p-3 border-b border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
+        <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-neutral-500 flex items-center gap-2">
+          <IconTrophy className="w-4 h-4" />
           Honors & Awards
-        </p>
+        </h3>
         {!isAdding && (
           <Button
             onClick={() => setIsAdding(true)}
             size="sm"
-            variant="outline"
-            className="h-8 text-xs font-medium"
+            variant="ghost"
+            className="h-7 text-[10px] font-mono uppercase tracking-wider hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
-            <Plus className="w-3.5 h-3.5 mr-1" /> Add
+            <IconPlus className="w-3.5 h-3.5 mr-1" /> Add
           </Button>
         )}
       </div>
@@ -163,33 +163,33 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
       {!isAdding && (
         <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
           {(initialData || []).length === 0 && ( // Handle null/undefined initially
-            <div className="p-8 text-center text-neutral-500 text-sm">
+            <div className="p-8 text-center text-neutral-500 text-xs font-mono uppercase tracking-wide">
               No achievements added yet.
             </div>
           )}
           {(initialData || []).map((item) => {
-            const Icon = icons[item.type] || Trophy;
+            const Icon = icons[item.type] || IconTrophy;
             return (
               <div
                 key={item.id}
-                className="p-5 flex items-start justify-between group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+                className="p-5 flex items-start justify-between group hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-sm bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 border border-neutral-200 dark:border-neutral-700">
                     <Icon className="w-4 h-4 text-neutral-500" />
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                  <div className="space-y-0.5">
+                    <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
                       {item.title}
                     </h3>
                     {item.subtitle && (
-                      <p className="text-xs text-neutral-500 pb-0.5">
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400">
                         {item.subtitle}
                       </p>
                     )}
-                    <div className="flex items-center gap-2 text-xs text-neutral-500">
+                    <div className="flex items-center gap-2 text-xs text-neutral-500 mt-1 font-mono">
                       {item.type && (
-                        <span className="uppercase text-[10px] font-mono border border-neutral-200 dark:border-neutral-700 px-1.5 py-0.5 rounded">
+                        <span className="uppercase text-[10px] border border-neutral-200 dark:border-neutral-700 px-1.5 py-0.5 rounded-sm bg-neutral-50 dark:bg-neutral-800/50">
                           {item.type}
                         </span>
                       )}
@@ -204,18 +204,18 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-7 w-7"
+                    className="h-7 w-7 rounded-sm"
                     onClick={() => handleEdit(item)}
                   >
-                    <Pencil className="w-3.5 h-3.5" />
+                    <IconPencil className="w-3.5 h-3.5" />
                   </Button>
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+                    className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-sm"
                     onClick={() => handleDelete(item.id)}
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <IconTrash className="w-3.5 h-3.5" />
                   </Button>
                 </div>
               </div>
@@ -228,11 +228,11 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
       {isAdding && (
         <form
           onSubmit={handleSubmit}
-          className="p-5 space-y-4 animate-in slide-in-from-top-2"
+          className="p-5 space-y-4 animate-in slide-in-from-top-2 bg-neutral-50/30 dark:bg-neutral-900/30"
         >
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-[11px] uppercase text-neutral-400">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-mono uppercase text-neutral-500">
                 Title
               </Label>
               <Input
@@ -242,11 +242,11 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
                   setFormData({ ...formData, title: e.target.value })
                 }
                 placeholder="e.g. Vercel OSS Program"
-                className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                className="h-9 font-mono text-xs bg-white dark:bg-neutral-900"
               />
             </div>
-            <div className="space-y-2">
-              <Label className="text-[11px] uppercase text-neutral-400">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-mono uppercase text-neutral-500">
                 SubTitle / Context
               </Label>
               <Input
@@ -255,14 +255,14 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
                   setFormData({ ...formData, subtitle: e.target.value })
                 }
                 placeholder="e.g. Summer 2025 Cohort"
-                className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                className="h-9 font-mono text-xs bg-white dark:bg-neutral-900"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-[11px] uppercase text-neutral-400">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-mono uppercase text-neutral-500">
                 Type
               </Label>
               <Select
@@ -271,19 +271,39 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
                   setFormData({ ...formData, type: String(val || "award") })
                 }
               >
-                <SelectTrigger className="h-9 bg-neutral-50 dark:bg-neutral-950/50">
+                <SelectTrigger className="h-9 font-mono text-xs bg-white dark:bg-neutral-900 uppercase">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="award">Award</SelectItem>
-                  <SelectItem value="badge">Badge</SelectItem>
-                  <SelectItem value="hackathon">Hackathon</SelectItem>
-                  <SelectItem value="oss">Open Source</SelectItem>
+                  <SelectItem
+                    value="award"
+                    className="font-mono text-xs uppercase"
+                  >
+                    Award
+                  </SelectItem>
+                  <SelectItem
+                    value="badge"
+                    className="font-mono text-xs uppercase"
+                  >
+                    Badge
+                  </SelectItem>
+                  <SelectItem
+                    value="hackathon"
+                    className="font-mono text-xs uppercase"
+                  >
+                    Hackathon
+                  </SelectItem>
+                  <SelectItem
+                    value="oss"
+                    className="font-mono text-xs uppercase"
+                  >
+                    Open Source
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label className="text-[11px] uppercase text-neutral-400">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-mono uppercase text-neutral-500">
                 Date
               </Label>
               <Input
@@ -292,13 +312,13 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, date: e.target.value })
                 }
-                className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                className="h-9 font-mono text-xs bg-white dark:bg-neutral-900"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-[11px] uppercase text-neutral-400">
+          <div className="space-y-1.5">
+            <Label className="text-[10px] font-mono uppercase text-neutral-500">
               URL (Certificate/Link)
             </Label>
             <Input
@@ -307,17 +327,16 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
                 setFormData({ ...formData, url: e.target.value })
               }
               placeholder="https://..."
-              className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+              className="h-9 font-mono text-xs bg-white dark:bg-neutral-900"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-[11px] uppercase text-neutral-400">
+          <div className="space-y-1.5">
+            <Label className="text-[10px] font-mono uppercase text-neutral-500">
               Description (Bullet points)
             </Label>
-            <p className="text-[10px] text-neutral-400 mb-1">
-              Enter each point on a new line. Supports markdown links:
-              [Title](url)
+            <p className="text-[10px] text-neutral-400 font-mono">
+              Enter each point on a new line.
             </p>
             <Textarea
               value={formData.description}
@@ -325,18 +344,18 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
                 setFormData({ ...formData, description: e.target.value })
               }
               placeholder="- Selected for program...&#10;- Received credits..."
-              className="bg-neutral-50 dark:bg-neutral-950/50 resize-none"
+              className="bg-white dark:bg-neutral-900 font-mono text-xs resize-none"
               rows={4}
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 pt-2 border-t border-dashed border-neutral-200 dark:border-neutral-800">
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={resetForm}
-              className="h-8"
+              className="h-8 font-mono text-xs uppercase"
             >
               Cancel
             </Button>
@@ -344,14 +363,16 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
               type="submit"
               size="sm"
               disabled={isLoading}
-              className="h-8 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900"
+              className="h-8 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-mono text-xs uppercase font-bold rounded-sm"
             >
               {isLoading ? (
-                <Loader2 className="w-3 h-3 animate-spin" />
+                <IconLoader2 className="w-3 h-3 animate-spin" />
               ) : editingId ? (
-                "Update"
+                "Update Item"
               ) : (
-                "Add"
+                <>
+                  <IconPlus className="w-3 h-3 mr-1" /> Add Item
+                </>
               )}
             </Button>
           </div>

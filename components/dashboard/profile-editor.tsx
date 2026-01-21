@@ -13,20 +13,32 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  AlertCircle,
-  User,
-  X,
-  ImageIcon,
-  Loader2,
-  Globe,
-  Eye,
-  Lock,
-} from "lucide-react";
+  IconAlertCircle,
+  IconUser,
+  IconX,
+  IconPhoto,
+  IconLoader2,
+  IconWorld,
+  IconEye,
+  IconLock,
+  IconBrandGithub,
+  IconBrandLinkedin,
+  IconBrandTwitter,
+  IconBrandInstagram,
+  IconLink,
+  IconDeviceFloppy,
+  IconTrash,
+  IconCheck,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { UploadButton } from "@/lib/uploadthing";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
+import { ExperienceForm } from "@/components/dashboard/forms/experience-form";
+import { AchievementsForm } from "@/components/dashboard/forms/achievements-form";
+import { CertificatesForm } from "@/components/dashboard/forms/certificates-form";
+import { VisibilitySettings } from "@/components/dashboard/visibility-settings";
 
 interface ProfileEditorProps {
   data: FullProfile;
@@ -43,7 +55,6 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
     profile.image || null,
   );
 
-  // We keep imageUrl state for form submission, updated by upload success
   // We keep imageUrl state for form submission, updated by upload success
   const [imageUrl, setImageUrl] = useState<string>(profile.image || "");
   const [coverImageUrl, setCoverImageUrl] = useState<string>(
@@ -87,8 +98,7 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
     });
 
     if (result.success) {
-      // Update socials if profile update succeeded
-      // We don't block on this, but maybe we should awaiting it to show error if it fails
+      // Update socials
       try {
         await updateSocials(socialLinks);
         setSuccess(true);
@@ -136,101 +146,94 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
 
   return (
     <div className="space-y-6">
-      {/* BENTO GRID - Profile Settings */}
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm overflow-hidden">
-        {/* Header Row */}
-        <div className="flex items-center justify-between p-5 border-b border-neutral-200 dark:border-neutral-800">
-          <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
-            Identity & Status
+      {/* Introduction / Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-dashed border-neutral-200 dark:border-neutral-800 pb-6">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 font-mono">
+            PROFILE SETTINGS
+          </h1>
+          <p className="text-xs text-neutral-500 mt-1 uppercase tracking-widest">
+            Manage your public identity
           </p>
-
-          <div className="flex items-center gap-3">
-            {/* Public Toggle */}
-            <div className="flex items-center gap-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-sm px-3 py-1 border border-neutral-100 dark:border-neutral-700/50">
-              {profileSettings.isPublic ? (
-                <Globe className="w-3.5 h-3.5 text-emerald-500" />
-              ) : (
-                <Lock className="w-3.5 h-3.5 text-neutral-400" />
-              )}
-              <span
-                className={cn(
-                  "text-xs font-medium",
-                  profileSettings.isPublic
-                    ? "text-emerald-600 dark:text-emerald-400"
-                    : "text-neutral-500",
-                )}
-              >
-                {profileSettings.isPublic ? "Public" : "Private"}
-              </span>
-              <Switch
-                checked={profileSettings.isPublic}
-                onCheckedChange={handleVisibilityToggle}
-                className="scale-75 ml-1"
-              />
-            </div>
-
-            {/* View Link */}
-            <Link
-              href={`/${profile.slug}`}
-              target="_blank"
-              className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 transition-colors"
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span>View</span>
-            </Link>
-          </div>
         </div>
 
-        <form action={handleSubmit}>
-          {/* Cover & Avatar Section */}
-          <div className="relative border-b border-neutral-200 dark:border-neutral-800">
-            {/* Cover Image Area */}
-            {/* Cover Image Area */}
-            <div className="relative w-full h-32 md:h-48 bg-neutral-50 dark:bg-neutral-950/30 group overflow-hidden">
-              {/* Grid pattern for empty state */}
-              {!coverImagePreview && (
-                <div className="absolute inset-0 opacity-[0.03] pattern-grid-lg" />
+        {/* Visibility Toggle */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-900 rounded-sm px-3 py-1.5 border border-dashed border-neutral-200 dark:border-neutral-800">
+            {profileSettings.isPublic ? (
+              <IconWorld className="w-4 h-4 text-emerald-500" />
+            ) : (
+              <IconLock className="w-4 h-4 text-neutral-400" />
+            )}
+            <span
+              className={cn(
+                "text-xs font-mono font-medium uppercase",
+                profileSettings.isPublic
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-neutral-500",
               )}
+            >
+              {profileSettings.isPublic ? "Public" : "Private"}
+            </span>
+            <Switch
+              checked={profileSettings.isPublic}
+              onCheckedChange={handleVisibilityToggle}
+              className="scale-75 ml-1"
+            />
+          </div>
 
-              {coverImagePreview ? (
-                <img
-                  src={coverImagePreview}
-                  alt="Cover"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              ) : null}
+          <Link href={`/${profile.slug}`} target="_blank">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 border-dashed border-neutral-300 dark:border-neutral-700 font-mono text-xs uppercase tracking-wider"
+            >
+              <IconEye className="w-3.5 h-3.5 mr-2" />
+              View Live
+            </Button>
+          </Link>
+        </div>
+      </div>
 
-              {/* Cover Actions - Always visible when empty, visible on hover when filled */}
-              <div
-                className={cn(
-                  "absolute inset-0 flex flex-col items-center justify-center gap-2 transition-all duration-200",
-                  coverImagePreview
-                    ? "opacity-0 group-hover:opacity-100 bg-black/10 backdrop-blur-[2px]"
-                    : "opacity-100",
+      <form action={handleSubmit}>
+        <div className="grid grid-cols-1 gap-8">
+          {/* Left Column: Visual Identity */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm overflow-hidden">
+              <div className="p-3 border-b border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
+                <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-neutral-500">
+                  Visual Assets
+                </h3>
+              </div>
+
+              {/* Cover Image */}
+              <div className="relative h-32 w-full bg-neutral-100 dark:bg-neutral-900 group">
+                {!coverImagePreview && (
+                  <div className="absolute inset-0 flex items-center justify-center text-neutral-300 dark:text-neutral-700">
+                    <div className="text-center">
+                      <IconPhoto className="w-8 h-8 mx-auto opacity-50 mb-1" />
+                      <span className="text-[10px] uppercase font-mono tracking-widest block">
+                        No Cover
+                      </span>
+                    </div>
+                  </div>
                 )}
-              >
-                <div className="flex gap-2">
-                  {/* Remove Button (Only if filled) */}
-                  {coverImagePreview && (
-                    <button
-                      type="button"
-                      onClick={handleRemoveCoverImage}
-                      className="h-8 px-3 bg-white/90 dark:bg-neutral-900/90 text-red-500 hover:text-red-600 hover:bg-white dark:hover:bg-neutral-900 text-[10px] font-semibold rounded-sm shadow-sm transition-all flex items-center gap-1.5"
-                    >
-                      <X className="w-3.5 h-3.5" /> Remove
-                    </button>
-                  )}
 
-                  {/* Upload/Change Button */}
+                {coverImagePreview && (
+                  <img
+                    src={coverImagePreview}
+                    alt="Cover"
+                    className="w-full h-full object-cover transition-opacity group-hover:opacity-40"
+                  />
+                )}
+
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
                   <div className="relative">
                     <UploadButton
                       endpoint="imageUploader"
                       appearance={{
                         button: cn(
-                          "text-[10px] font-semibold h-8 px-4 rounded-sm shadow-sm transition-all flex items-center gap-1.5 !text-neutral-900 dark:!text-neutral-100",
-                          coverImagePreview
-                            ? "bg-white/95 dark:bg-neutral-900/95 hover:bg-white dark:hover:bg-neutral-900 border border-neutral-200 dark:border-neutral-700"
-                            : "bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-700/50",
+                          "h-8 px-3 text-[10px] font-mono uppercase font-bold bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 rounded-sm shadow-sm transition-transform active:scale-95 flex items-center gap-2",
                         ),
                         allowedContent: "hidden",
                       }}
@@ -238,14 +241,10 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
                         button({ ready }) {
                           if (!ready) return "Loading...";
                           return (
-                            <span className="flex items-center gap-1.5">
-                              <ImageIcon className="w-3.5 h-3.5" />
-                              {isUploadingCover
-                                ? "Uploading..."
-                                : coverImagePreview
-                                  ? "Change Cover"
-                                  : "Add Cover Image"}
-                            </span>
+                            <>
+                              <IconPhoto className="w-3.5 h-3.5" />{" "}
+                              {coverImagePreview ? "CHANGE" : "UPLOAD"}
+                            </>
                           );
                         },
                       }}
@@ -255,82 +254,67 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
                       }}
                       onClientUploadComplete={(res) => {
                         setIsUploadingCover(false);
-                        if (res && res[0]) {
+                        if (res && res[0])
                           handleCoverImageUrlChange(res[0].url);
-                        }
                       }}
                       onUploadError={(error: Error) => {
                         setIsUploadingCover(false);
-                        let msg = error.message;
-                        if (msg.includes("File size"))
-                          msg = "Image too large (max 4MB)";
-                        else if (msg.includes("Invalid file type"))
-                          msg = "Unsupported file type";
-                        setUploadError(msg);
+                        setUploadError(error.message);
                       }}
                     />
                   </div>
+                  {coverImagePreview && (
+                    <Button
+                      type="button"
+                      onClick={handleRemoveCoverImage}
+                      size="sm"
+                      variant="destructive"
+                      className="h-8 w-8 p-0 rounded-sm"
+                    >
+                      <IconTrash className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
                 </div>
-
-                {/* Shared Upload Error (visible on hover or if no cover) */}
-                {uploadError && !isUploadingImage && (
-                  <div className="px-3 py-1 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-[10px] font-medium rounded-full shadow-sm animate-in fade-in slide-in-from-bottom-2">
-                    {uploadError}
+                {isUploadingCover && (
+                  <div className="absolute inset-0 bg-neutral-900/50 flex items-center justify-center z-20">
+                    <IconLoader2 className="w-5 h-5 text-white animate-spin" />
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Avatar Row (Overlapping) */}
-            <div className="flex px-5 pb-5 -mt-10 relative z-10 pointer-events-none">
-              <div className="pointer-events-auto flex flex-col gap-2">
-                <div className="flex items-end gap-4">
-                  {/* Avatar */}
-                  <div className="relative group">
-                    <div
-                      className={cn(
-                        "relative w-20 h-20 rounded-sm overflow-hidden bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center transition-all duration-500 border-4 border-white dark:border-neutral-900 shadow-sm",
-                        isUploadingImage && "ring-2 ring-indigo-500/30",
-                      )}
-                    >
-                      {isUploadingImage && (
-                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-[2px] animate-in fade-in">
-                          <Loader2 className="w-6 h-6 text-white animate-spin" />
-                        </div>
-                      )}
-                      {imagePreview ? (
-                        <Image
-                          src={imagePreview}
-                          alt="Profile preview"
-                          width={80}
-                          height={80}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <User className="w-8 h-8 text-neutral-300" />
-                      )}
-                    </div>
-                    {/* Avatar Upload Trigger */}
-                    <div className="absolute -bottom-2 -right-2 flex gap-1">
-                      {imagePreview && !isUploadingImage && (
-                        <button
-                          type="button"
-                          onClick={handleRemoveImage}
-                          className="w-6 h-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors shadow-sm border border-white dark:border-neutral-900"
-                          title="Remove avatar"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      )}
+              {/* Avatar - Negative Margin overlap */}
+              <div className="px-4 pb-4 -mt-10 relative z-10 pointer-events-none">
+                <div className="pointer-events-auto inline-block relative group">
+                  <div
+                    className={cn(
+                      "w-20 h-20 rounded-sm border-4 border-white dark:border-neutral-900 bg-neutral-200 dark:bg-neutral-800 overflow-hidden relative shadow-sm",
+                      isUploadingImage &&
+                        "ring-2 ring-neutral-900 dark:ring-neutral-100",
+                    )}
+                  >
+                    {imagePreview ? (
+                      <Image
+                        src={imagePreview}
+                        alt="Avatar"
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover group-hover:opacity-50 transition-opacity"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                        <IconUser className="w-8 h-8" />
+                      </div>
+                    )}
 
-                      <div className="w-6 h-6 overflow-hidden relative rounded-full bg-neutral-900 text-white hover:bg-neutral-800 transition-colors shadow-sm border border-white dark:border-neutral-900 flex items-center justify-center cursor-pointer">
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="relative w-full h-full cursor-pointer flex items-center justify-center">
                         <UploadButton
                           endpoint="imageUploader"
                           appearance={{
                             button:
-                              "w-full h-full bg-transparent opacity-0 absolute inset-0 z-10 cursor-pointer", // Invisible overlay
+                              "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10",
                             allowedContent: "hidden",
-                            container: "w-full h-full absolute inset-0",
+                            container: "absolute inset-0 w-full h-full",
                           }}
                           onUploadBegin={() => {
                             setIsUploadingImage(true);
@@ -338,208 +322,228 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
                           }}
                           onClientUploadComplete={(res) => {
                             setIsUploadingImage(false);
-                            if (res && res[0]) {
-                              handleImageUrlChange(res[0].url);
-                            }
+                            if (res && res[0]) handleImageUrlChange(res[0].url);
                           }}
                           onUploadError={(error: Error) => {
                             setIsUploadingImage(false);
-                            let msg = error.message;
-                            if (msg.includes("File size"))
-                              msg = "Image too large (max 4MB)";
-                            else if (msg.includes("Invalid file type"))
-                              msg = "Unsupported file type";
-                            setUploadError(msg);
+                            setUploadError(error.message);
                           }}
                         />
-                        <ImageIcon className="w-3 h-3" />
+                        <IconPhoto className="w-5 h-5 text-neutral-900 dark:text-white" />
                       </div>
                     </div>
+
+                    {isUploadingImage && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
+                        <IconLoader2 className="w-5 h-5 text-white animate-spin" />
+                      </div>
+                    )}
+                  </div>
+
+                  {imagePreview && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <IconX className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {uploadError && (
+                <div className="px-4 pb-4">
+                  <div className="text-[10px] text-red-600 bg-red-50 dark:bg-red-900/20 p-2 rounded-sm border border-red-100 dark:border-red-900 flex items-center gap-2">
+                    <IconAlertCircle className="w-3 h-3 shrink-0" />
+                    {uploadError}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: Form Fields */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm">
+              <div className="p-3 border-b border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
+                <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-neutral-500">
+                  Core Information
+                </h3>
+              </div>
+              <div className="p-5 space-y-5">
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-mono uppercase text-neutral-500">
+                    Username / Slug
+                  </Label>
+                  <div className="flex rounded-sm shadow-sm ring-1 ring-inset ring-neutral-300 dark:ring-neutral-700 focus-within:ring-2 focus-within:ring-inset focus-within:ring-neutral-900 dark:focus-within:ring-neutral-100 bg-neutral-50 dark:bg-neutral-950">
+                    <span className="flex select-none items-center pl-3 text-neutral-400 font-mono text-xs">
+                      skilldock.site/
+                    </span>
+                    <input
+                      type="text"
+                      name="slug"
+                      defaultValue={profile.slug}
+                      className="flex-1 border-0 bg-transparent py-2 pl-1 text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 focus:ring-0 sm:text-xs font-mono font-medium"
+                      placeholder="username"
+                    />
                   </div>
                 </div>
 
-                {/* Upload Error Message */}
-                {uploadError && (
-                  <div className="animate-in fade-in slide-in-from-top-1 px-3 py-1.5 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-md flex items-center gap-1.5 max-w-[200px]">
-                    <AlertCircle className="w-3 h-3 text-red-600 dark:text-red-400 shrink-0" />
-                    <p className="text-[10px] font-medium text-red-600 dark:text-red-400 leading-tight">
-                      {uploadError}
-                    </p>
-                  </div>
-                )}
-              </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-mono uppercase text-neutral-500">
+                    Professional Headline
+                  </Label>
+                  <Input
+                    name="headline"
+                    defaultValue={profile.headline || ""}
+                    placeholder="e.g. Full Stack Engineer & UI Enthusiast"
+                    className="font-mono text-xs bg-neutral-50 dark:bg-neutral-950/50 border-neutral-300 dark:border-neutral-700 h-9"
+                  />
+                </div>
 
-              <div className="flex-1 ml-4 pt-10 pointer-events-auto">
-                <p className="text-xs text-neutral-500">
-                  Recommended: Square for avatar, 1200x480 for cover (max 4MB).
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Form Fields */}
-          <div className="p-5 space-y-5">
-            <div className="grid gap-2">
-              <Label className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
-                Username
-              </Label>
-              <div className="flex items-center gap-2 bg-neutral-50 dark:bg-neutral-950/50 rounded-sm px-3 border border-neutral-200 dark:border-neutral-800 focus-within:border-neutral-300 dark:focus-within:border-neutral-700 transition-colors">
-                <span className="text-neutral-400 text-sm font-mono">
-                  skilldock.site/
-                </span>
-                <Input
-                  name="slug"
-                  defaultValue={profile.slug}
-                  required
-                  className="border-none shadow-none bg-transparent h-10 px-0 focus-visible:ring-0 font-medium text-neutral-800 dark:text-neutral-200"
-                />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
-                Headline
-              </Label>
-              <Input
-                name="headline"
-                defaultValue={profile.headline || ""}
-                placeholder="e.g. Senior Product Designer"
-                className="h-10 border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/50 rounded-sm shadow-none focus-visible:ring-1 focus-visible:ring-neutral-300 dark:focus-visible:ring-neutral-700"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
-                About You
-              </Label>
-              <Textarea
-                name="summary"
-                defaultValue={profile.summary || ""}
-                placeholder="Tell your story..."
-                rows={5}
-                className="border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/50 rounded-sm shadow-none focus-visible:ring-1 focus-visible:ring-neutral-300 dark:focus-visible:ring-neutral-700 resize-none p-4"
-              />
-            </div>
-          </div>
-
-          {/* Social Links */}
-          <div className="p-5 border-t border-neutral-200 dark:border-neutral-800 space-y-5">
-            <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
-              Social Links
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-[11px] uppercase text-neutral-400">
-                  GitHub
-                </Label>
-                <Input
-                  name="social_github"
-                  defaultValue={
-                    data.socialLinks?.find((l) => l.platform === "github")
-                      ?.url ?? ""
-                  }
-                  placeholder="https://github.com/..."
-                  className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[11px] uppercase text-neutral-400">
-                  LinkedIn
-                </Label>
-                <Input
-                  name="social_linkedin"
-                  defaultValue={
-                    data.socialLinks?.find((l) => l.platform === "linkedin")
-                      ?.url ?? ""
-                  }
-                  placeholder="https://linkedin.com/in/..."
-                  className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[11px] uppercase text-neutral-400">
-                  X (Twitter)
-                </Label>
-                <Input
-                  name="social_twitter"
-                  defaultValue={
-                    data.socialLinks?.find((l) => l.platform === "twitter")
-                      ?.url ?? ""
-                  }
-                  placeholder="https://x.com/..."
-                  className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[11px] uppercase text-neutral-400">
-                  Instagram
-                </Label>
-                <Input
-                  name="social_instagram"
-                  defaultValue={
-                    data.socialLinks?.find((l) => l.platform === "instagram")
-                      ?.url ?? ""
-                  }
-                  placeholder="https://instagram.com/..."
-                  className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label className="text-[11px] uppercase text-neutral-400">
-                  Website / Portfolio
-                </Label>
-                <Input
-                  name="social_website"
-                  defaultValue={
-                    data.socialLinks?.find((l) => l.platform === "website")
-                      ?.url ?? ""
-                  }
-                  placeholder="https://..."
-                  className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
-                />
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-mono uppercase text-neutral-500">
+                    About / Bio
+                  </Label>
+                  <Textarea
+                    name="summary"
+                    defaultValue={profile.summary || ""}
+                    rows={5}
+                    placeholder="Briefly describe your background, interests, and what you're currently working on."
+                    className="font-mono text-xs bg-neutral-50 dark:bg-neutral-950/50 border-neutral-300 dark:border-neutral-700 resize-none p-3 leading-relaxed"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Custom Links could be added here, but keeping it simple for now as requested by user "give fields in profile page" which implies simpler fixed fields often, but let's stick to standard first. 
-                If they want custom, I should add a dynamic list.
-                For now, let's stick to these core 5.
-            */}
-          </div>
-
-          {/* Footer Row */}
-          <div className="flex justify-between items-center p-5 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/30">
-            <div>
-              {success && (
-                <span className="text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-sm animate-in fade-in flex items-center gap-1">
-                  <svg
-                    className="w-3 h-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+            <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm">
+              <div className="p-3 border-b border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
+                <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-neutral-500">
+                  Social Connections
+                </h3>
+              </div>
+              <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  {
+                    key: "social_github",
+                    icon: IconBrandGithub,
+                    label: "GitHub",
+                    placeholder: "github.com/username",
+                    platform: "github",
+                  },
+                  {
+                    key: "social_linkedin",
+                    icon: IconBrandLinkedin,
+                    label: "LinkedIn",
+                    placeholder: "linkedin.com/in/username",
+                    platform: "linkedin",
+                  },
+                  {
+                    key: "social_twitter",
+                    icon: IconBrandTwitter,
+                    label: "X / Twitter",
+                    placeholder: "x.com/username",
+                    platform: "twitter",
+                  },
+                  {
+                    key: "social_instagram",
+                    icon: IconBrandInstagram,
+                    label: "Instagram",
+                    placeholder: "instagram.com/username",
+                    platform: "instagram",
+                  },
+                  {
+                    key: "social_website",
+                    icon: IconLink,
+                    label: "Website",
+                    placeholder: "your-portfolio.com",
+                    platform: "website",
+                    full: true,
+                  },
+                ].map((social) => (
+                  <div
+                    key={social.key}
+                    className={cn(
+                      "space-y-1.5",
+                      social.full && "md:col-span-2",
+                    )}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
+                    <Label className="text-[10px] font-mono uppercase text-neutral-500 flex items-center gap-1.5">
+                      <social.icon className="w-3 h-3" /> {social.label}
+                    </Label>
+                    <Input
+                      name={social.key}
+                      defaultValue={
+                        data.socialLinks?.find(
+                          (l) => l.platform === social.platform,
+                        )?.url ?? ""
+                      }
+                      placeholder={social.placeholder}
+                      className="font-mono text-xs bg-neutral-50 dark:bg-neutral-950/50 border-neutral-300 dark:border-neutral-700 h-9"
                     />
-                  </svg>{" "}
-                  Saved
-                </span>
-              )}
-              {error && <span className="text-xs text-red-500">{error}</span>}
+                  </div>
+                ))}
+              </div>
             </div>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="rounded-sm px-8 shadow-none bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 h-9 text-xs font-medium transition-all"
-            >
-              {isLoading ? (
-                <Loader2 className="w-3 h-3 animate-spin" />
-              ) : (
-                "Save Changes"
-              )}
-            </Button>
           </div>
-        </form>
+        </div>
+
+        {/* Action Bar */}
+        <div className="mt-6 flex items-center justify-end gap-4 pt-6 border-t border-dashed border-neutral-200 dark:border-neutral-800">
+          {success && (
+            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-500 animate-in fade-in slide-in-from-right-4">
+              <IconCheck className="w-4 h-4" />
+              <span className="text-xs font-mono font-medium uppercase tracking-wide">
+                Saved Successfully
+              </span>
+            </div>
+          )}
+
+          {error && (
+            <div className="flex items-center gap-2 text-red-600 dark:text-red-500 animate-in fade-in">
+              <IconAlertCircle className="w-4 h-4" />
+              <span className="text-xs font-mono font-medium">{error}</span>
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black hover:opacity-90 transition-opacity rounded-sm h-10 px-6 font-mono text-xs uppercase tracking-widest font-bold"
+          >
+            {isLoading ? (
+              <IconLoader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <IconDeviceFloppy className="w-4 h-4 mr-2" /> Save Changes
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+
+      {/* Additional Profile Sections */}
+      <div className="space-y-8 pt-8 border-t border-dashed border-neutral-200 dark:border-neutral-800">
+        <div>
+          <h2 className="text-lg font-bold tracking-tight text-neutral-900 dark:text-neutral-100 font-mono mb-4">
+            CAREER & ACHIEVEMENTS
+          </h2>
+
+          <div className="space-y-6">
+            <ExperienceForm initialData={data.experiences} />
+            <AchievementsForm initialData={data.achievements} />
+            <CertificatesForm initialData={data.certificates} />
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-bold tracking-tight text-neutral-900 dark:text-neutral-100 font-mono mb-4">
+            VISIBILITY CONTROLS
+          </h2>
+          <VisibilitySettings data={data} />
+        </div>
       </div>
     </div>
   );

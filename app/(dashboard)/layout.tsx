@@ -10,7 +10,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen bg-neutral-50 dark:bg-background">
+    <div className="fixed inset-0 flex bg-neutral-50 dark:bg-background overflow-hidden">
       {/* Sidebar for desktop */}
       <div className="hidden md:block h-full shrink-0">
         <DashboardSidebar />

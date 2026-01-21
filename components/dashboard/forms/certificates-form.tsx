@@ -11,14 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Trophy,
-  Loader2,
-  Plus,
-  Trash2,
-  Pencil,
-  ExternalLink,
-  Award,
-} from "lucide-react";
+  IconCertificate,
+  IconLoader2,
+  IconPlus,
+  IconTrash,
+  IconPencil,
+  IconExternalLink,
+  IconAward,
+} from "@tabler/icons-react";
 import { format } from "date-fns";
 import { Certificate } from "@prisma/client";
 import { cn } from "@/lib/utils";
@@ -108,20 +108,20 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm overflow-hidden mt-6">
-      <div className="flex items-center justify-between p-5 border-b border-neutral-200 dark:border-neutral-800">
-        <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-          <Award className="w-3.5 h-3.5" />
+    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm overflow-hidden">
+      <div className="flex items-center justify-between p-3 border-b border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
+        <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-neutral-500 flex items-center gap-2">
+          <IconAward className="w-4 h-4" />
           Certifications
-        </p>
+        </h3>
         {!isAdding && (
           <Button
             onClick={() => setIsAdding(true)}
             size="sm"
-            variant="outline"
-            className="h-8 text-xs font-medium"
+            variant="ghost"
+            className="h-7 text-[10px] font-mono uppercase tracking-wider hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
-            <Plus className="w-3.5 h-3.5 mr-1" /> Add
+            <IconPlus className="w-3.5 h-3.5 mr-1" /> Add
           </Button>
         )}
       </div>
@@ -130,24 +130,24 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
       {!isAdding && (
         <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
           {(initialData || []).length === 0 && (
-            <div className="p-8 text-center text-neutral-500 text-sm">
+            <div className="p-8 text-center text-neutral-500 text-xs font-mono uppercase tracking-wide">
               No certifications added yet.
             </div>
           )}
           {(initialData || []).map((item) => (
             <div
               key={item.id}
-              className="p-5 flex items-start justify-between group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+              className="p-5 flex items-start justify-between group hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors"
             >
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                  <Award className="w-4 h-4 text-neutral-500" />
+                <div className="w-8 h-8 rounded-sm bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 border border-neutral-200 dark:border-neutral-700">
+                  <IconCertificate className="w-4 h-4 text-neutral-500" />
                 </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                <div className="space-y-0.5">
+                  <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
                     {item.name}
                   </h3>
-                  <div className="flex items-center gap-2 text-xs text-neutral-500">
+                  <div className="flex items-center gap-2 text-xs text-neutral-500 font-mono mt-1">
                     <span className="font-medium text-neutral-700 dark:text-neutral-300">
                       @{item.issuer}
                     </span>
@@ -155,7 +155,7 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
                     <span>{format(new Date(item.date), "MMM yyyy")}</span>
                   </div>
                   {item.credentialId && (
-                    <p className="text-[10px] text-neutral-400 font-mono">
+                    <p className="text-[10px] text-neutral-400 font-mono uppercase tracking-wide mt-1">
                       ID: {item.credentialId}
                     </p>
                   )}
@@ -168,26 +168,26 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="h-7 w-7 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-50"
+                    className="h-7 w-7 inline-flex items-center justify-center rounded-sm text-sm font-medium transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 text-neutral-500"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <IconExternalLink className="w-3.5 h-3.5" />
                   </a>
                 )}
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="h-7 w-7"
+                  className="h-7 w-7 rounded-sm"
                   onClick={() => handleEdit(item)}
                 >
-                  <Pencil className="w-3.5 h-3.5" />
+                  <IconPencil className="w-3.5 h-3.5" />
                 </Button>
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+                  className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-sm"
                   onClick={() => handleDelete(item.id)}
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <IconTrash className="w-3.5 h-3.5" />
                 </Button>
               </div>
             </div>
@@ -199,11 +199,11 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
       {isAdding && (
         <form
           onSubmit={handleSubmit}
-          className="p-5 space-y-4 animate-in slide-in-from-top-2"
+          className="p-5 space-y-4 animate-in slide-in-from-top-2 bg-neutral-50/30 dark:bg-neutral-900/30"
         >
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-[11px] uppercase text-neutral-400">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-mono uppercase text-neutral-500">
                 Name
               </Label>
               <Input
@@ -213,11 +213,11 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
                   setFormData({ ...formData, name: e.target.value })
                 }
                 placeholder="e.g. AWS Certified Solutions Architect"
-                className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                className="h-9 font-mono text-xs bg-white dark:bg-neutral-900"
               />
             </div>
-            <div className="space-y-2">
-              <Label className="text-[11px] uppercase text-neutral-400">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-mono uppercase text-neutral-500">
                 Issuer
               </Label>
               <Input
@@ -227,14 +227,14 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
                   setFormData({ ...formData, issuer: e.target.value })
                 }
                 placeholder="e.g. Amazon Web Services"
-                className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                className="h-9 font-mono text-xs bg-white dark:bg-neutral-900"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-[11px] uppercase text-neutral-400">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-mono uppercase text-neutral-500">
                 Date
               </Label>
               <Input
@@ -244,11 +244,11 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, date: e.target.value })
                 }
-                className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                className="h-9 font-mono text-xs bg-white dark:bg-neutral-900"
               />
             </div>
-            <div className="space-y-2">
-              <Label className="text-[11px] uppercase text-neutral-400">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-mono uppercase text-neutral-500">
                 Credential ID (Optional)
               </Label>
               <Input
@@ -257,13 +257,13 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
                   setFormData({ ...formData, credentialId: e.target.value })
                 }
                 placeholder="e.g. ABC-123-XYZ"
-                className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+                className="h-9 font-mono text-xs bg-white dark:bg-neutral-900"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-[11px] uppercase text-neutral-400">
+          <div className="space-y-1.5">
+            <Label className="text-[10px] font-mono uppercase text-neutral-500">
               URL (Optional)
             </Label>
             <Input
@@ -272,17 +272,17 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
                 setFormData({ ...formData, url: e.target.value })
               }
               placeholder="https://..."
-              className="h-9 bg-neutral-50 dark:bg-neutral-950/50"
+              className="h-9 font-mono text-xs bg-white dark:bg-neutral-900"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 pt-2 border-t border-dashed border-neutral-200 dark:border-neutral-800">
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={resetForm}
-              className="h-8"
+              className="h-8 font-mono text-xs uppercase"
             >
               Cancel
             </Button>
@@ -290,14 +290,16 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
               type="submit"
               size="sm"
               disabled={isLoading}
-              className="h-8 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900"
+              className="h-8 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-mono text-xs uppercase font-bold rounded-sm"
             >
               {isLoading ? (
-                <Loader2 className="w-3 h-3 animate-spin" />
+                <IconLoader2 className="w-3 h-3 animate-spin" />
               ) : editingId ? (
-                "Update"
+                "Update Cert"
               ) : (
-                "Add"
+                <>
+                  <IconPlus className="w-3 h-3 mr-1" /> Add Cert
+                </>
               )}
             </Button>
           </div>

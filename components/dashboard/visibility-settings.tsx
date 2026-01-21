@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { updateProfileSettings, FullProfile } from "@/lib/actions/profile";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Loader2 } from "lucide-react";
+import {
+  IconAlertCircle,
+  IconLoader2,
+  IconEye,
+  IconEyeOff,
+} from "@tabler/icons-react";
+import { Switch } from "@/components/ui/switch";
 
 interface VisibilitySettingsProps {
   data: FullProfile;
@@ -17,36 +23,33 @@ function ToggleItem({
   label,
   description,
   defaultChecked,
+  onChange,
 }: {
   id: string;
   label: string;
   description: string;
   defaultChecked: boolean;
+  onChange?: (checked: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between p-5">
+    <div className="flex items-center justify-between p-5 group hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors">
       <div className="space-y-1">
         <Label
           htmlFor={id}
-          className="text-sm font-medium text-neutral-900 dark:text-neutral-100 cursor-pointer"
+          className="text-xs font-bold font-mono uppercase tracking-wider text-neutral-900 dark:text-neutral-100 cursor-pointer flex items-center gap-2"
         >
           {label}
         </Label>
-        <p className="text-xs text-neutral-500">{description}</p>
+        <p className="text-[11px] text-neutral-500 font-mono leading-relaxed max-w-sm">
+          {description}
+        </p>
       </div>
-      <label
-        htmlFor={id}
-        className="relative inline-flex items-center cursor-pointer"
-      >
-        <input
-          id={id}
-          name={id}
-          type="checkbox"
-          defaultChecked={defaultChecked}
-          className="peer sr-only"
-        />
-        <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-300 dark:peer-focus:ring-neutral-800 rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-neutral-900 dark:peer-checked:bg-neutral-100 dark:peer-checked:after:bg-neutral-900"></div>
-      </label>
+      <Switch
+        id={id}
+        name={id}
+        defaultChecked={defaultChecked}
+        onCheckedChange={onChange}
+      />
     </div>
   );
 }
@@ -90,15 +93,16 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
   return (
     <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-sm overflow-hidden">
       {/* Header */}
-      <div className="p-5 border-b border-neutral-200 dark:border-neutral-800">
-        <p className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
+      <div className="p-3 border-b border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
+        <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-neutral-500 flex items-center gap-2">
+          <IconEye className="w-4 h-4" />
           Public Visibility
-        </p>
+        </h3>
       </div>
 
       <form action={handleSubmit}>
         {/* Toggle Items */}
-        <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
+        <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
           {/* Show Email */}
           <ToggleItem
             id="showEmail"
@@ -157,24 +161,24 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
         </div>
 
         {error && (
-          <div className="mx-5 mb-5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-sm text-sm flex items-center gap-2 border border-red-200 dark:border-red-900/50">
-            <AlertCircle className="w-4 h-4" />
+          <div className="mx-5 mb-5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-sm text-xs font-mono flex items-center gap-2 border border-red-200 dark:border-red-900/50">
+            <IconAlertCircle className="w-4 h-4" />
             {error}
           </div>
         )}
 
         {/* Footer */}
-        <div className="flex justify-end p-5 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/30">
+        <div className="flex justify-end p-3 border-t border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/30 dark:bg-neutral-900/30">
           <Button
             type="submit"
             disabled={isLoading}
             variant="outline"
-            className="rounded-sm px-6 text-xs h-9 bg-transparent border-neutral-200 dark:border-neutral-800 hover:bg-white dark:hover:bg-neutral-900 shadow-none"
+            className="rounded-sm px-6 h-8 text-[10px] uppercase font-mono font-bold bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             {isLoading ? (
-              <Loader2 className="w-3 h-3 animate-spin mr-2" />
+              <IconLoader2 className="w-3 h-3 animate-spin mr-2" />
             ) : null}
-            {isLoading ? "Saving..." : "Save Visibility"}
+            {isLoading ? "Saving..." : "Save Visibility Settings"}
           </Button>
         </div>
       </form>
