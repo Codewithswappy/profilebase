@@ -183,22 +183,22 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
             </div>
 
             {/* Socials + Buttons Row */}
-            <div className="flex flex-row items-center justify-between pt-6">
+            <div className="flex items-center justify-between pt-4">
               {/* Socials */}
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center ">
                 <SocialsSection links={data.socialLinks} />
 
                 {/* Email Display */}
                 {profileSettings.showEmail && data.email && (
                   <a
                     href={`mailto:${data.email}`}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors group"
+                    className="flex items-center px-2.5 py-1.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors group"
                   >
-                    <div className="w-4 h-4 flex items-center justify-center rounded-full bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100">
+                    <div className="w-4 h-4 flex items-center justify-center group-hover:text-neutral-900 dark:group-hover:text-neutral-100">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="10"
-                        height="10"
+                        width="14"
+                        height="14"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -210,15 +210,18 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                         <polyline points="22,6 12,13 2,6" />
                       </svg>
                     </div>
-                    <span className="text-xs font-mono font-medium text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors">
+                    <span className="text-xs hidden md:block font-mono font-medium text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors">
                       Email
                     </span>
                   </a>
                 )}
               </div>
 
-              {/* Resume & Contact Buttons */}
-              <div className="flex items-center gap-3">
+             
+            </div>
+
+             {/* Resume & Contact Buttons */}
+              <div className="inline-flex items-center justify-end gap-3 pt-8 relative left-65 md:left-125">
                 <ViewfinderButton
                   variant="filled"
                   className="cursor-pointer rounded-lg"
@@ -245,7 +248,6 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                   </ViewfinderButton>
                 )}
               </div>
-            </div>
 
             {/* Dotted Line Divider */}
             <div className="flex justify-center pt-6">
@@ -380,7 +382,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
             {/* Summary (About) */}
             {showSummary && profile.summary && (
               <div className="flex flex-col gap-4  text-center border-t border-neutral-200 dark:border-neutral-800/50 border-dashed pt-8">
-                 <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <h2 className="font-bold font-mono text-neutral-400 dark:text-neutral-600 tracking-tight uppercase text-md">
                     // About me
                   </h2>

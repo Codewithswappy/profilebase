@@ -42,7 +42,7 @@ export function SocialsSection({ links }: SocialsSectionProps) {
   }
 
   return (
-    <div className="inline-flex flex-row flex-wrap items-center gap-1 w-fit animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300">
+    <div className="inline-flex flex-row flex-wrap items-center  w-fit animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300">
       {links.map((link) => {
         const iconNode = getIcon(link.platform);
         // Fallback for website/other
@@ -55,13 +55,13 @@ export function SocialsSection({ links }: SocialsSectionProps) {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center gap-1 px-2.5 py-1.5 rounded-md hover:bg-neutral-200/50 dark:hover:bg-neutral-800 transition-all"
+            className="group flex items-center px-2.5 py-1.5 rounded-md hover:bg-neutral-200/50 dark:hover:bg-neutral-800 transition-all"
           >
             <span className="w-4 h-4 flex items-center justify-center text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors shrink-0">
               {iconNode ? (
                 iconNode
               ) : isWebsite ? (
-                <Globe className="w-3.5 h-3.5" />
+                <Globe className="w-3.5 h-3.5 text-black" />
               ) : (
                 <LinkIcon className="w-3.5 h-3.5" />
               )}

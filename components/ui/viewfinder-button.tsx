@@ -15,7 +15,7 @@ export const ViewfinderButton = forwardRef<
     <button
       ref={ref}
       className={cn(
-        "group relative overflow-hidden rounded-full px-8 py-3 text-sm font-semibold tracking-wide transition-all duration-300 ease-out",
+        "group relative overflow-hidden rounded-full px-4 py-3 text-sm font-semibold tracking-wide transition-all duration-300 ease-out",
         "active:scale-[0.98] active:translate-y-0.5",
 
         variant === "outline"
