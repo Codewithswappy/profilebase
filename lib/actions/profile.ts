@@ -119,7 +119,7 @@ export async function createProfile(
       return { success: false, error: (validated.error as any).errors[0].message };
     }
 
-    const { slug, headline, summary } = validated.data;
+    const { slug, headline, location, summary } = validated.data;
 
     // Check if slug is taken
     const slugExists = await db.profile.findUnique({
@@ -137,6 +137,7 @@ export async function createProfile(
           userId,
           slug,
           headline,
+          location,
           summary,
         },
       });
@@ -183,7 +184,7 @@ export async function updateProfile(
       return { success: false, error: (validated.error as any).errors[0].message };
     }
 
-    const { slug, headline, summary, image, coverImage } = validated.data;
+    const { slug, headline, location, summary, image, coverImage } = validated.data;
 
     // Get existing profile
     const existingProfile = await db.profile.findUnique({
@@ -211,6 +212,7 @@ export async function updateProfile(
       data: {
         ...(slug !== undefined && { slug }),
         ...(headline !== undefined && { headline }),
+        ...(location !== undefined && { location }),
         ...(summary !== undefined && { summary }),
         ...(image !== undefined && { image: image || null }),
         ...(coverImage !== undefined && { coverImage: coverImage || null }),
@@ -223,7 +225,10 @@ export async function updateProfile(
     return { success: true, data: profile };
   } catch (error) {
     console.error("updateProfile error:", error);
-    return { success: false, error: "Failed to update profile" };
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Failed to update profile" 
+    };
   }
 }
 

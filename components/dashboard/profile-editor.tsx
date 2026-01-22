@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   IconAlertCircle,
+  IconMapPin,
   IconUser,
   IconX,
   IconPhoto,
@@ -74,6 +75,7 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
 
     const slug = formData.get("slug") as string;
     const headline = formData.get("headline") as string;
+    const location = formData.get("location") as string;
     const summary = formData.get("summary") as string;
 
     // Extract social links
@@ -92,6 +94,7 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
     const result = await updateProfile({
       slug,
       headline,
+      location,
       summary,
       image: imageUrl,
       coverImage: coverImageUrl,
@@ -401,6 +404,21 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
                     placeholder="e.g. Full Stack Engineer & UI Enthusiast"
                     className="font-mono text-xs bg-neutral-50 dark:bg-neutral-950/50 border-neutral-300 dark:border-neutral-700 h-9"
                   />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-mono uppercase text-neutral-500">
+                    Location
+                  </Label>
+                  <div className="relative">
+                    <IconMapPin className="absolute left-3 top-2.5 w-4 h-4 text-neutral-400" />
+                    <Input
+                      name="location"
+                      defaultValue={(profile as any).location || ""}
+                      placeholder="e.g. Mumbai, India"
+                      className="font-mono text-xs bg-neutral-50 dark:bg-neutral-950/50 border-neutral-300 dark:border-neutral-700 h-9 pl-9"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">

@@ -35,12 +35,14 @@ export const SlugSchema = z
 export const CreateProfileSchema = z.object({
   slug: SlugSchema,
   headline: z.string().max(100, "Headline must be at most 100 characters").optional(),
+  location: z.string().max(100, "Location must be at most 100 characters").optional(),
   summary: z.string().max(2000, "Summary must be at most 2000 characters").optional(),
 });
 
 export const UpdateProfileSchema = z.object({
   slug: SlugSchema.optional(),
   headline: z.string().max(100, "Headline must be at most 100 characters").optional(),
+  location: z.string().max(100, "Location must be at most 100 characters").optional(),
   summary: z.string().max(2000, "Summary must be at most 2000 characters").optional(),
   image: z.string().url("Invalid image URL").optional().or(z.literal("")),
   coverImage: z.string().url("Invalid cover image URL").optional().or(z.literal("")),

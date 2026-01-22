@@ -97,6 +97,7 @@ model Profile {
   summary   String?  @db.Text
   image     String?  // Profile picture URL
   coverImage String? // Profile cover/banner image URL
+  location   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

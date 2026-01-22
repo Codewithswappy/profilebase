@@ -504,9 +504,76 @@ Respond in JSON array format:
   }
 }
 
-// ============================================
-// CHECK IF AI IS AVAILABLE
-// ============================================
+// ... existing code ...
+
+const RESUME_EVALUATION_PROMPT = `You are a strict, senior-level Technical Recruiter and ATS algorithm. Your job is to critically evaluate a developer's profile/resume.
+
+CANDIDATE PROFILE:
+{{PROFILE_JSON}}
+
+CRITICAL RULES:
+1. **FAKE CONTENT DETECTION**: If you detect "Lorem Ipsum", placeholder text (e.g., "Company Name", "Position Title"), or obviously fake/nonsense data, YOU MUST ASSIGN A SCORE OF 0. Set status to "Invalid Content" and feedback to "Replace placeholder text with real content."
+2. **STRICT SCORING**: Start at 0. Award points ONLY for:
+   - Quantifiable Impact (e.g., "Improved performance by 20%").
+   - Strong Action Verbs (e.g., "Architected", "Deployed").
+   - Concrete Technical Skills (matched to projects/experience).
+   - Professional Grammar/Tone.
+3. **PENALTIES**: 
+   - -20 points for spelling/grammar errors.
+   - -30 points for vague descriptions (e.g., "Worked on a project").
+   - -50 points for lack of any contact info or summary.
+
+TASK:
+1. Calculate a realistic, strict ATS Score (0-100). Do NOT be generous. An average resume should get ~40-50. Top 1% gets 90+.
+2. Provide harsh but actionable feedback.
+3. Identify missing critical keywords based on the technologies listed in projects.
+4. Suggest a professional summary improvement only if the content is real; otherwise, ask them to write one.
+
+Respond in JSON format:
+{
+  "score": 45,
+  "status": "Needs Work",
+  "summarySuggestion": "Experienced Full Stack Engineer with...",
+  "missingKeywords": ["Docker", "CI/CD", "AWS"],
+  "feedback": [
+    "Measurable outcomes are missing. Add numbers (e.g., 30% reduction in load time).",
+    "Summary is too genetic. Mention specific industries or core strengths."
+  ]
+}`;
+
+// ... existing code ...
+
+/**
+ * Evaluate Resume/Profile for ATS Score
+ */
+export async function evaluateResume(
+  profileData: any
+): Promise<{
+  score: number;
+  status: string;
+  feedback: string[];
+  summarySuggestion?: string;
+  missingKeywords?: string[];
+}> {
+  const prompt = RESUME_EVALUATION_PROMPT.replace(
+    "{{PROFILE_JSON}}", 
+    JSON.stringify(profileData, null, 2)
+  );
+
+  const response = await callAI(prompt);
+  const cleaned = cleanJsonResponse(response);
+
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    console.error("Failed to parse ATS evaluation:", cleaned);
+    return {
+      score: 0,
+      status: "Error",
+      feedback: ["Failed to analyze resume. Please try again."],
+    };
+  }
+}
 
 export function isAIEnabled(): boolean {
   return !!process.env.GROQ_API_KEY || !!process.env.GEMINI_API_KEY;
