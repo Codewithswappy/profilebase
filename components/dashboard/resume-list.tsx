@@ -111,7 +111,7 @@ export function ResumeList({ initialResumes, profileData }: ResumeListProps) {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between border-b border-dashed border-neutral-200 dark:border-neutral-800 pb-6">
+      <div className="flex-col md:block items-center justify-between border-b border-dashed border-neutral-200 dark:border-neutral-800 pb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
             My Resumes
@@ -124,7 +124,7 @@ export function ResumeList({ initialResumes, profileData }: ResumeListProps) {
           onClick={handleCreate}
           disabled={loading}
           size="lg"
-          className="gap-2 bg-neutral-900 dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white shadow-none rounded-none border border-transparent"
+          className="gap-2 mt-6 bg-neutral-900 dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white shadow-none rounded-none border border-transparent"
         >
           {loading ? (
             "Creating..."

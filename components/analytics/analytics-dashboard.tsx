@@ -214,7 +214,7 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
           ].map((item, i) => (
             <div
               key={i}
-              className="p-5 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+              className="p-5 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors border border-dashed"
             >
               <div className="w-8 h-8 rounded border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center mb-4">
                 <item.icon
@@ -287,19 +287,13 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
             </h3>
             <div className="flex gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-neutral-900 dark:bg-neutral-400" />
+                <div className="w-3 h-3 rounded-full bg-lime-500" />
                 <span className="text-[10px] font-mono uppercase font-bold text-neutral-500">
                   Views
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 bg-lime-500"
-                  style={{
-                    backgroundImage:
-                      "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.3) 2px, rgba(255,255,255,0.3) 4px)",
-                  }}
-                />
+                <div className="w-3 h-3 rounded-full bg-orange-500" />
                 <span className="text-[10px] font-mono uppercase font-bold text-neutral-500">
                   Downloads
                 </span>
@@ -314,28 +308,29 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
                 <defs>
-                  <pattern
-                    id="stripePattern"
-                    patternUnits="userSpaceOnUse"
-                    width="8"
-                    height="8"
-                    patternTransform="rotate(45)"
+                  <linearGradient id="viewGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#84cc16" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#4d7c0f" stopOpacity={1} />
+                  </linearGradient>
+                  <linearGradient
+                    id="downloadGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
                   >
-                    <rect
-                      width="4"
-                      height="8"
-                      transform="translate(0,0)"
-                      fill="#84cc16"
-                      opacity="0.8"
+                    <stop offset="0%" stopColor="#f97316" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#c2410c" stopOpacity={1} />
+                  </linearGradient>
+                  <filter id="bar3dShadow" height="200%">
+                    <feDropShadow
+                      dx="2"
+                      dy="2"
+                      stdDeviation="3"
+                      floodColor="#000"
+                      floodOpacity="0.3"
                     />
-                    <rect
-                      width="4"
-                      height="8"
-                      transform="translate(4,0)"
-                      fill="#65a30d"
-                      opacity="0.9"
-                    />
-                  </pattern>
+                  </filter>
                 </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -373,12 +368,12 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
                           {label}
                         </div>
                         <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-xs font-mono font-bold text-neutral-900 dark:text-white">
-                            <div className="w-2 h-2 bg-neutral-900 dark:bg-neutral-400" />
+                          <div className="flex items-center gap-2 text-xs font-mono font-bold text-lime-600">
+                            <div className="w-2 h-2 rounded-full bg-lime-500" />
                             {payload[0].value} Views
                           </div>
-                          <div className="flex items-center gap-2 text-xs font-mono font-bold text-lime-600">
-                            <div className="w-2 h-2 bg-lime-500" />
+                          <div className="flex items-center gap-2 text-xs font-mono font-bold text-orange-500">
+                            <div className="w-2 h-2 rounded-full bg-orange-500" />
                             {payload[1].value} Downloads
                           </div>
                         </div>
@@ -386,18 +381,21 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
                     );
                   }}
                 />
+                {/* Views as Gradient Bars */}
                 <Bar
                   dataKey="views"
-                  fill="#171717"
-                  radius={[2, 2, 0, 0]}
+                  fill="url(#viewGradient)"
+                  radius={[4, 4, 0, 0]}
                   barSize={12}
-                  className="dark:fill-neutral-400"
+                  filter="url(#bar3dShadow)"
                 />
+                {/* Downloads as Gradient Bars */}
                 <Bar
                   dataKey="downloads"
-                  fill="url(#stripePattern)"
-                  radius={[2, 2, 0, 0]}
+                  fill="url(#downloadGradient)"
+                  radius={[4, 4, 0, 0]}
                   barSize={12}
+                  filter="url(#bar3dShadow)"
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -511,7 +509,7 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
             </div>
           </div>
 
-          {/* Devices Chart */}
+          {/* Devices Chart (3D Shadow) */}
           <div className="p-5 flex flex-col">
             <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest font-mono mb-6">
               Devices
@@ -521,6 +519,17 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
                 <div className="h-[180px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
+                      <defs>
+                        <filter id="pieShadow" height="200%">
+                          <feDropShadow
+                            dx="0"
+                            dy="4"
+                            stdDeviation="4"
+                            floodColor="#000"
+                            floodOpacity="0.25"
+                          />
+                        </filter>
+                      </defs>
                       <Pie
                         data={deviceBreakdown}
                         cx="50%"
@@ -531,11 +540,18 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
                         dataKey="value"
                         stroke="none"
                         cornerRadius={4}
+                        filter="url(#pieShadow)"
                       >
+                        {/* Lime, Orange, White/Grey */}
                         {deviceBreakdown.map((entry, index) => (
                           <Cell
                             key={`cell-${index}`}
-                            fill={["#404040", "#84cc16", "#a3a3a3"][index % 3]}
+                            fill={["#84cc16", "#f97316", "#e5e5e5"][index % 3]}
+                            className={
+                              index % 3 === 2
+                                ? "dark:fill-white transition-colors"
+                                : "transition-colors"
+                            }
                           />
                         ))}
                       </Pie>
@@ -556,14 +572,16 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
                   {deviceBreakdown.map((entry, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <div
-                        className="w-2 h-2 rounded-full"
+                        className={cn(
+                          "w-2 h-2 rounded-full",
+                          index % 3 === 2 && "dark:bg-white",
+                        )}
                         style={{
-                          backgroundColor: ["#404040", "#84cc16", "#a3a3a3"][
+                          backgroundColor: ["#84cc16", "#f97316", "#e5e5e5"][
                             index % 3
                           ],
-                        }} 
+                        }}
                       />
-                      
                       <span className="text-[10px] font-mono uppercase font-bold text-neutral-500">
                         {entry.name}
                       </span>
@@ -578,102 +596,87 @@ export function AnalyticsDashboard({ profileId }: AnalyticsDashboardProps) {
             )}
           </div>
 
-          {/* Traffic Sources (Radial Chart) - Full Width Row */}
+          {/* Traffic Sources (Lime 3D Gradient Bar Chart) */}
           <div className="p-5 col-span-1 lg:col-span-4 border-t border-dashed border-neutral-200 dark:border-neutral-800">
             <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest font-mono mb-6">
               Traffic Sources
             </p>
-            <div className="h-[240px] flex flex-col sm:flex-row items-center justify-center gap-8">
+            <div className="h-[200px]">
               {referrerBreakdown && referrerBreakdown.length > 0 ? (
-                <>
-                  <div className="w-48 h-48 relative">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RadialBarChart
-                        innerRadius="30%"
-                        outerRadius="100%"
-                        data={referrerBreakdown}
-                        startAngle={180}
-                        endAngle={0}
-                        barSize={16}
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={referrerBreakdown}
+                    layout="vertical"
+                    margin={{ left: 0, right: 20 }}
+                  >
+                    <defs>
+                      <linearGradient
+                        id="limeGradient"
+                        x1="0"
+                        y1="0"
+                        x2="1"
+                        y2="0"
                       >
-                        <RadialBar
-                          label={{
-                            position: "insideStart",
-                            fill: "#fff",
-                            fontSize: 10,
-                            fontWeight: "bold",
-                          }}
-                          background
-                          dataKey="value"
-                          cornerRadius={5}
-                        >
-                          {referrerBreakdown.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={
-                                ["#84cc16", "#10b981", "#14b8a6", "#3b82f6"][
-                                  index % 4
-                                ]
-                              }
-                            />
-                          ))}
-                        </RadialBar>
-                        <Tooltip
-                          cursor={false}
-                          content={({ active, payload }) => {
-                            if (!active || !payload?.length) return null;
-                            return (
-                              <div className="bg-white dark:bg-neutral-900 border border-dashed border-neutral-300 dark:border-neutral-700 px-3 py-2 text-xs font-mono font-bold z-50">
-                                {payload[0].payload.name}: {payload[0].value}
-                              </div>
-                            );
-                          }}
+                        <stop
+                          offset="0%"
+                          stopColor="#84cc16"
+                          stopOpacity={0.8}
                         />
-                      </RadialBarChart>
-                    </ResponsiveContainer>
-                    {/* Center Label for Total */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center pt-8 pointer-events-none">
-                      <span className="text-xs font-mono font-bold text-neutral-400 uppercase tracking-widest">
-                        Top Sources
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Legend */}
-                  <div className="flex flex-col gap-3 min-w-[200px] z-100">
-                    {referrerBreakdown.map((entry, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between w-full group"
-                      >
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-2.5 h-2.5 rounded-sm"
-                            style={{
-                              backgroundColor: [
-                                "#84cc16",
-                                "#10b981",
-                                "#14b8a6",
-                                "#3b82f6",
-                              ][index % 4],
-                            }}
-                          />
-                          <span
-                            className="text-xs font-mono text-neutral-600 dark:text-neutral-400 font-bold truncate max-w-[120px]"
-                            title={entry.name}
-                          >
-                            {entry.name}
-                          </span>
-                        </div>
-                        <span className="text-xs font-mono font-bold text-neutral-900 dark:text-white">
-                          {entry.value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </>
+                        <stop
+                          offset="100%"
+                          stopColor="#a3e635"
+                          stopOpacity={1}
+                        />
+                      </linearGradient>
+                      <filter id="barShadow" height="200%">
+                        <feDropShadow
+                          dx="2"
+                          dy="2"
+                          stdDeviation="2"
+                          floodColor="#65a30d"
+                          floodOpacity="0.3"
+                        />
+                      </filter>
+                    </defs>
+                    <XAxis type="number" hide />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      width={100}
+                      tick={{
+                        fontSize: 10,
+                        fontFamily: "monospace",
+                        fill: "#737373",
+                      }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "rgba(132, 204, 22, 0.1)" }}
+                      content={({ active, payload, label }) => {
+                        if (!active || !payload?.length) return null;
+                        return (
+                          <div className="bg-white dark:bg-neutral-900 border border-dashed border-neutral-300 dark:border-neutral-700 px-3 py-2 text-xs font-mono font-bold">
+                            {label}: {payload[0].value} visits
+                          </div>
+                        );
+                      }}
+                    />
+                    <Bar
+                      dataKey="value"
+                      barSize={12}
+                      radius={[0, 4, 4, 0]}
+                      fill="url(#limeGradient)"
+                      filter="url(#barShadow)"
+                    >
+                      {referrerBreakdown.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill="url(#limeGradient)" />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs font-mono text-neutral-400">
+                <div className="h-full flex items-center justify-center text-xs font-mono text-neutral-400">
                   NO REFERRER DATA
                 </div>
               )}

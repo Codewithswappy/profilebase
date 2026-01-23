@@ -75,7 +75,7 @@ function CertificateItem({ item }: { item: Certificate }) {
     .join(".");
 
   return (
-    <div className="group relative flex items-center justify-between p-2 border hover:border-neutral-200 dark:hover:border-neutral-800 transition-all duration-300">
+    <div className="group relative flex items-center justify-between p-2 border border-dashed hover:border-neutral-200 dark:hover:border-neutral-800 transition-all duration-300">
       <div className="flex items-center gap-4 text-left">
         {/* Placeholder Icon - could be dynamic if we had logos */}
         <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-900 flex items-center justify-center shrink-0 text-neutral-500 dark:text-neutral-400 font-bold text-xs">
@@ -103,12 +103,12 @@ function CertificateItem({ item }: { item: Certificate }) {
           className="p-2 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
         >
           <svg
-            width="12"
-            height="12"
+            width="10"
+            height="10"
             viewBox="0 0 12 12"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-3.5 h-3.5"
+            className="w-3 h-3"
           >
             <path
               d="M1 11L11 1M11 1H3M11 1V9"

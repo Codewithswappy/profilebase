@@ -187,7 +187,7 @@ export function ResumeEditorRoot({ resume }: ResumeEditorRootProps) {
         {/* LEFT: Editor Panel (Hidden on mobile if preview active) */}
         <div
           className={cn(
-            "w-full md:w-[500px] flex flex-col border-r border-dashed border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 z-20 shadow-xl absolute md:relative inset-0 transition-transform duration-300 md:translate-x-0",
+            "w-full md:w-[600px] flex flex-col border-r border-dashed border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 z-20 shadow-xl absolute md:relative inset-0 transition-transform duration-300 md:translate-x-0",
             activeTab === "preview"
               ? "-translate-x-full md:translate-x-0"
               : "translate-x-0",
@@ -238,12 +238,12 @@ export function ResumeEditorRoot({ resume }: ResumeEditorRootProps) {
           </header>
 
           {/* Editor Content */}
-          <div className="flex-1 flex overflow-hidden">
-            <aside className="w-[80px] md:w-[140px] border-r border-dashed border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 flex flex-col overflow-y-auto shrink-0">
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-neutral-50/30 dark:bg-neutral-900/30">
+            <aside className="w-full h-auto md:w-[150px] md:h-full border-b md:border-b-0 md:border-r border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 flex flex-col shrink-0 z-10">
               <ResumeEditorSidebar />
             </aside>
 
-            <main className="flex-1 overflow-y-auto bg-white dark:bg-neutral-900">
+            <main className="flex-1 overflow-y-auto bg-white dark:bg-neutral-900 scrollbar-thin">
               <ResumeEditorForm />
             </main>
           </div>
