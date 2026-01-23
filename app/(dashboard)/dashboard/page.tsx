@@ -22,9 +22,9 @@ export default async function DashboardPage() {
 
   const data = result.data;
 
-  if (!data) {
-    return <CreateProfileWizard />;
-  }
+  // Layout handles redirect if !data, but strict typing might need this check still.
+  // We can just return null or empty if layout hasn't redirected yet (edge case).
+  if (!data) return null;
 
   // Fetch quick analytics for overview (7 days)
   const analytics = await getAnalytics(data.profile.id, 7);

@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Rocket, AlertCircle } from "lucide-react";
+import { IconRocket, IconRocketOff } from "@tabler/icons-react";
 
 export function CreateProfileWizard() {
   const router = useRouter();
@@ -34,7 +35,9 @@ export function CreateProfileWizard() {
     const result = await createProfile({ slug, headline, summary });
 
     if (result.success) {
-      router.refresh(); // Reload to show dashboard
+      router.refresh();
+      // Redirect handled by layout/server action often, but router.push works too
+      router.push("/dashboard");
     } else {
       setError(result.error);
       setIsLoading(false);
@@ -42,79 +45,91 @@ export function CreateProfileWizard() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-12">
-      <Card>
-        <CardHeader className="text-center pb-2">
-          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Rocket className="w-6 h-6 text-primary" />
+    <div className="w-full animate-in fade-in zoom-in-95 duration-500">
+      <div className="border border-dashed border-neutral-800 bg-neutral-950 rounded-xl p-1 shadow-2xl">
+        <div className="bg-neutral-900/50 rounded-lg p-8 border border-neutral-900">
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
+              Welcome to SkillDock
+            </h1>
+            <p className="text-neutral-400">
+              Let&apos;s set up your profile. You can change these details
+              later.
+            </p>
           </div>
-          <CardTitle className="text-xl">Welcome to SkillDock</CardTitle>
-          <CardDescription>
-            Let&apos;s set up your profile. You can change these details later.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+
           <form
             id="create-profile-form"
             action={handleSubmit}
             className="space-y-6"
           >
-            <div className="space-y-2">
-              <Label htmlFor="slug">Profile URL</Label>
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground text-sm">
+            <div className="space-y-3">
+              <Label htmlFor="slug" className="text-neutral-200">
+                Profile URL
+              </Label>
+              <div className="bg-neutral-950/50 border border-dashed border-neutral-800 rounded-lg p-1 flex items-center focus-within:border-neutral-600 transition-colors">
+                <span className="text-neutral-500 pl-4 py-3 text-sm font-mono border-r border-dashed border-neutral-800 pr-3">
                   skilldock.site/
-                  <span className="text-primary font-bold">
-                    {slugInput || "your-username"}
-                  </span>
                 </span>
                 <Input
                   id="slug"
                   name="slug"
                   required
                   placeholder="your-username"
-                  className="font-mono"
-                  onChange={(e) => setSlugInput(e.target.value)} // Added to simulate watchSlug
+                  className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-white font-bold h-auto py-3 pl-3 font-mono placeholder:text-neutral-700"
+                  onChange={(e) => setSlugInput(e.target.value)}
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-neutral-600 pl-1">
                 Lowercase alphanumeric and hyphens only.
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="headline">Headline</Label>
+            <div className="space-y-3">
+              <Label htmlFor="headline" className="text-neutral-200">
+                Headline
+              </Label>
               <Input
                 id="headline"
                 name="headline"
                 placeholder="Full Stack Developer specialized in React & Node.js"
+                className="bg-neutral-950/50 border-neutral-800 text-white placeholder:text-neutral-700 focus-visible:ring-neutral-700 focus-visible:border-neutral-600 h-12"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="summary">Summary</Label>
+            <div className="space-y-3">
+              <Label htmlFor="summary" className="text-neutral-200">
+                Summary
+              </Label>
               <Textarea
                 id="summary"
                 name="summary"
                 placeholder="Briefly describe your experience and what you're looking for..."
                 rows={4}
+                className="bg-neutral-950/50 border-neutral-800 text-white placeholder:text-neutral-700 focus-visible:ring-neutral-700 focus-visible:border-neutral-600 resize-none"
               />
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-900/50 dark:text-red-400">
-                <AlertCircle className="w-4 h-4" />
+              <div className="flex items-center gap-3 p-4 text-sm text-red-400 bg-red-950/30 border border-red-900/50 rounded-lg">
+                <AlertCircle className="w-5 h-5 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
+
+            <div className="flex justify-end pt-4">
+              <Button
+                type="submit"
+                form="create-profile-form"
+                disabled={isLoading}
+                className="bg-white text-black hover:bg-neutral-200 font-bold px-8 h-12 rounded-full"
+              >
+                {isLoading ? "Creating..." : "Create Profile"}
+              </Button>
+            </div>
           </form>
-        </CardContent>
-        <CardFooter className="flex justify-end gap-3">
-          <Button type="submit" form="create-profile-form" disabled={isLoading}>
-            {isLoading ? "Creating Profile..." : "Create Profile"}
-          </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -4,11 +4,22 @@ import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 // Force dynamic rendering for all dashboard routes (uses auth/headers)
 export const dynamic = "force-dynamic";
 
+import { getMyProfile } from "@/lib/actions/profile";
+import { redirect } from "next/navigation";
+
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const result = await getMyProfile();
+
+  // If user is authenticated but has no profile, force them to onboarding
+  // We check session inside getMyProfile, but if error is auth, we might want to let middleware handle it
+  // But if success is true and data is null, it means no profile.
+  if (result.success && !result.data) {
+    redirect("/onboarding");
+  }
   return (
     <div className="fixed inset-0 flex bg-neutral-50 dark:bg-background overflow-hidden">
       {/* Sidebar for desktop */}
