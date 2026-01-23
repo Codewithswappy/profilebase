@@ -55,16 +55,16 @@ function SortableItem({ id, isActive, onClick, onRemove, children }: any) {
       <div
         onClick={onClick}
         className={cn(
-          "border rounded-lg p-3 bg-white hover:border-lime-300 transition-all cursor-pointer flex items-center gap-3",
+          "border rounded-lg p-3 bg-white dark:bg-neutral-800 hover:border-lime-300 dark:hover:border-lime-500 transition-all cursor-pointer flex items-center gap-3",
           isActive
-            ? "border-lime-500 ring-1 ring-lime-500 bg-lime-50/10"
-            : "border-neutral-200",
+            ? "border-lime-500 ring-1 ring-lime-500 bg-lime-50/10 dark:bg-lime-900/10"
+            : "border-neutral-200 dark:border-neutral-700",
         )}
       >
         <div
           {...attributes}
           {...listeners}
-          className="text-neutral-300 hover:text-neutral-600 cursor-grab active:cursor-grabbing p-1"
+          className="text-neutral-300 dark:text-neutral-600 hover:text-neutral-600 dark:hover:text-neutral-400 cursor-grab active:cursor-grabbing p-1"
         >
           <IconGripVertical className="w-4 h-4" />
         </div>
@@ -74,7 +74,7 @@ function SortableItem({ id, isActive, onClick, onRemove, children }: any) {
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 text-neutral-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="h-7 w-7 text-neutral-400 dark:text-neutral-500 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
           onClick={(e) => {
             e.stopPropagation();
             onRemove();
@@ -127,13 +127,17 @@ export function ListSection({
   return (
     <div className="p-6 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 h-full flex flex-col">
       <div className="shrink-0">
-        <h2 className="text-lg font-bold mb-1">{title}</h2>
-        <p className="text-xs text-neutral-500 mb-4">{description}</p>
+        <h2 className="text-lg font-bold mb-1 text-neutral-900 dark:text-neutral-100">
+          {title}
+        </h2>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-4">
+          {description}
+        </p>
 
         {!editingId && (
           <Button
             onClick={onAdd}
-            className="w-full gap-2 border-dashed border-2 bg-transparent text-neutral-600 hover:bg-neutral-50 hover:border-lime-400 hover:text-lime-600 shadow-none h-12"
+            className="w-full gap-2 border-dashed border-2 bg-transparent text-neutral-600 dark:text-neutral-400 border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:border-lime-400 dark:hover:border-lime-500 hover:text-lime-600 dark:hover:text-lime-400 shadow-none h-12"
           >
             <IconPlus className="w-4 h-4" /> Add New
           </Button>

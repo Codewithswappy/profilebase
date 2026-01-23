@@ -259,11 +259,11 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                   <div className="flex items-center justify-end gap-3 pt-8">
                     <button
                      
-                      className="cursor-pointer flex pr-4 pl-1 py-1 items-center gap-1 border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-lg"
+                      className="cursor-pointer flex pr-4 items-center gap-1 border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-lg"
                       onClick={() => setShowResume(true)}
                     >
-                     <span className="bg-neutral-300 dark:bg-neutral-700 px-4 py-2 rounded-lg shadow-sm shadow-black/10  text-neutral-900 dark:text-neutral-100 font-medium">Resume</span>
-                      <IconFoldUp className="w-4 h-4" />
+                     <span className="bg-neutral-300 dark:bg-neutral-700 px-3 py-2 rounded-lg shadow-sm shadow-black/10  text-neutral-900 dark:text-neutral-100 font-medium">Resume</span>
+                      <IconFoldUp className="w-5 h-5" />
                     </button>
 
                     {profileSettings.showEmail && data.email ? (

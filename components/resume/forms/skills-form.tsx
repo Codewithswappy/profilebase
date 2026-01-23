@@ -55,7 +55,9 @@ function SkillStringHelper({
 
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs uppercase text-neutral-500">Skills List</Label>
+      <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
+        Skills List
+      </Label>
       <Textarea
         value={value}
         onChange={handleChange}
@@ -63,7 +65,7 @@ function SkillStringHelper({
         placeholder="React, TypeScript, Node.js"
         className="h-24"
       />
-      <p className="text-[10px] text-neutral-400">
+      <p className="text-[10px] text-neutral-400 dark:text-neutral-500">
         Separate skills with commas.
       </p>
     </div>
@@ -122,8 +124,10 @@ export function SkillsForm() {
       onReorder={reorderGroups}
       renderItem={(item) => (
         <div className="text-sm">
-          <div className="font-semibold">{item.name || "Category"}</div>
-          <div className="text-neutral-500 text-xs truncate max-w-[200px]">
+          <div className="font-semibold text-neutral-900 dark:text-neutral-100">
+            {item.name || "Category"}
+          </div>
+          <div className="text-neutral-500 dark:text-neutral-400 text-xs truncate max-w-[200px]">
             {item.skills.map((s: any) => s.name).join(", ") || "No skills"}
           </div>
         </div>
@@ -132,7 +136,7 @@ export function SkillsForm() {
         return (
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Category Name
               </Label>
               <Input

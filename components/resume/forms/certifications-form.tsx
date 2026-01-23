@@ -20,8 +20,12 @@ export function CertificationsForm() {
       onReorder={(newItems) => reorderItems("certifications", newItems)}
       renderItem={(item) => (
         <div className="text-sm">
-          <div className="font-semibold">{item.name || "Certificate"}</div>
-          <div className="text-neutral-500 text-xs">{item.issuer}</div>
+          <div className="font-semibold text-neutral-900 dark:text-neutral-100">
+            {item.name || "Certificate"}
+          </div>
+          <div className="text-neutral-500 dark:text-neutral-400 text-xs">
+            {item.issuer}
+          </div>
         </div>
       )}
       renderForm={(item, _) => {
@@ -31,7 +35,7 @@ export function CertificationsForm() {
         return (
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Certificate Name
               </Label>
               <Input
@@ -41,7 +45,7 @@ export function CertificationsForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Issuer / Organization
               </Label>
               <Input
@@ -52,7 +56,7 @@ export function CertificationsForm() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase text-neutral-500">
+                <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                   Date
                 </Label>
                 <Input
@@ -62,7 +66,7 @@ export function CertificationsForm() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase text-neutral-500">
+                <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                   Credential URL
                 </Label>
                 <Input

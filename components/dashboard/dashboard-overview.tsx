@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { FullProfile } from "@/lib/actions/profile";
 import { AnalyticsData } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";

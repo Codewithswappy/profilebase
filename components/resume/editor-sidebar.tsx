@@ -26,7 +26,7 @@ export function ResumeEditorSidebar() {
   ];
 
   return (
-    <div className="flex flex-row md:flex-col p-2 md:py-4 gap-2 overflow-x-auto no-scrollbar md:overflow-visible w-full md:w-auto bg-neutral-50/50 dark:bg-neutral-900/50">
+    <div className="flex flex-row p-2 gap-2 overflow-x-auto no-scrollbar w-full items-center bg-neutral-50/50 dark:bg-neutral-900/50">
       {sections.map((section) => {
         const isActive = activeSection === section.id;
         return (
@@ -36,7 +36,7 @@ export function ResumeEditorSidebar() {
               useResumeStore.setState({ activeSection: section.id })
             }
             className={cn(
-              "flex-shrink-0 flex items-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-md text-xs font-medium transition-all duration-200 border",
+              "shrink-0 flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium transition-all duration-200 border",
               isActive
                 ? "bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-200 dark:border-neutral-700 shadow-sm ring-1 ring-neutral-900/5 dark:ring-white/10"
                 : "text-neutral-500 dark:text-neutral-400 border-transparent hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-200",

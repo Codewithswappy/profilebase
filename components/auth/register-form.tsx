@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import { register } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +17,7 @@ import {
 import { AlertCircle } from "lucide-react";
 
 export function RegisterForm() {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -68,7 +67,13 @@ export function RegisterForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" placeholder="********" required />
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="********"
+              required
+            />
             <p className="text-xs text-muted-foreground">
               Must contain at least 8 characters, one uppercase letter, and one
               number.

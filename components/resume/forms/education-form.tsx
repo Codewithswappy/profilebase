@@ -20,8 +20,12 @@ export function EducationForm() {
       onReorder={(newItems) => reorderItems("education", newItems)}
       renderItem={(item) => (
         <div className="text-sm">
-          <div className="font-semibold">{item.school || "School"}</div>
-          <div className="text-neutral-500 text-xs">{item.degree}</div>
+          <div className="font-semibold text-neutral-900 dark:text-neutral-100">
+            {item.school || "School"}
+          </div>
+          <div className="text-neutral-500 dark:text-neutral-400 text-xs">
+            {item.degree}
+          </div>
         </div>
       )}
       renderForm={(item, _) => {
@@ -30,7 +34,7 @@ export function EducationForm() {
         return (
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 School / University
               </Label>
               <Input
@@ -40,7 +44,7 @@ export function EducationForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Degree / Major
               </Label>
               <Input
@@ -51,7 +55,7 @@ export function EducationForm() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase text-neutral-500">
+                <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                   Start Date
                 </Label>
                 <Input
@@ -61,7 +65,7 @@ export function EducationForm() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase text-neutral-500">
+                <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                   End Date
                 </Label>
                 <Input
@@ -73,7 +77,7 @@ export function EducationForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Location
               </Label>
               <Input

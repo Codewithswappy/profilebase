@@ -21,8 +21,10 @@ export function ProjectsForm() {
       onReorder={(newItems) => reorderItems("projects", newItems)}
       renderItem={(item) => (
         <div className="text-sm">
-          <div className="font-semibold">{item.title || "New Project"}</div>
-          <div className="text-neutral-500 text-xs truncate max-w-[200px]">
+          <div className="font-semibold text-neutral-900 dark:text-neutral-100">
+            {item.title || "New Project"}
+          </div>
+          <div className="text-neutral-500 dark:text-neutral-400 text-xs truncate max-w-[200px]">
             {item.subtitle ||
               item.description?.replace(/<[^>]*>?/gm, "") ||
               "No details"}
@@ -35,7 +37,7 @@ export function ProjectsForm() {
         return (
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Project Title
               </Label>
               <Input
@@ -45,7 +47,7 @@ export function ProjectsForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Subtitle / Tech Snippet
               </Label>
               <Input
@@ -57,7 +59,7 @@ export function ProjectsForm() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase text-neutral-500">
+                <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                   Project URL
                 </Label>
                 <Input
@@ -67,7 +69,7 @@ export function ProjectsForm() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase text-neutral-500">
+                <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                   Repo URL
                 </Label>
                 <Input
@@ -79,7 +81,7 @@ export function ProjectsForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Description
               </Label>
               <RichTextEditor

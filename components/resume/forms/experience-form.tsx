@@ -24,8 +24,10 @@ export function ExperienceForm() {
       onReorder={(newItems) => reorderItems("experience", newItems)}
       renderItem={(item) => (
         <div className="text-sm">
-          <div className="font-semibold">{item.title || "New Role"}</div>
-          <div className="text-neutral-500 text-xs">
+          <div className="font-semibold text-neutral-900 dark:text-neutral-100">
+            {item.title || "New Role"}
+          </div>
+          <div className="text-neutral-500 dark:text-neutral-400 text-xs">
             {item.company || "Company"}
           </div>
         </div>
@@ -37,7 +39,7 @@ export function ExperienceForm() {
         return (
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Position Title
               </Label>
               <Input
@@ -47,7 +49,7 @@ export function ExperienceForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Company
               </Label>
               <Input
@@ -58,7 +60,7 @@ export function ExperienceForm() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase text-neutral-500">
+                <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                   Start Date
                 </Label>
                 <Input
@@ -70,7 +72,7 @@ export function ExperienceForm() {
               </div>
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center mb-1">
-                  <Label className="text-xs uppercase text-neutral-500">
+                  <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                     End Date
                   </Label>
                   <div className="flex items-center gap-1.5">
@@ -79,7 +81,7 @@ export function ExperienceForm() {
                       checked={item.current}
                       onCheckedChange={(c) => update({ current: c })}
                     />
-                    <span className="text-[10px] text-neutral-500">
+                    <span className="text-[10px] text-neutral-500 dark:text-neutral-400">
                       Current
                     </span>
                   </div>
@@ -95,7 +97,7 @@ export function ExperienceForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Location
               </Label>
               <Input
@@ -105,7 +107,7 @@ export function ExperienceForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase text-neutral-500">
+              <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                 Description
               </Label>
               <RichTextEditor

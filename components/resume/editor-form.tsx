@@ -29,7 +29,7 @@ export function ResumeEditorForm() {
       return <CertificationsForm />;
     default:
       return (
-        <div className="p-8 text-center text-neutral-500">
+        <div className="p-8 text-center text-neutral-500 dark:text-neutral-400">
           Select a section from the sidebar to edit.
         </div>
       );

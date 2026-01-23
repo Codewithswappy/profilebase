@@ -187,7 +187,7 @@ export function ResumeEditorRoot({ resume }: ResumeEditorRootProps) {
         {/* LEFT: Editor Panel (Hidden on mobile if preview active) */}
         <div
           className={cn(
-            "w-full md:w-[600px] flex flex-col border-r border-dashed border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 z-20 shadow-xl absolute md:relative inset-0 transition-transform duration-300 md:translate-x-0",
+            "w-full md:w-1/2 flex flex-col border-r border-dashed border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 z-20 shadow-xl absolute md:relative inset-0 transition-transform duration-300 md:translate-x-0",
             activeTab === "preview"
               ? "-translate-x-full md:translate-x-0"
               : "translate-x-0",
@@ -238,8 +238,8 @@ export function ResumeEditorRoot({ resume }: ResumeEditorRootProps) {
           </header>
 
           {/* Editor Content */}
-          <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-neutral-50/30 dark:bg-neutral-900/30">
-            <aside className="w-full h-auto md:w-[150px] md:h-full border-b md:border-b-0 md:border-r border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 flex flex-col shrink-0 z-10">
+          <div className="flex-1 flex flex-col overflow-hidden bg-neutral-50/30 dark:bg-neutral-900/30">
+            <aside className="w-full shrink-0 border-b border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 z-10">
               <ResumeEditorSidebar />
             </aside>
 
@@ -294,7 +294,7 @@ export function ResumeEditorRoot({ resume }: ResumeEditorRootProps) {
 
           {/* Preview Canvas */}
           <div className="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center bg-neutral-200/50 dark:bg-neutral-950/50">
-            <div className="scale-[0.5] origin-top md:scale-100 transition-transform w-[210mm] min-h-[297mm]">
+            <div className="scale-[0.4] origin-top md:scale-[0.5] lg:scale-[0.6] xl:scale-[0.8] 2xl:scale-100 transition-transform w-[210mm] min-h-[297mm]">
               <div id="resume-preview-content">
                 <ResumePreview content={content} template={templateId} />
               </div>
