@@ -3,7 +3,7 @@ import { ResumeBuilder } from "@/components/dashboard/resume-builder";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Editor — SkillDock Resume",
+  title: "Editor — ProfileBase Resume",
   layout: "fullscreen",
 };
 

@@ -113,7 +113,7 @@ export function DashboardSidebar({
       animate={isCollapsed ? "collapsed" : "expanded"}
       variants={onClose ? {} : sidebarVariants}
       className={cn(
-        "flex flex-col h-full bg-white dark:bg-[#0A0A0A] border-r border-neutral-200 dark:border-neutral-900 z-50 relative",
+        "flex  flex-col h-full bg-white dark:bg-[#0A0A0A] border-r border-neutral-200 dark:border-neutral-900 z-50 relative",
         className,
         onClose && "w-full border-none", // Mobile overrides
       )}
@@ -132,13 +132,13 @@ export function DashboardSidebar({
           {isCollapsed ? (
             <div className="relative w-16 h-16 flex items-center justify-center select-none">
               <img
-                src="/logo/blackLogo.png"
-                alt="SkillDock"
+                src="/logo/newLogo.png"
+                alt="ProfileBase"
                 className="h-16 w-auto object-contain block dark:hidden"
               />
               <img
-                src="/logo/lightLogo.png"
-                alt="SkillDock"
+                src="/logo/newlogodarkMode.png"
+                alt="ProfileBase"
                 className="h-16 w-auto object-contain hidden dark:block"
               />
             </div>
@@ -150,13 +150,13 @@ export function DashboardSidebar({
               className="flex items-center"
             >
               <img
-                src="/logo/blackLogo.png"
-                alt="SkillDock"
+                src="/logo/newLogo.png"
+                alt="ProfileBase"
                 className="h-12 w-auto object-contain block dark:hidden"
               />
               <img
-                src="/logo/lightLogo.png"
-                alt="SkillDock"
+                src="/logo/newlogodarkMode.png"
+                alt="ProfileBase"
                 className="h-12 w-auto object-contain hidden dark:block"
               />
             </motion.div>
@@ -164,8 +164,8 @@ export function DashboardSidebar({
         </Link>
 
         {!isCollapsed && (
-          <div className="text-lg font-bold text-neutral-800 dark:text-neutral-200 border-b border-dashed border-neutral-300 dark:border-neutral-700 relative -left-6 top-1">
-            SkillDock
+          <div className="text-lg font-semibold font-serif italic tracking-wide text-neutral-800 dark:text-neutral-200 border-b border-dashed border-neutral-300 dark:border-neutral-700 relative -left-7 top-3">
+            ProfileBase
           </div>
         )}
 

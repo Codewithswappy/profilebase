@@ -1,5 +1,5 @@
 // ============================================
-// SKILLPROOF PRISMA SCHEMA
+// Profilebase PRISMA SCHEMA
 // Portfolio Generator Architecture
 // ============================================
 // Clean portfolio creation with projects,
@@ -18,7 +18,7 @@ datasource db {
 // ============================================
 // USER
 // ============================================
-// The human who owns a SkillProof profile.
+// The human who owns a Profilebase profile.
 // Root of all ownership. Authentication anchor.
 // ============================================
 

@@ -382,7 +382,7 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
                   </Label>
                   <div className="flex rounded-sm shadow-sm ring-1 ring-inset ring-neutral-300 dark:ring-neutral-700 focus-within:ring-2 focus-within:ring-inset focus-within:ring-neutral-900 dark:focus-within:ring-neutral-100 bg-neutral-50 dark:bg-neutral-950">
                     <span className="flex select-none items-center pl-3 text-neutral-400 font-mono text-xs">
-                      skilldock.site/
+                      ProfileBase.site/
                     </span>
                     <input
                       type="text"

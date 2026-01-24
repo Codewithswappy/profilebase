@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import { RegisterForm } from "@/components/auth/register-form";
 
 export const metadata = {
-  title: "Register — SkillDock",
-  description: "Create your SkillDock account",
+  title: "Register — ProfileBase",
+  description: "Create your ProfileBase account",
 };
 
 export default function RegisterPage() {

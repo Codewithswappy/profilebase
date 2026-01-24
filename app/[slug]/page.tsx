@@ -12,18 +12,19 @@ export async function generateMetadata({
   const result = await getPublicProfile(slug);
 
   if (!result.success || !result.data) {
-    return { title: "Profile Not Found — SkillDock" };
+    return { title: "Profile Not Found — ProfileBase" };
   }
 
   const { profile } = result.data;
 
   return {
-    title: `${profile.slug} — SkillDock`,
+    title: `${profile.slug} — ProfileBase`,
     description:
-      profile.headline || `View ${profile.slug}'s proven skills on SkillDock.`,
+      profile.headline ||
+      `View ${profile.slug}'s proven skills on ProfileBase.`,
     openGraph: {
-      title: `${profile.slug} — SkillDock`,
-      description: profile.headline || "Proof over claims.",
+      title: `${profile.slug} — ProfileBase`,
+      description: profile.headline || "A better way to share your professional work.",
       images: [`/api/og/${slug}`],
       type: "profile",
     },

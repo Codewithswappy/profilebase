@@ -2,7 +2,7 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
-  prisma_skillproof: PrismaClient | undefined;
+  prisma_Profilebase: PrismaClient | undefined;
 };
 
 function createPrismaClient() {
@@ -15,6 +15,6 @@ function createPrismaClient() {
   });
 }
 
-export const db = globalForPrisma.prisma_skillproof ?? createPrismaClient();
+export const db = globalForPrisma.prisma_Profilebase ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma_skillproof = db;
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma_Profilebase = db;

@@ -10,10 +10,9 @@ import {
 import { cn } from "@/lib/utils";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { LandingBentoGrid } from "@/components/landing/bento-grid";
-import { GithubStarButton } from "@/components/landing/github-star-button";
 
 export const metadata = {
-  title: "SkillDock — Proof Over Claims",
+  title: "ProfileBase — A better way to share your professional work",
   description:
     "The structured skills profile for developers. Prove your abilities to recruiters in 60 seconds.",
 };
@@ -32,19 +31,19 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <img
-              src="/logo/blackLogo.png"
-              alt="SkillDock"
-              className="h-8 md:h-10 w-auto object-contain dark:hidden"
+              src="/logo/newLogo.png"
+              alt="ProfileBase"
+              className="h-10 md:h-12 w-auto object-cover dark:hidden"
             />
             <img
-              src="/logo/lightLogo.png"
-              alt="SkillDock"
-              className="h-8 md:h-10 w-auto object-contain hidden dark:block"
+              src="/logo/newlogodarkMode.png"
+              alt="ProfileBase"
+              className="h-10 md:h-12 w-auto object-cover hidden dark:block"
             />
           </div>
 
           <div className="flex items-center gap-2 md:gap-6">
-             {/* <GithubStarButton /> */}
+            {/* <GithubStarButton /> */}
             <Link
               href="/login"
               className="text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white transition-colors"
@@ -65,18 +64,15 @@ export default function Home() {
 
       {/* Hero Section */}
       <main className="flex-1 relative z-10 pt-20">
-        
         <section className="py-20 px-6 relative">
           {/* Subtle Glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neutral-100 dark:bg-white/[0.02] rounded-full blur-3xl pointer-events-none" />
 
-
           <div className="max-w-4xl mx-auto text-center space-y-6 relative">
-           <div className="inline-flex items-center gap-2 border border-dashed border-neutral-300 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900/50 px-3 py-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 border border-dashed border-neutral-300 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900/50 px-3 py-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 backdrop-blur-sm">
               <span className="flex h-4 w-4 rounded-full border border-dashed border-neutral-100 bg-neutral-800 dark:bg-neutral-100 dark:border-neutral-900 animate-pulse" />
               v1.0 is now live
             </div>
-           
 
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tighter text-neutral-950 dark:text-white leading-[1.1]">
               One Profile. <br className="hidden sm:block" />
@@ -138,7 +134,7 @@ export default function Home() {
             </h2>
 
             <p className="text-md text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto">
-              Join thousands of developers who are already using SkillDock to
+              Join thousands of developers who are already using ProfileBase to
               showcase their proof of work.
             </p>
 
@@ -163,7 +159,7 @@ export default function Home() {
           <div className="w-4 h-4 border border-dashed bg-lime-400" />
         </div>
         <p>
-          &copy; {new Date().getFullYear()} SkillDock. Build with{" "}
+          &copy; {new Date().getFullYear()} ProfileBase. Build with{" "}
           <span className="text-red-600">&hearts;</span> by{" "}
           <Link
             href="https://x.com/heyyswap"

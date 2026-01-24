@@ -704,7 +704,7 @@ export function ResumeBuilder({ resume, initialData }: ResumeBuilderProps) {
           </div>
           <div>
             <span className="font-extrabold text-sm tracking-tight block">
-              SkillDock
+              ProfileBase
             </span>
             <span className="text-[10px] text-neutral-400 font-medium uppercase tracking-widest">
               Resume Builder

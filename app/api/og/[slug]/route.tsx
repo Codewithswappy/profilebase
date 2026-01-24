@@ -125,7 +125,7 @@ export async function GET(
           }}
         >
           <div style={{ fontSize: 20, color: "#cbd5e1" }}>
-            SkillProof Portfolio
+            Profilebase Portfolio
           </div>
         </div>
       </div>

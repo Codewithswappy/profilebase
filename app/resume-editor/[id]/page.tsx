@@ -3,7 +3,7 @@ import { ResumeEditorRoot } from "@/components/resume/resume-editor-root";
 import { redirect, notFound } from "next/navigation";
 
 export const metadata = {
-  title: "Editor — SkillDock Resume",
+  title: "Editor — ProfileBase Resume",
   layout: "fullscreen",
 };
 

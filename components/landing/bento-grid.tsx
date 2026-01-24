@@ -66,7 +66,7 @@ const PortfolioVisual = () => {
           <div className="flex-1 flex justify-center">
             <div className="bg-white dark:bg-neutral-800 rounded px-3 py-0.5 text-[10px] text-neutral-400 font-medium flex items-center gap-1.5 border border-neutral-100 dark:border-neutral-700">
               <Globe className="w-2.5 h-2.5" />
-              skilldock.site/Username
+              ProfileBase.site/Username
             </div>
           </div>
         </div>
@@ -308,7 +308,7 @@ const ShareVisual = () => {
         >
           <IconBrandTwitterFilled className="w-5 h-5 text-black dark:text-white" />
         </motion.div>
-          <motion.div
+        <motion.div
           animate={{ y: [0, 20, 0], opacity: [0, 1, 0] }}
           transition={{
             duration: 5,
@@ -330,7 +330,7 @@ const ShareVisual = () => {
         >
           <Globe className="w-4 h-4 text-neutral-400 shrink-0" />
           <div className="flex-1 text-sm font-medium text-neutral-600 dark:text-neutral-300 truncate">
-            skilldock.site/
+            ProfileBase.site/
             <span className="text-neutral-900 dark:text-white font-bold">
               Username
             </span>

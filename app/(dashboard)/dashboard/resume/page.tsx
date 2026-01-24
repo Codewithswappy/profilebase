@@ -3,7 +3,7 @@ import { getMyProfile } from "@/lib/actions/profile";
 import { ResumeList } from "@/components/dashboard/resume-list";
 
 export const metadata = {
-  title: "Resumes — SkillDock",
+  title: "Resumes — ProfileBase",
 };
 
 export default async function ResumeDashboardPage() {

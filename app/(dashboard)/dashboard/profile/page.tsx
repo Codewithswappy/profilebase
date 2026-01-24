@@ -2,7 +2,7 @@ import { getMyProfile } from "@/lib/actions/profile";
 import { ProfileEditor } from "@/components/dashboard/profile-editor";
 
 export const metadata = {
-  title: "Profile Settings — SkillDock",
+  title: "Profile Settings — ProfileBase",
 };
 
 export default async function ProfilePage() {

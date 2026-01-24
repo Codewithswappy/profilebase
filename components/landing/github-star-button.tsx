@@ -13,7 +13,7 @@ interface GithubStarButtonProps {
 }
 
 export const GithubStarButton = ({
-  repoUrl = "https://github.com/Codewithswappy/skillproof",
+  repoUrl = "https://github.com/Codewithswappy/Profilebase",
   initialStars = 120,
   className,
 }: GithubStarButtonProps) => {

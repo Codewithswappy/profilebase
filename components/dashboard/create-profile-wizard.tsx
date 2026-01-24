@@ -50,7 +50,7 @@ export function CreateProfileWizard() {
         <div className="bg-neutral-900/50 rounded-lg p-8 border border-neutral-900">
           <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
-              Welcome to SkillDock
+              Welcome to ProfileBase
             </h1>
             <p className="text-neutral-400">
               Let&apos;s set up your profile. You can change these details
@@ -69,7 +69,7 @@ export function CreateProfileWizard() {
               </Label>
               <div className="bg-neutral-950/50 border border-dashed border-neutral-800 rounded-lg p-1 flex items-center focus-within:border-neutral-600 transition-colors">
                 <span className="text-neutral-500 pl-4 py-3 text-sm font-mono border-r border-dashed border-neutral-800 pr-3">
-                  skilldock.site/
+                  ProfileBase.site/
                 </span>
                 <Input
                   id="slug"

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ViewTransitions } from "next-view-transitions";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { UmamiAnalytics } from "@/components/analytics/umami-analytics";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -16,8 +17,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SkillDock",
+  title: "ProfileBase",
   description: "The structured skills profile for developers.",
+  icons: {
+    icon: "/logo/favicon.png",
+    apple: "/logo/favicon.png",
+  },
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
@@ -43,6 +48,7 @@ export default function RootLayout({
             {children}
             <Toaster />
           </ThemeProvider>
+          <UmamiAnalytics />
         </body>
       </html>
     </ViewTransitions>

@@ -2,7 +2,7 @@ import { getMyProfile } from "@/lib/actions/profile";
 import { ProjectsManager } from "@/components/dashboard/projects/projects-manager";
 
 export const metadata = {
-  title: "Projects Manager — SkillDock",
+  title: "Projects Manager — ProfileBase",
 };
 
 export default async function ProjectsPage() {

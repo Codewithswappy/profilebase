@@ -46,14 +46,20 @@ export function RegisterForm() {
           Create an account
         </CardTitle>
         <CardDescription className="text-center">
-          Enter your information to create your SkillDock account
+          Enter your information to create your ProfileBase account
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" name="name" required placeholder="John Doe" className="border border-dashed rounded-none border-neutral-300 dark:border-neutral-800 focus-visible:ring-0 focus-visible:ring-offset-0" />
+            <Input
+              id="name"
+              name="name"
+              required
+              placeholder="John Doe"
+              className="border border-dashed rounded-none border-neutral-300 dark:border-neutral-800 focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
