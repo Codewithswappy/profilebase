@@ -318,10 +318,10 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                   {/* Avatar + Name/Headline Row */}
                   <motion.div
                     variants={fadeIn}
-                    className="flex items-center gap-4 -mt-12 md:-mt-14"
+                    className="flex items-center justify-between -mt-12 md:-mt-14"
                   >
                     {/* Avatar - overlaps cover image */}
-                    <div className="shrink-0 relative z-20 mb-10">
+                    <div className="shrink-0 relative z-20 mb-4">
                       <div className="w-20 h-20 md:w-20 md:h-20 rounded-full overflow-hidden bg-white dark:bg-neutral-800  border-4 border-white dark:border-neutral-950 ring-1 ring-black/5 dark:ring-white/10">
                         {profile.image ? (
                           <Image
@@ -339,8 +339,86 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                       </div>
                     </div>
 
-                    {/* Name & Headline - Right of Avatar */}
-                    <div className="min-w-0 pt-10 md:pt-12">
+                    {/* Socials - Right of Avatar (Swapped) */}
+                    <div className=" flex flex-wrap items-center justify-end pt-8">
+                      <SocialsSection links={data.socialLinks} />
+
+                      {/* Email Display */}
+                      {profileSettings.showEmail && data.email && (
+                        <a
+                          href={`mailto:${data.email}`}
+                          className="flex items-center px-2.5 py-1.5 gap-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors group"
+                        >
+                          <div className="w-4 h-4 flex items-center justify-center group-hover:text-neutral-900 dark:group-hover:text-neutral-100">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="text-neutral-600 dark:text-neutral-400"
+                            >
+                              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                              <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                          </div>
+                          <span className="text-xs hidden md:block font-mono font-medium text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors">
+                            Email
+                          </span>
+                        </a>
+                      )}
+                    {/* Theme Toggle Button */}
+                    <div className="flex items-center border-l-2 border-neutral-200 dark:border-neutral-800 pl-2">
+                      <motion.button
+                        onClick={handleThemeToggle}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9, rotate: 180 }}
+                        className=" transition-colors text-neutral-600 dark:text-neutral-400 relative overflow-hidden group"
+                        aria-label="Toggle theme"
+                      >
+                        <motion.svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-[18px] h-[18px]"
+                          animate={{ rotate: theme === "dark" ? 180 : 0 }}
+                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                        >
+                          <path
+                            stroke="none"
+                            d="M0 0h24v24H0z"
+                            fill="none"
+                          ></path>
+                          <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                          <path d="M12 3l0 18"></path>
+                          <path d="M12 9l4.65 -4.65"></path>
+                          <path d="M12 14.3l7.37 -7.37"></path>
+                          <path d="M12 19.6l8.85 -8.85"></path>
+                        </motion.svg>
+                      </motion.button>
+                    </div>
+                    </div>
+
+                  </motion.div>
+
+                  {/* Socials + Buttons Row */}
+                  <motion.div
+                    variants={fadeIn}
+                    className="flex items-center justify-between"
+                  >
+                   
+                    {/* Name & Headline (Swapped) */}
+                    <div className="flex flex-col min-w-0">
                       <h1 className="text-xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 text-balance leading-tight">
                         {displayName}
                       </h1>
@@ -364,83 +442,6 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                           </svg>
                           {profile.location}
                         </p>
-                      )}
-                    </div>
-
-                    {/* Theme Toggle Button */}
-                    <div className="ml-auto pt-10 md:pt-12 self-start hidden md:block">
-                      <motion.button
-                        onClick={handleThemeToggle}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9, rotate: 180 }}
-                        className=" transition-colors text-neutral-600 dark:text-neutral-400 relative overflow-hidden group"
-                        aria-label="Toggle theme"
-                      >
-                        <motion.svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="w-[20px] h-[20px]"
-                          animate={{ rotate: theme === "dark" ? 180 : 0 }}
-                          transition={{ duration: 0.5, ease: "easeInOut" }}
-                        >
-                          <path
-                            stroke="none"
-                            d="M0 0h24v24H0z"
-                            fill="none"
-                          ></path>
-                          <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
-                          <path d="M12 3l0 18"></path>
-                          <path d="M12 9l4.65 -4.65"></path>
-                          <path d="M12 14.3l7.37 -7.37"></path>
-                          <path d="M12 19.6l8.85 -8.85"></path>
-                        </motion.svg>
-                      </motion.button>
-                    </div>
-                  </motion.div>
-
-                  {/* Socials + Buttons Row */}
-                  <motion.div
-                    variants={fadeIn}
-                    className="flex items-center justify-between pt-4"
-                  >
-                    {/* Socials */}
-                    <div className="flex flex-wrap items-center ">
-                      <SocialsSection links={data.socialLinks} />
-
-                      {/* Email Display */}
-                      {profileSettings.showEmail && data.email && (
-                        <a
-                          href={`mailto:${data.email}`}
-                          className="flex items-center px-2.5 py-1.5 gap-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors group"
-                        >
-                          <div className="w-4 h-4 flex items-center justify-center group-hover:text-neutral-900 dark:group-hover:text-neutral-100">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="14"
-                              height="14"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="text-neutral-600 dark:text-neutral-400"
-                            >
-                              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                              <polyline points="22,6 12,13 2,6" />
-                            </svg>
-                          </div>
-                          <span className="text-xs hidden md:block font-mono font-medium text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors">
-                            Email
-                          </span>
-                        </a>
                       )}
                     </div>
                   </motion.div>

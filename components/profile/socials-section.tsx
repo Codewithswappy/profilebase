@@ -70,9 +70,9 @@ export function SocialsSection({ links, className }: SocialsSectionProps) {
               {iconNode ? (
                 iconNode
               ) : isWebsite ? (
-                <IconWorld className="w-3.5 h-3.5" />
+                <IconWorld className="w-4 h-4 text-neutral-700 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors" />
               ) : (
-                <LinkIcon className="w-3.5 h-3.5" />
+                <LinkIcon className="w-4 h-4" />
               )}
             </span>
             <span className="hidden sm:inline text-[12px] text-neutral-500 dark:text-neutral-400 font-medium font-mono group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors truncate">
