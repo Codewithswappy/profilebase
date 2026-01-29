@@ -662,7 +662,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                       {/* Decorative Background Blur */}
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-neutral-100/50 via-transparent to-transparent dark:from-neutral-900/20 opacity-50 pointer-events-none" />
 
-                      <h2 className="relative text-xl md:text-2xl font-semibold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-neutral-800 to-neutral-500 dark:from-neutral-100 dark:to-neutral-500 max-w-lg mx-auto leading-tight">
+                      <h2 className="relative text-md md:text-2xl font-semibold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-neutral-800 to-neutral-500 dark:from-neutral-100 dark:to-neutral-500 max-w-lg mx-auto leading-tight">
                         &ldquo;
                         {profile.ctaMessage ||
                           "Heyy, If you made it this far, let's chat."}
@@ -670,7 +670,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                       </h2>
 
                       {/* CTA Section Container with Node Lines */}
-                      <div className="relative flex justify-center py-8">
+                      <div className="relative flex justify-center ">
                         {/* Decorative Node Lines Removed */}
 
                         {/* CTA Button with Avatar */}
