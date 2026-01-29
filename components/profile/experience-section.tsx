@@ -68,7 +68,7 @@ function CompanyGroup({
   const hasCurrent = roles.some((r) => r.current);
 
   return (
-    <div className={cn("relative pl-0 md:pl-0", !isLast && "pb-12")}>
+    <div className={cn("relative pl-0 md:pl-0", !isLast && "pb-0")}>
       {/* Vertical Timeline Line */}
       <div
         className={cn(
@@ -163,7 +163,7 @@ function RoleItem({
           <div className="flex items-start justify-between gap-4 group-hover/role:translate-x-1 transition-transform duration-300">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <h4 className="font-bold text-neutral-900 dark:text-neutral-100 text-sm">
+                <h4 className="font-bold text-neutral-900 dark:text-neutral-100 text-[13px]">
                   {experience.position}
                 </h4>
               </div>

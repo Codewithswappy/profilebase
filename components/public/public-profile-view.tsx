@@ -9,6 +9,8 @@ import { ExperienceSection } from "@/components/profile/experience-section";
 import { SocialsSection } from "@/components/profile/socials-section";
 import { TechIcons } from "@/components/TechIcons";
 import { ProjectCard } from "@/components/public/project-card";
+import { cn } from "@/lib/utils";
+
 import { ViewfinderFrame } from "@/components/ui/viewfinder-frame";
 import { ViewfinderButton } from "@/components/ui/viewfinder-button";
 import { AchievementsSection } from "@/components/public/achievements-section";
@@ -107,11 +109,56 @@ const stagger = {
   },
 };
 
+import { useTheme } from "next-themes";
+
+// ... existing imports
+
 export function PublicProfileView({ data }: PublicProfileViewProps) {
   const { profile, projects, userName, profileSettings } = data;
   const sessionIdRef = useRef<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showResume, setShowResume] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionTheme, setTransitionTheme] = useState<string | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleThemeToggle = () => {
+    // Lock the current theme for the overlay color
+    setTransitionTheme(theme);
+
+    // Play sound immediately
+    playCutSound();
+
+    setIsTransitioning(true);
+
+    // Wait for overlay to fully cover (fast entry)
+    setTimeout(() => {
+      setTheme(theme === "dark" ? "light" : "dark");
+
+      // longer delay before opening to ensure theme switch is done and suspense is built
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 400);
+    }, 400);
+  };
+
+  // Play "Scissors Cut" sound
+  const playCutSound = () => {
+    try {
+      const audio = new Audio("/sound/paper-cut.mp3");
+      audio.volume = 0.6; // Slightly adjusted volume
+      audio.play().catch((e) => console.error("Audio play failed", e));
+    } catch (e) {
+      console.error("Audio construction failed", e);
+    }
+  };
 
   // Extract GitHub username from social links
   const githubLink = data.socialLinks.find(
@@ -214,7 +261,11 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
           <motion.div
             key="profile"
             initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              filter: isTransitioning ? "blur(12px)" : "blur(0px)",
+            }}
             exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             className="w-full min-h-screen bg-white dark:bg-neutral-950 backface-hidden"
@@ -314,6 +365,43 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                           {profile.location}
                         </p>
                       )}
+                    </div>
+
+                    {/* Theme Toggle Button */}
+                    <div className="ml-auto pt-10 md:pt-12 self-start hidden md:block">
+                      <motion.button
+                        onClick={handleThemeToggle}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9, rotate: 180 }}
+                        className="p-2 transition-colors text-neutral-600 dark:text-neutral-400 relative overflow-hidden group"
+                        aria-label="Toggle theme"
+                      >
+                        <motion.svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-[20px] h-[20px]"
+                          animate={{ rotate: theme === "dark" ? 180 : 0 }}
+                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                        >
+                          <path
+                            stroke="none"
+                            d="M0 0h24v24H0z"
+                            fill="none"
+                          ></path>
+                          <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                          <path d="M12 3l0 18"></path>
+                          <path d="M12 9l4.65 -4.65"></path>
+                          <path d="M12 14.3l7.37 -7.37"></path>
+                          <path d="M12 19.6l8.85 -8.85"></path>
+                        </motion.svg>
+                      </motion.button>
                     </div>
                   </motion.div>
 
@@ -821,6 +909,53 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
         open={!!selectedProject}
         onOpenChange={(open) => !open && setSelectedProject(null)}
       />
+
+      {/* Transition Overlay - Zig Zag Paper Cut */}
+      <AnimatePresence>
+        {isTransitioning && (
+          <div className="fixed inset-0 z-[100] pointer-events-none overflow-hidden">
+            {/* Bottom-Left Half */}
+            <motion.div
+              initial={{ x: 0, y: 0 }}
+              exit={{ x: "-60%", y: "60%" }} // Increased distance for drama
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} // Slower
+              style={{
+                clipPath: `polygon(
+                    0% 0%, 
+                    4% 8%, 8% 4%, 12% 16%, 16% 12%, 20% 24%, 24% 20%, 28% 32%, 32% 28%, 36% 40%, 40% 36%, 44% 48%, 48% 44%, 52% 56%, 56% 52%, 60% 64%, 64% 60%, 68% 72%, 72% 68%, 76% 80%, 80% 76%, 84% 88%, 88% 84%, 92% 96%, 96% 92%, 100% 100%,
+                    0% 100%
+                  )`,
+              }}
+              className={cn(
+                "absolute inset-0 w-full h-full drop-shadow-2xl",
+                (transitionTheme || theme) === "light"
+                  ? "bg-white"
+                  : "bg-neutral-950",
+              )}
+            ></motion.div>
+
+            {/* Top-Right Half */}
+            <motion.div
+              initial={{ x: 0, y: 0 }}
+              exit={{ x: "60%", y: "-60%" }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                clipPath: `polygon(
+                    0% 0%, 
+                    4% 8%, 8% 4%, 12% 16%, 16% 12%, 20% 24%, 24% 20%, 28% 32%, 32% 28%, 36% 40%, 40% 36%, 44% 48%, 48% 44%, 52% 56%, 56% 52%, 60% 64%, 64% 60%, 68% 72%, 72% 68%, 76% 80%, 80% 76%, 84% 88%, 88% 84%, 92% 96%, 96% 92%, 100% 100%,
+                    100% 0%
+                  )`,
+              }}
+              className={cn(
+                "absolute inset-0 w-full h-full drop-shadow-2xl",
+                (transitionTheme || theme) === "light"
+                  ? "bg-white"
+                  : "bg-neutral-950",
+              )}
+            />
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
