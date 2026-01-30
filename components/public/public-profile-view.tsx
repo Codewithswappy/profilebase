@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { User } from "lucide-react";
+import { User, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { PublicProfileData } from "@/lib/actions/public";
 import { Project } from "@prisma/client";
@@ -23,6 +23,7 @@ import {
   Icon3dRotate,
   IconArcheryArrow,
   IconArchive,
+  IconArrowUpRight,
   IconCurlyLoop,
   IconFoldUp,
   IconInfinity,
@@ -124,6 +125,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
   const [transitionTheme, setTransitionTheme] = useState<string | undefined>(
     undefined,
   );
+  const [visibleProjects, setVisibleProjects] = useState(4);
 
   useEffect(() => {
     setMounted(true);
@@ -275,7 +277,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
             <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-black p-1 md:py-4 lg:py-4">
               <div className="max-w-3xl mx-auto bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 shadow-2xl shadow-neutral-200/50 dark:shadow-none border-dashed overflow-hidden relative">
                 {/* Top Status Bar Decoration */}
-                <div className="flex h-6 bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-3 items-center justify-between">
+                {/* <div className="flex h-6 bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-3 items-center justify-between">
                   <div className="flex gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700" />
                     <div className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700" />
@@ -283,7 +285,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                   <div className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">
                     Profile_Base_v1.0
                   </div>
-                </div>
+                </div> */}
                 {/* --- COVER IMAGE --- */}
                 <div className="w-full h-[120px] md:h-[180px] relative overflow-hidden bg-neutral-100 dark:bg-neutral-900">
                   <div className="absolute inset-0 bg-neutral-900/10 dark:bg-neutral-900/30 z-10 pointer-events-none mix-blend-overlay"></div>
@@ -371,44 +373,43 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                           </span>
                         </a>
                       )}
-                    {/* Theme Toggle Button */}
-                    <div className="flex items-center border-l-2 border-neutral-200 dark:border-neutral-800 pl-2">
-                      <motion.button
-                        onClick={handleThemeToggle}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9, rotate: 180 }}
-                        className=" transition-colors text-neutral-600 dark:text-neutral-400 relative overflow-hidden group"
-                        aria-label="Toggle theme"
-                      >
-                        <motion.svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="w-[18px] h-[18px]"
-                          animate={{ rotate: theme === "dark" ? 180 : 0 }}
-                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                      {/* Theme Toggle Button */}
+                      <div className="flex items-center border-l-2 border-neutral-200 dark:border-neutral-800 pl-2">
+                        <motion.button
+                          onClick={handleThemeToggle}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9, rotate: 180 }}
+                          className=" transition-colors text-neutral-600 dark:text-neutral-400 relative overflow-hidden group"
+                          aria-label="Toggle theme"
                         >
-                          <path
-                            stroke="none"
-                            d="M0 0h24v24H0z"
+                          <motion.svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
                             fill="none"
-                          ></path>
-                          <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
-                          <path d="M12 3l0 18"></path>
-                          <path d="M12 9l4.65 -4.65"></path>
-                          <path d="M12 14.3l7.37 -7.37"></path>
-                          <path d="M12 19.6l8.85 -8.85"></path>
-                        </motion.svg>
-                      </motion.button>
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="w-[18px] h-[18px]"
+                            animate={{ rotate: theme === "dark" ? 180 : 0 }}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                          >
+                            <path
+                              stroke="none"
+                              d="M0 0h24v24H0z"
+                              fill="none"
+                            ></path>
+                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                            <path d="M12 3l0 18"></path>
+                            <path d="M12 9l4.65 -4.65"></path>
+                            <path d="M12 14.3l7.37 -7.37"></path>
+                            <path d="M12 19.6l8.85 -8.85"></path>
+                          </motion.svg>
+                        </motion.button>
+                      </div>
                     </div>
-                    </div>
-
                   </motion.div>
 
                   {/* Socials + Buttons Row */}
@@ -416,7 +417,6 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     variants={fadeIn}
                     className="flex items-center justify-between"
                   >
-                   
                     {/* Name & Headline (Swapped) */}
                     <div className="flex flex-col min-w-0">
                       <h1 className="text-xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 text-balance leading-tight">
@@ -455,12 +455,15 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setShowResume(true)}
-                      className="group flex items-center gap-2 px-4 py-2 border border-dashed border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors cursor-pointer shadow-sm hover:shadow-md"
+                      className="relative z-20 group flex items-center gap-2 px-4 py-2.5 rounded-lg bg-linear-to-b from-neutral-200 to-neutral-400 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] overflow-hidden cursor-pointer"
                     >
-                      <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-neutral-100">
+                      {/* Inner Stitching */}
+                      <div className="absolute inset-[3px] rounded-lg border border-dashed border-neutral-400 pointer-events-none" />
+
+                      <span className="relative z-10 text-sm font-bold tracking-wide text-neutral-700 group-hover:text-black transition-colors drop-shadow-sm">
                         Resume
                       </span>
-                      <IconFoldUp className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 dark:text-neutral-500 dark:group-hover:text-neutral-300 transition-colors" />
+                      <IconFoldUp className="relative z-10 w-4 h-4 text-neutral-700 group-hover:text-black transition-colors" />
                     </motion.button>
 
                     <motion.div
@@ -471,7 +474,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                         <a href={`mailto:${data.email}`}>
                           <ViewfinderButton
                             variant="filled"
-                            className="cursor-pointer rounded-sm px-6 h-[42px]"
+                            className="cursor-pointer rounded-lg "
                           >
                             Contact
                           </ViewfinderButton>
@@ -479,7 +482,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                       ) : (
                         <ViewfinderButton
                           variant="filled"
-                          className="cursor-pointer rounded-sm opacity-50 h-[42px]"
+                          className="cursor-pointer opacity-50 rounded-lg"
                           title="Contact info hidden"
                         >
                           Contact
@@ -499,20 +502,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                   )}
 
                   {/* Dotted Line Divider */}
-                  <div className="flex justify-center pt-6">
-                    <svg width="100%" height="2" className="overflow-visible">
-                      <line
-                        x1="0"
-                        y1="1"
-                        x2="100%"
-                        y2="1"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeDasharray="4 4"
-                        className="text-neutral-300 dark:text-neutral-700"
-                      />
-                    </svg>
-                  </div>
+                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
                 </motion.div>
 
                 {/* --- MAIN CONTENT --- */}
@@ -535,98 +525,106 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     </div>
                   )}
 
-                  {/* Dotted Line Divider */}
-                  <div className="flex justify-center pt-6">
-                    <svg width="100%" height="2" className="overflow-visible">
-                      <line
-                        x1="0"
-                        y1="1"
-                        x2="100%"
-                        y2="1"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeDasharray="4 4"
-                        className="text-neutral-300 dark:text-neutral-700"
-                      />
-                    </svg>
-                  </div>
+                  {/* Minimal Divider */}
+                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
 
                   {showProjects && (
-                    <div className="relative px-0 md:px-6">
-                      {/* Technical Corner Markers - Viewfinder Aesthetic */}
-                      <div className="absolute -top-6 -left-2 w-4 h-4 border-t border-l border-neutral-300 dark:border-neutral-700 hidden md:block" />
-                      <div className="absolute -top-6 -right-2 w-4 h-4 border-t border-r border-neutral-300 dark:border-neutral-700 hidden md:block" />
-
+                    <div className="space-y-6 relative">
                       <div className="flex items-center justify-between md:justify-start gap-4 mb-6">
                         <h2 className="font-mono text-xs font-bold text-neutral-500 dark:text-neutral-500 tracking-wider uppercase flex items-center gap-2">
                           // Selected Work
                         </h2>
                       </div>
-                      <div className="w-full flex items-center md:justify-end justify-start py-10">
-                        <p className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-800 dark:text-neutral-200 leading-tight md:max-w-2/5 ">
-                          Here are some of my{" "}
-                          <span className="text-neutral-400 dark:text-neutral-600">
-                            Selected Work
-                          </span>
-                        </p>
-                      </div>
 
-                      {/* Projects */}
-                      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 overflow-y-auto ">
-                        {projects.length === 0 ? (
-                          <div className="py-8 text-center text-sm text-neutral-500 font-mono">
-                            No projects initialized.
-                          </div>
-                        ) : (
-                          projects.map((project, index) => (
-                            <motion.div
-                              key={project.id}
-                              initial={{ opacity: 0, y: 20 }}
-                              whileInView={{ opacity: 1, y: 0 }}
-                              viewport={{ once: true, margin: "-50px" }}
-                              transition={{ duration: 0.4, delay: index * 0.1 }}
-                              whileHover={{
-                                y: -5,
-                                transition: { duration: 0.2 },
-                              }}
+                      <div className="relative pl-8 md:pl-10">
+                        {/* Unique Tech Node Line */}
+                        <div className="absolute left-[11px] top-[4px] bottom-0 w-px bg-neutral-200 dark:bg-neutral-800">
+                          {/* Top "Target" Node */}
+                          <div className="absolute -top-[5px] -left-[3.5px] w-2 h-2 border border-neutral-400 dark:border-neutral-600 bg-white dark:bg-neutral-950 rotate-45 shadow-sm z-10" />
+                          <div className="absolute top-[15px] -left-[1.5px] w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+
+                          {/* Bottom Gradient Fade Out */}
+                          <div className="absolute bottom-0 left-0 w-full h-24 bg-linear-to-t from-white via-white/50 to-transparent dark:from-neutral-950 dark:via-neutral-950/50" />
+                        </div>
+
+                        {/* Projects Grid */}
+                        <motion.div
+                          layout
+                          className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 pt-1"
+                        >
+                          <AnimatePresence>
+                            {projects.length === 0 ? (
+                              <div className="col-span-1 md:col-span-2 py-8 text-center text-sm text-neutral-500 font-mono">
+                                No projects initialized.
+                              </div>
+                            ) : (
+                              projects
+                                .slice(0, visibleProjects)
+                                .map((project, index) => (
+                                  <motion.div
+                                    layout
+                                    key={project.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    viewport={{ once: true, margin: "-50px" }}
+                                    transition={{
+                                      duration: 0.3,
+                                      delay: (index % 4) * 0.1,
+                                    }}
+                                    whileHover={{
+                                      y: -5,
+                                      transition: { duration: 0.2, delay: 0 },
+                                    }}
+                                  >
+                                    <ProjectCard
+                                      project={project}
+                                      onInteraction={() =>
+                                        handleProjectInteraction(project.id)
+                                      }
+                                      onClick={() =>
+                                        setSelectedProject(project)
+                                      }
+                                    />
+                                  </motion.div>
+                                ))
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
+
+                        {projects.length > 4 && (
+                          <div className="text-center flex items-center justify-center pt-8">
+                            <motion.button
+                              onClick={() =>
+                                setVisibleProjects((prev) =>
+                                  prev === projects.length
+                                    ? 4
+                                    : projects.length,
+                                )
+                              }
+                              whileHover={{ scale: 1.01 }}
+                              whileTap={{ scale: 0.99 }}
+                              className="w-1/2 py-3 flex items-center justify-center gap-2 border-y border-dashed border-neutral-200 dark:border-neutral-800 text-xs font-mono uppercase tracking-tight text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-all group"
                             >
-                              <ProjectCard
-                                project={project}
-                                onInteraction={() =>
-                                  handleProjectInteraction(project.id)
-                                }
-                                onClick={() => setSelectedProject(project)}
+                              {visibleProjects === projects.length
+                                ? "Show Less"
+                                : "Load All Work"}
+                              <ChevronDown
+                                className={cn(
+                                  "w-3.5 h-3.5 transition-transform duration-300",
+                                  visibleProjects === projects.length &&
+                                    "rotate-180",
+                                )}
                               />
-                            </motion.div>
-                          ))
+                            </motion.button>
+                          </div>
                         )}
                       </div>
-
-                      {projects.length > 4 && (
-                        <div className="text-center pt-2">
-                          <button className="text-xs font-mono font-medium text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
-                            [LOAD MORE . . .]
-                          </button>
-                        </div>
-                      )}
                     </div>
                   )}
 
-                  {/* Dotted Line Divider */}
-                  <div className="flex justify-center pt-6">
-                    <svg width="100%" height="2" className="overflow-visible">
-                      <line
-                        x1="0"
-                        y1="1"
-                        x2="100%"
-                        y2="1"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeDasharray="4 4"
-                        className="text-neutral-300 dark:text-neutral-700"
-                      />
-                    </svg>
-                  </div>
+                  {/* Minimal Divider */}
+                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
 
                   {/* --- TECH STACK MARQUEE --- */}
                   {showTechStack && allTech.length > 0 && (
@@ -679,21 +677,8 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     </div>
                   )}
 
-                  {/* Dotted Line Divider */}
-                  <div className="flex justify-center pt-6">
-                    <svg width="100%" height="2" className="overflow-visible">
-                      <line
-                        x1="0"
-                        y1="1"
-                        x2="100%"
-                        y2="1"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeDasharray="4 4"
-                        className="text-neutral-300 dark:text-neutral-700"
-                      />
-                    </svg>
-                  </div>
+                  {/* Minimal Divider */}
+                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
 
                   {/* --- ACHIEVEMENTS --- */}
                   <div className="">
@@ -703,21 +688,8 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     />
                   </div>
 
-                  {/* Dotted Line Divider */}
-                  <div className="flex justify-center pt-6">
-                    <svg width="100%" height="2" className="overflow-visible">
-                      <line
-                        x1="0"
-                        y1="1"
-                        x2="100%"
-                        y2="1"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeDasharray="4 4"
-                        className="text-neutral-300 dark:text-neutral-700"
-                      />
-                    </svg>
-                  </div>
+                  {/* Minimal Divider */}
+                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
 
                   {/* --- CERTIFICATES --- */}
                   {data.profileSettings.showCertificates !== false &&
@@ -728,26 +700,13 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                       </div>
                     )}
 
-                  {/* Dotted Line Divider */}
-                  <div className="flex justify-center pt-6">
-                    <svg width="100%" height="2" className="overflow-visible">
-                      <line
-                        x1="0"
-                        y1="1"
-                        x2="100%"
-                        y2="1"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeDasharray="4 4"
-                        className="text-neutral-300 dark:text-neutral-700"
-                      />
-                    </svg>
-                  </div>
+                  {/* Minimal Divider */}
+                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
 
                   {/* Summary (About) */}
                   {showSummary && profile.summary && (
                     <div className="space-y-6 ">
-                      <div className="flex items-center justify-between md:justify-start gap-4 mb-2">
+                      <div className="flex items-center justify-between md:justify-start gap-4 mb-6">
                         <h2 className="font-mono text-xs font-bold text-neutral-500 dark:text-neutral-500 tracking-wider uppercase flex items-center gap-2">
                           // About Me
                         </h2>
@@ -755,11 +714,11 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
 
                       <div className="relative pl-0 md:pl-0">
                         {/* Leaf Node Connector: L-Shape from top to text */}
-                        <div className="absolute left-[18px] top-[-10px] h-[30px] w-px bg-neutral-200 dark:bg-neutral-800" />
-                        <div className="absolute left-[18px] top-[20px] w-[20px] h-px bg-neutral-200 dark:bg-neutral-800" />
+                        <div className="absolute left-[24px] top-[-6px] h-[30px] w-px bg-neutral-200 dark:bg-neutral-800" />
+                        <div className="absolute left-[24px] top-[23px] w-[20px] h-px bg-neutral-200 dark:bg-neutral-800" />
 
                         {/* Terminal Square Node at end of connector */}
-                        <div className="absolute left-[39px] top-[17px] w-1.5 h-1.5 bg-neutral-200 dark:bg-neutral-800" />
+                        <div className="absolute left-[39px] top-[20px] w-1.5 h-1.5 bg-neutral-200 dark:bg-neutral-800" />
 
                         <div className="relative pl-12 md:pl-14">
                           <div className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans text-left border-l-2 border-neutral-100 dark:border-neutral-800 pl-2 py-1">
@@ -770,14 +729,36 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     </div>
                   )}
 
+                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+
                   {/* --- CTA SECTION --- */}
                   {data.profileSettings.showContact !== false && (
                     <motion.div
                       initial={{ opacity: 0, y: 30 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      className=" py-6 text-center space-y-8 border max-w-2xl mx-auto border-dashed border-neutral-200 dark:border-neutral-800 relative"
+                      className="pb-16  pt-8 text-center space-y-8 max-w-2xl mx-auto relative group"
                     >
+                      {/* Unique Tech Node Border Decoration */}
+                      <div className="absolute inset-0 pointer-events-none">
+                        {/* Top Left Corner */}
+                        <div className="absolute top-0 left-0 w-4 h-4 border-l border-t border-neutral-300 dark:border-neutral-700" />
+                        <div className="absolute -top-[3px] -left-[3px] w-1.5 h-1.5 bg-neutral-800 dark:bg-neutral-200" />
+
+                        {/* Top Right Corner */}
+                        <div className="absolute top-0 right-0 w-4 h-4 border-r border-t border-neutral-300 dark:border-neutral-700" />
+
+                        {/* Bottom Right Corner */}
+                        <div className="absolute bottom-0 right-0 w-4 h-4 border-r border-b border-neutral-300 dark:border-neutral-700" />
+                        <div className="absolute -bottom-[3px] -right-[3px] w-1.5 h-1.5 bg-neutral-800 dark:bg-neutral-200" />
+
+                        {/* Bottom Left Corner */}
+                        <div className="absolute bottom-0 left-0 w-4 h-4 border-l border-b border-neutral-300 dark:border-neutral-700" />
+
+                        {/* Horizontal Fading Lines */}
+                        <div className="absolute top-0 left-6 right-6 h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent" />
+                        <div className="absolute bottom-0 left-6 right-6 h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent" />
+                      </div>
                       {/* Decorative Background Blur */}
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-neutral-100/50 via-transparent to-transparent dark:from-neutral-900/20 opacity-50 pointer-events-none" />
 
@@ -814,7 +795,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                                 ? "noopener noreferrer"
                                 : undefined
                             }
-                            className="relative flex items-center gap-4 bg-white dark:bg-neutral-950 px-2 pl-2 pr-8 py-2 rounded-full border-[0.5px] border-neutral-200 dark:border-neutral-800 group-hover:border-transparent transition-colors duration-300 overflow-hidden"
+                            className="relative flex items-center gap-3 bg-white dark:bg-neutral-950 px-1.5 pl-1.5 pr-6 py-1.5 rounded-full border-[0.5px] border-neutral-200 dark:border-neutral-800 group-hover:border-transparent transition-colors duration-300 overflow-hidden"
                           >
                             {/* Shimmer Effect */}
                             <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-linear-to-r from-transparent via-neutral-100/50 dark:via-neutral-800/50 to-transparent z-0 pointer-events-none" />
@@ -837,33 +818,33 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                             <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-1.5 h-1.5 bg-neutral-50 dark:bg-neutral-950 rounded-full border border-neutral-300 dark:border-neutral-700 z-20 group-hover:border-neutral-500 dark:group-hover:border-neutral-400 transition-colors shadow-sm" />
 
                             {/* Avatar Container */}
-                            <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-100 ring-2 ring-neutral-100 dark:ring-neutral-900 group-hover:ring-neutral-200 dark:group-hover:ring-neutral-700 transition-all flex items-center justify-center shrink-0 relative z-10 shadow-inner">
+                            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full overflow-hidden bg-neutral-100 ring-2 ring-neutral-100 dark:ring-neutral-900 group-hover:ring-neutral-200 dark:group-hover:ring-neutral-700 transition-all flex items-center justify-center shrink-0 relative z-10 shadow-inner">
                               {profile.image ? (
                                 <Image
                                   src={profile.image}
                                   alt={displayName}
-                                  width={40}
-                                  height={40}
+                                  width={36}
+                                  height={36}
                                   className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
                                 />
                               ) : (
-                                <User className="w-5 h-5 text-neutral-400" />
+                                <User className="w-4 h-4 text-neutral-400" />
                               )}
                             </div>
 
                             {/* Text Content */}
                             <div className="flex flex-col items-start relative z-10 gap-0.5">
-                              <span className="font-bold text-sm text-neutral-800 dark:text-neutral-200 leading-none group-hover:text-black dark:group-hover:text-white transition-colors">
+                              <span className="font-bold text-xs md:text-sm text-neutral-800 dark:text-neutral-200 leading-none group-hover:text-black dark:group-hover:text-white transition-colors">
                                 Book a Free Call
                               </span>
                               {/* Smooth Reveal Subtitle */}
                               <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-out">
-                                <span className="text-[10px] text-neutral-500 font-mono tracking-tight overflow-hidden flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                                <span className="text-[9px] text-neutral-500 font-mono tracking-tight overflow-hidden flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                                   {(profile as any).meetingUrl
                                     ? "Schedule meeting"
                                     : "Send me an email"}
                                   <span className="opacity-0 group-hover:opacity-100 transition-opacity delay-200">
-                                    &gt;
+                                   <IconArrowUpRight size={10}/>
                                   </span>
                                 </span>
                               </div>

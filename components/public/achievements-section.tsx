@@ -130,7 +130,7 @@ function AchievementItem({ item }: { item: Achievement }) {
           <div className="flex items-start gap-4 flex-1">
             <div className="relative z-30">
               {/* Icon Wrapper */}
-              <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-neutral-200 dark:border-neutral-800 shrink-0 shadow-sm overflow-hidden ring-4 ring-neutral-50 dark:ring-neutral-950">
+              <div className="w-8 h-8 flex items-center justify-center rounded-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shrink-0 shadow-sm overflow-hidden ring-4 ring-neutral-50 dark:ring-neutral-950">
                 <Icon className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
               </div>
             </div>

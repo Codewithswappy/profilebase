@@ -6,6 +6,7 @@ import { Project } from "@prisma/client";
 import Image from "next/image";
 import { ViewfinderFrame } from "@/components/ui/viewfinder-frame";
 import { TechIcons } from "@/components/TechIcons";
+import { IconArrowUp, IconArrowUpFromArc, IconArrowUpRight, IconBrandGithub } from "@tabler/icons-react";
 
 interface ProjectCardProps {
   project: Project;
@@ -85,9 +86,10 @@ export function ProjectCard({
               href={project.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center px-4 border-r border-dashed border-neutral-300 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors text-xs font-mono lowercase"
+              className="flex items-center justify-between px-4 border-r border-dashed border-neutral-300 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors text-xs font-mono lowercase"
             >
               Github
+              <IconBrandGithub className="w-3 h-3 ml-2" />
             </a>
           ) : (
             <div className="w-16 border-r border-dashed border-neutral-300 dark:border-neutral-800" />
@@ -105,6 +107,7 @@ export function ProjectCard({
               className="flex items-center justify-center px-4 border-l border-dashed border-neutral-300 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors text-xs font-mono lowercase"
             >
               preview
+              <IconArrowUpRight className="w-3 h-3 ml-2" />
             </a>
           ) : (
             <div className="w-16 border-l border-dashed border-neutral-300 dark:border-neutral-800" />

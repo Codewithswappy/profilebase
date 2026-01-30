@@ -52,7 +52,7 @@ export default function Home() {
             </Link>
             <Link
               href="/register"
-              className="group relative hidden md:flex h-8 md:h-9 items-center gap-2 overflow-hidden rounded-full bg-neutral-950 dark:bg-white px-3 md:px-6 text-xs md:text-sm font-semibold text-white dark:text-neutral-950 transition-all hover:bg-neutral-800 dark:hover:bg-neutral-200"
+              className="group relative hidden md:flex h-8 md:h-9 items-center gap-2 overflow-hidden rounded-full border border-dashed bg-neutral-950 dark:bg-white px-3 md:px-4 text-xs md:text-sm font-semibold text-white dark:text-neutral-950 transition-all hover:bg-neutral-800 dark:hover:bg-neutral-200"
             >
               <span className="">Get Started</span>
               <ArrowRight className="w-3 h-3 md:w-4 md:h-4 transition-transform group-hover:translate-x-1 " />

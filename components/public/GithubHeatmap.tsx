@@ -165,9 +165,16 @@ export const GithubHeatmap = ({ className, username }: GithubHeatmapProps) => {
     };
 
     fetchLatestPush(); // Initial call
-    const interval = setInterval(fetchLatestPush, 60000); // Poll every 60s
 
-    return () => clearInterval(interval);
+    // Poll every 5 minutes to stay within GitHub's unauthenticated rate limit (60 req/hr)
+    const intervalId = setInterval(fetchLatestPush, 300000);
+
+    // Store interval ID in a way we can clear it if needed (though locally scoped here is fine for unmount)
+    // If we hit a 403 inside fetchLatestPush, we ideally want to stop polling.
+    // However, for simplicity and stability, just reducing frequency to 5m is usually enough.
+    // If strictly needed to stop on 403, we'd need to move `interval` to a ref or state.
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const formatTimeAgo = (date: Date) => {
@@ -207,7 +214,7 @@ export const GithubHeatmap = ({ className, username }: GithubHeatmapProps) => {
       {/* Header Stat - Clean & Floating */}
       <div className="absolute top-0 left-0 flex flex-col items-start px-2">
         <span className="text-[9px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500 font-mono mb-1">
-         // Activity
+          // Activity
         </span>
         <div className="flex items-baseline gap-1.5">
           <span className="text-2xl font-bold font-mono tracking-tighter text-neutral-600 dark:text-neutral-400">
