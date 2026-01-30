@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 
 import { ViewfinderFrame } from "@/components/ui/viewfinder-frame";
 import { ViewfinderButton } from "@/components/ui/viewfinder-button";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 import { AchievementsSection } from "@/components/public/achievements-section";
 import { CertificatesSection } from "@/components/public/certificates-section";
 import { ProjectDetailsDialog } from "@/components/public/project-details-dialog";
@@ -419,8 +420,9 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                   >
                     {/* Name & Headline (Swapped) */}
                     <div className="flex flex-col min-w-0">
-                      <h1 className="text-xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 text-balance leading-tight">
+                      <h1 className="text-xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 text-balance leading-tight flex items-center gap-1">
                         {displayName}
+                        <VerificationBadge size={30} className="shrink-0" />
                       </h1>
                       <p className="text-sm md:text-base text-neutral-500 dark:text-neutral-400 font-medium">
                         {profile.headline || "Developer"}
@@ -493,7 +495,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
 
                   {/* GitHub Heatmap - Render if username exists */}
                   {githubUsername && (
-                    <div className="pt-8">
+                    <div className="pt-10">
                       <GithubHeatmap
                         username={githubUsername}
                         className="scale-100 origin-center"
@@ -712,15 +714,15 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                         </h2>
                       </div>
 
-                      <div className="relative pl-0 md:pl-0">
+                      <div className="relative">
                         {/* Leaf Node Connector: L-Shape from top to text */}
-                        <div className="absolute left-[24px] top-[-6px] h-[30px] w-px bg-neutral-200 dark:bg-neutral-800" />
-                        <div className="absolute left-[24px] top-[23px] w-[20px] h-px bg-neutral-200 dark:bg-neutral-800" />
+                        <div className="absolute left-0 top-[-6px] h-[30px] w-px bg-neutral-200 dark:bg-neutral-800" />
+                        <div className="absolute left-0 top-[23px] w-[20px] h-px bg-neutral-200 dark:bg-neutral-800" />
 
                         {/* Terminal Square Node at end of connector */}
-                        <div className="absolute left-[39px] top-[20px] w-1.5 h-1.5 bg-neutral-200 dark:bg-neutral-800" />
+                        <div className="absolute left-[15px] top-[20px] w-1.5 h-1.5 bg-neutral-200 dark:bg-neutral-800" />
 
-                        <div className="relative pl-12 md:pl-14">
+                        <div className="relative pl-6 md:pl-8">
                           <div className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans text-left border-l-2 border-neutral-100 dark:border-neutral-800 pl-2 py-1">
                             {profile.summary}
                           </div>
@@ -844,7 +846,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                                     ? "Schedule meeting"
                                     : "Send me an email"}
                                   <span className="opacity-0 group-hover:opacity-100 transition-opacity delay-200">
-                                   <IconArrowUpRight size={10}/>
+                                    <IconArrowUpRight size={10} />
                                   </span>
                                 </span>
                               </div>

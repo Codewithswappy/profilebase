@@ -61,24 +61,24 @@ export function AchievementsSection({
 
       <div className="space-y-8">
         {sortedTypes.map((type) => (
-          <div key={type} className="relative group/section pl-0 md:pl-0">
+          <div key={type} className="relative group/section">
             {/* Vertical Timeline Line (Dashed for Achievements) */}
-            <div className="absolute left-[19px] top-[10px] bottom-0 w-px border-l border-dashed border-neutral-300 dark:border-neutral-700 h-full" />
+            <div className="absolute left-1px top-[10px] bottom-0 w-px border-l border-dashed border-neutral-300 dark:border-neutral-700 h-full" />
 
             <div className="space-y-6 relative">
               {groupedAchievements[type].map((item, index) => (
                 <motion.div
                   key={item.id}
-                  className="relative pl-12 md:pl-14"
+                  className="relative pl-8 md:pl-8"
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1, duration: 0.4 }}
                 >
                   {/* Horizontal Connector (Dashed) */}
-                  <div className="absolute left-[20px] top-[24px] w-[20px] md:w-[28px] h-px border-t border-dashed border-neutral-300 dark:border-neutral-700" />
+                  <div className="absolute left-0 top-[14px] w-[20px] md:w-[28px] h-px border-t border-dashed border-neutral-300 dark:border-neutral-700" />
                   {/* Connector Node (Diamond) */}
-                  <div className="absolute left-[16px] top-[20px] w-2 h-2 rotate-45 bg-white dark:bg-neutral-950 border border-neutral-400 dark:border-neutral-600 z-10" />
+                  <div className="absolute -left-[4px] top-[10px] w-2 h-2 rotate-45 bg-white dark:bg-neutral-950 border border-neutral-400 dark:border-neutral-600 z-10" />
 
                   <AchievementItem item={item} />
                 </motion.div>

@@ -40,22 +40,22 @@ export function CertificatesSection({
 
       <div className="relative pl-0 md:pl-0">
         {/* Vertical Timeline Line */}
-        <div className="absolute left-[19px] top-[10px] bottom-0 w-px bg-linear-to-b from-neutral-200 via-neutral-200 to-transparent dark:from-neutral-800 dark:via-neutral-800 h-full" />
+        <div className="absolute left-0 top-[10px] bottom-0 w-px bg-linear-to-b from-neutral-200 via-neutral-200 to-transparent dark:from-neutral-800 dark:via-neutral-800 h-full" />
 
         <div className="space-y-6 relative">
           {displayed.map((item, index) => (
             <motion.div
               key={item.id}
-              className="relative pl-12 md:pl-14"
+              className="relative pl-6 md:pl-8"
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.4 }}
             >
               {/* Horizontal Connector */}
-              <div className="absolute left-[20px] top-[24px] w-[20px] md:w-[28px] h-px bg-neutral-200 dark:bg-neutral-800" />
+              <div className="absolute left-0 top-[24px] w-[20px] md:w-[28px] h-px bg-neutral-200 dark:bg-neutral-800" />
               {/* Connector Node */}
-              <div className="absolute left-[18px] top-[22px] w-1.5 h-1.5 rounded-full bg-neutral-200 dark:bg-neutral-800 ring-2 ring-white dark:ring-neutral-950" />
+              <div className="absolute left-0 top-[22px] w-1.5 h-1.5 rounded-full bg-neutral-200 dark:bg-neutral-800 ring-2 ring-white dark:ring-neutral-950" />
 
               <CertificateItem item={item} />
             </motion.div>
