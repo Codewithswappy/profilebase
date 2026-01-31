@@ -32,6 +32,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "sonner";
 
 interface AchievementsFormProps {
   initialData: Achievement[];
@@ -48,6 +50,7 @@ interface AchievementFormData {
 
 export function AchievementsForm({ initialData }: AchievementsFormProps) {
   const router = useRouter();
+  const { confirm } = useConfirmDialog();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -107,27 +110,40 @@ export function AchievementsForm({ initialData }: AchievementsFormProps) {
 
       if (editingId) {
         await updateAchievement(editingId, payload);
+        toast.success("Achievement updated successfully");
       } else {
         await addAchievement(payload);
+        toast.success("Achievement added successfully");
       }
 
       resetForm();
       router.refresh();
     } catch (error) {
-      console.error("Failed to save achievement", error);
+      toast.error("Failed to save achievement. Please try again.");
     } finally {
       setIsLoading(false);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Are you sure you want to delete this achievement?")) return;
+    const confirmed = await confirm({
+      title: "Delete Achievement",
+      description:
+        "Are you sure you want to delete this achievement? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      variant: "destructive",
+    });
+
+    if (!confirmed) return;
+
     setIsLoading(true);
     try {
       await deleteAchievement(id);
+      toast.success("Achievement deleted successfully");
       router.refresh();
     } catch (error) {
-      console.error("Failed to delete achievement", error);
+      toast.error("Failed to delete achievement. Please try again.");
     } finally {
       setIsLoading(false);
     }

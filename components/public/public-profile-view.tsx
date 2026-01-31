@@ -135,6 +135,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
     experiences.length > 0 &&
     projects.length > 0 &&
     !!profile.headline &&
+    !!profile.summary &&
     certificates.length > 0 &&
     achievements.length > 0 &&
     socialLinks.length >= 3;

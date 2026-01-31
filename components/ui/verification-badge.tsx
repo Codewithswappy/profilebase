@@ -18,7 +18,7 @@ export function VerificationBadge({
         "inline-flex items-center justify-center relative select-none",
         className,
       )}
-      title="Verified Creator"
+      title="Verified"
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       whileHover={{ scale: 1.05 }}

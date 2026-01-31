@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { rateLimit, getClientIp } from "@/lib/utils/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 
 // Active sessions are stored in memory for simplicity
@@ -7,6 +7,11 @@ const activeSessions: Map<string, Map<string, number>> = new Map();
 
 // Session timeout in milliseconds (30 seconds of inactivity)
 const SESSION_TIMEOUT = 30000;
+
+// Rate limit configs
+const RATE_LIMIT_GET = { limit: 60, windowSeconds: 60 };
+const RATE_LIMIT_POST = { limit: 120, windowSeconds: 60 }; // Higher for heartbeats
+const RATE_LIMIT_DELETE = { limit: 30, windowSeconds: 60 };
 
 // Clean up expired sessions
 function cleanupSessions(profileId: string) {
@@ -23,9 +28,33 @@ function cleanupSessions(profileId: string) {
   return sessions.size;
 }
 
+// Helper to create rate limit error response
+function rateLimitErrorResponse(result: { limit: number; resetInSeconds: number }) {
+  return NextResponse.json(
+    { error: "Too many requests. Please try again later." },
+    {
+      status: 429,
+      headers: {
+        "X-RateLimit-Limit": String(result.limit),
+        "X-RateLimit-Remaining": "0",
+        "X-RateLimit-Reset": String(result.resetInSeconds),
+        "Retry-After": String(result.resetInSeconds),
+      },
+    }
+  );
+}
+
 // GET: Get count of active visitors
 export async function GET(request: NextRequest) {
   try {
+    // Apply rate limiting
+    const clientIp = getClientIp(request);
+    const rateLimitResult = rateLimit(`online-get:${clientIp}`, RATE_LIMIT_GET);
+    
+    if (!rateLimitResult.success) {
+      return rateLimitErrorResponse(rateLimitResult);
+    }
+
     const { searchParams } = new URL(request.url);
     const profileId = searchParams.get("profileId");
 
@@ -45,6 +74,14 @@ export async function GET(request: NextRequest) {
 // POST: Register/heartbeat a visitor session
 export async function POST(request: NextRequest) {
   try {
+    // Apply rate limiting
+    const clientIp = getClientIp(request);
+    const rateLimitResult = rateLimit(`online-post:${clientIp}`, RATE_LIMIT_POST);
+    
+    if (!rateLimitResult.success) {
+      return rateLimitErrorResponse(rateLimitResult);
+    }
+
     let body;
     try {
       const text = await request.text();
@@ -84,6 +121,14 @@ export async function POST(request: NextRequest) {
 // DELETE: Remove a visitor session (on page unload)
 export async function DELETE(request: NextRequest) {
   try {
+    // Apply rate limiting
+    const clientIp = getClientIp(request);
+    const rateLimitResult = rateLimit(`online-delete:${clientIp}`, RATE_LIMIT_DELETE);
+    
+    if (!rateLimitResult.success) {
+      return rateLimitErrorResponse(rateLimitResult);
+    }
+
     const { searchParams } = new URL(request.url);
     const profileId = searchParams.get("profileId");
     const sessionId = searchParams.get("sessionId");
@@ -100,3 +145,4 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: false });
   }
 }
+

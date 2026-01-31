@@ -31,6 +31,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { ProfileCompletionWidget } from "@/components/dashboard/profile-completion-widget";
 
 interface DashboardOverviewProps {
   data: FullProfile;
@@ -46,23 +47,19 @@ export function DashboardOverview({ data, analytics }: DashboardOverviewProps) {
   const viewTrend = analytics?.summary.viewTrend || 0;
   const chartData = analytics?.history || [];
 
-  // Calculate Profile Score
+  // Calculate Profile Score (Synced with Widget logic)
   const calculateProfileScore = () => {
-    let score = 0;
-    if (data.profile.headline) score += 15;
-    if (data.profile.summary) score += 15;
-    if (data.profile.image) score += 10;
-    // Projects: 15 points each, up to 45 points
-    score += Math.min(projects.length * 15, 45);
-    // Experience: 5 points if any
-    if (data.experiences.length > 0) score += 5;
-    // Social Links: 5 points if any
-    if (data.socialLinks.length > 0) score += 5;
-    // Achievemnets/Certs: 5 points if any
-    if (data.achievements.length > 0 || data.certificates.length > 0)
-      score += 5;
-
-    return Math.min(score, 100);
+    const steps = [
+      !!data.profile.headline,
+      !!data.profile.summary,
+      projects.length > 0,
+      data.experiences.length > 0,
+      data.achievements.length > 0,
+      data.certificates.length > 0,
+      data.socialLinks.length >= 3,
+    ];
+    const completed = steps.filter(Boolean).length;
+    return Math.round((completed / steps.length) * 100);
   };
 
   const profileScore = calculateProfileScore();
@@ -86,46 +83,6 @@ export function DashboardOverview({ data, analytics }: DashboardOverviewProps) {
         ),
     )
     .slice(0, 15);
-
-  // Determine optimization tip based on profile state
-  const getOptimizationTip = () => {
-    if (!data.profile.headline) {
-      return {
-        title: "Profile Incomplete",
-        description:
-          "Adding a professional headline helps visitors understand your role instantly.",
-        action: "ADD HEADLINE",
-        href: "/dashboard/profile",
-      };
-    }
-    if (projects.length === 0) {
-      return {
-        title: "Empty Portfolio",
-        description:
-          "Profiles with at least one project receive 40% more engagement.",
-        action: "ADD PROJECT",
-        href: "/dashboard/projects",
-      };
-    }
-    if (projects.some((p) => !p.techStack || p.techStack.length === 0)) {
-      return {
-        title: "Missing Tech Stack",
-        description:
-          "Adding specific technologies to your projects makes them discoverable by recruiters.",
-        action: "UPDATE PROJECTS",
-        href: "/dashboard/projects",
-      };
-    }
-    return {
-      title: "Optimization Tip",
-      description:
-        "Sharing your profile on social media can boost your visibility by up to 35%.",
-      action: "VIEW PROFILE",
-      href: `/${data.profile.slug}`,
-    };
-  };
-
-  const tip = getOptimizationTip();
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -384,6 +341,9 @@ export function DashboardOverview({ data, analytics }: DashboardOverviewProps) {
 
         {/* Right Column: Recent Activity / Projects */}
         <div className="space-y-6">
+          {/* Profile Completion Widget (Replaces Pro Tip) */}
+          <ProfileCompletionWidget data={data} />
+
           {/* Top Skills / Tech Stack (New) */}
           <div className="rounded-sm border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm overflow-hidden">
             <div className="p-4 border-b border-dashed border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
@@ -454,27 +414,6 @@ export function DashboardOverview({ data, analytics }: DashboardOverviewProps) {
             </div>
             {/* Decorative dotted line at bottom */}
             <div className="h-px w-full bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent border-t border-dashed border-neutral-300 dark:border-neutral-700 opacity-50 block" />
-          </div>
-
-          {/* Pro Tip */}
-          <div className="rounded-sm border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-900/20 p-5 relative overflow-hidden">
-            {/* Decorative diagonal lines */}
-            <div className="absolute top-0 right-0 p-2 opacity-10">
-              <IconSparkles className="w-10 h-10" />
-            </div>
-
-            <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-2 font-mono">
-              {tip.title}
-            </p>
-            <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed mb-3">
-              {tip.description}
-            </p>
-            <Link
-              href={tip.href}
-              className="text-[10px] font-bold text-neutral-900 dark:text-neutral-100 border-b border-dashed border-neutral-400 pb-0.5 hover:border-solid transition-all"
-            >
-              {tip.action} &rarr;
-            </Link>
           </div>
         </div>
       </div>

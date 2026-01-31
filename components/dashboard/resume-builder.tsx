@@ -49,7 +49,7 @@ import {
   IconFilePlus,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import { motion, Reorder, AnimatePresence } from "framer-motion";
+import { motion, Reorder, AnimatePresence } from "motion/react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";

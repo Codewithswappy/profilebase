@@ -27,6 +27,8 @@ import {
 import { format } from "date-fns";
 import { Experience } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { useConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "sonner";
 
 interface ExperienceFormProps {
   initialData: Experience[];
@@ -34,6 +36,7 @@ interface ExperienceFormProps {
 
 export function ExperienceForm({ initialData }: ExperienceFormProps) {
   const router = useRouter();
+  const { confirm } = useConfirmDialog();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -111,27 +114,40 @@ export function ExperienceForm({ initialData }: ExperienceFormProps) {
 
       if (editingId) {
         await updateExperience(editingId, payload);
+        toast.success("Experience updated successfully");
       } else {
         await addExperience(payload);
+        toast.success("Experience added successfully");
       }
 
       resetForm();
       router.refresh();
     } catch (error) {
-      console.error("Failed to save experience", error);
+      toast.error("Failed to save experience. Please try again.");
     } finally {
       setIsLoading(false);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Are you sure you want to delete this experience?")) return;
+    const confirmed = await confirm({
+      title: "Delete Experience",
+      description:
+        "Are you sure you want to delete this experience? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      variant: "destructive",
+    });
+
+    if (!confirmed) return;
+
     setIsLoading(true);
     try {
       await deleteExperience(id);
+      toast.success("Experience deleted successfully");
       router.refresh();
     } catch (error) {
-      console.error("Failed to delete experience", error);
+      toast.error("Failed to delete experience. Please try again.");
     } finally {
       setIsLoading(false);
     }

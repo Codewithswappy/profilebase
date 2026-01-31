@@ -44,18 +44,11 @@ export async function getResumes(): Promise<ActionResult<Resume[]>> {
 
 export async function createResume(title: string, initialData: ResumeData): Promise<ActionResult<Resume>> {
   try {
-    console.log("createResume: Starting...");
     const session = await auth();
-    console.log("createResume: Session User ID:", session?.user?.id);
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     const profile = await db.profile.findUnique({ where: { userId: session.user.id } });
-    console.log("createResume: Profile ID:", profile?.id);
     if (!profile) return { success: false, error: "Profile not found" };
-
-    // Debug DB instance
-    // @ts-ignore
-    console.log("createResume: db.resume exists?", !!db.resume);
 
     const resume = await db.resume.create({
       data: {
@@ -65,7 +58,6 @@ export async function createResume(title: string, initialData: ResumeData): Prom
       }
     });
 
-    console.log("createResume: Success, ID:", resume.id);
     revalidatePath("/dashboard/resume");
     return { success: true, data: resume };
   } catch (error: any) {

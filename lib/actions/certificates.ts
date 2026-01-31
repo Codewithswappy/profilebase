@@ -63,8 +63,12 @@ export async function updateCertificate(
     where: { id },
   });
 
-  if (!existing || existing.profileId !== profile.id) {
-    throw new Error("Certificate not found or unauthorized");
+  if (!existing) {
+     return { success: false, error: "Certificate not found" }; // Or just throw specific err
+  }
+  
+  if (existing.profileId !== profile.id) {
+    throw new Error("Unauthorized");
   }
 
   const certificate = await db.certificate.update({
@@ -97,8 +101,15 @@ export async function deleteCertificate(id: string) {
     where: { id },
   });
 
-  if (!existing || existing.profileId !== profile.id) {
-    throw new Error("Certificate not found or unauthorized");
+  // Idempotent delete: if it's already gone, we're good.
+  if (!existing) {
+      revalidatePath("/dashboard/settings");
+      revalidatePath(`/${profile.slug}`);
+      return; 
+  }
+
+  if (existing.profileId !== profile.id) {
+    throw new Error("Unauthorized");
   }
 
   await db.certificate.delete({

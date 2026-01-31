@@ -1,6 +1,5 @@
 import { neonConfig } from "@neondatabase/serverless";
 import { PrismaNeon } from "@prisma/adapter-neon";
-// Force client refresh: 3
 import { PrismaClient } from "@prisma/client";
 import ws from "ws";
 
@@ -20,7 +19,7 @@ function createPrismaClient() {
 
   return new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+    log: ["error"], // Only log errors - queries can contain sensitive data
   });
 }
 

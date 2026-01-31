@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface ResumeListProps {
   initialResumes: Resume[];
@@ -42,6 +43,7 @@ export function ResumeList({ initialResumes, profileData }: ResumeListProps) {
   const [primaryId, setPrimaryId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { confirm } = useConfirmDialog();
 
   useEffect(() => {
     getPrimaryResumeId().then((res) => {
@@ -80,10 +82,17 @@ export function ResumeList({ initialResumes, profileData }: ResumeListProps) {
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const confirm = window.confirm(
-      "Are you sure you want to delete this resume?",
-    );
-    if (!confirm) return;
+
+    const confirmed = await confirm({
+      title: "Delete Resume",
+      description:
+        "Are you sure you want to delete this resume? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      variant: "destructive",
+    });
+
+    if (!confirmed) return;
 
     const res = await deleteResume(id);
     if (res.success) {

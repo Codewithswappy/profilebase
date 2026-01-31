@@ -18,6 +18,8 @@ import {
 } from "@tabler/icons-react";
 import { Project } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { useConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "sonner";
 
 interface ProjectDetailPanelProps {
   project: Project;
@@ -31,6 +33,7 @@ export function ProjectDetailPanel({
   onEdit,
 }: ProjectDetailPanelProps) {
   const router = useRouter();
+  const { confirm } = useConfirmDialog();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const formatDate = (date: Date | null) => {
@@ -42,17 +45,29 @@ export function ProjectDetailPanel({
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this project?")) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: "Delete Project",
+      description:
+        "Are you sure you want to delete this project? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      variant: "destructive",
+    });
+
+    if (!confirmed) return;
 
     setIsDeleting(true);
     try {
       const result = await deleteProject({ projectId: project.id });
       if (result.success) {
+        toast.success("Project deleted successfully");
         router.refresh();
         onClose();
+      } else {
+        toast.error(result.error || "Failed to delete project");
       }
+    } catch (error) {
+      toast.error("Failed to delete project. Please try again.");
     } finally {
       setIsDeleting(false);
     }

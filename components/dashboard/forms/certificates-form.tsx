@@ -22,6 +22,8 @@ import {
 import { format } from "date-fns";
 import { Certificate } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { useConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "sonner";
 
 interface CertificatesFormProps {
   initialData: Certificate[];
@@ -29,6 +31,7 @@ interface CertificatesFormProps {
 
 export function CertificatesForm({ initialData }: CertificatesFormProps) {
   const router = useRouter();
+  const { confirm } = useConfirmDialog();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -81,27 +84,40 @@ export function CertificatesForm({ initialData }: CertificatesFormProps) {
 
       if (editingId) {
         await updateCertificate(editingId, payload);
+        toast.success("Certificate updated successfully");
       } else {
         await addCertificate(payload);
+        toast.success("Certificate added successfully");
       }
 
       resetForm();
       router.refresh();
     } catch (error) {
-      console.error("Failed to save certificate", error);
+      toast.error("Failed to save certificate. Please try again.");
     } finally {
       setIsLoading(false);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Are you sure you want to delete this certificate?")) return;
+    const confirmed = await confirm({
+      title: "Delete Certificate",
+      description:
+        "Are you sure you want to delete this certificate? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      variant: "destructive",
+    });
+
+    if (!confirmed) return;
+
     setIsLoading(true);
     try {
       await deleteCertificate(id);
+      toast.success("Certificate deleted successfully");
       router.refresh();
     } catch (error) {
-      console.error("Failed to delete certificate", error);
+      toast.error("Failed to delete certificate. Please try again.");
     } finally {
       setIsLoading(false);
     }
