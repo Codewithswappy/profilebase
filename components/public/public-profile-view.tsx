@@ -248,6 +248,11 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
   const showProjects = profileSettings.showProjects ?? true;
   const showTechStack = profileSettings.showTechStack ?? true;
   const showSummary = profileSettings.showSummary ?? true;
+  const showAchievements =
+    (profileSettings.showAchievements ?? true) && achievements.length > 0;
+  const showCertificates =
+    (profileSettings.showCertificates ?? true) && certificates.length > 0;
+  const showContact = profileSettings.showContact !== false;
 
   // Duplicate tech stack for smooth marquee
   const marqueeTech = [...allTech, ...allTech, ...allTech, ...allTech];
@@ -626,8 +631,10 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     </div>
                   )}
 
-                  {/* Minimal Divider */}
-                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                  {/* Minimal Divider - only show if experience OR projects visible */}
+                  {(showExperience || showProjects) && (
+                    <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                  )}
 
                   {showProjects && (
                     <div id="works" className="space-y-6 relative scroll-mt-24">
@@ -724,8 +731,14 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     </div>
                   )}
 
-                  {/* Minimal Divider */}
-                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                  {/* Minimal Divider - only show if projects visible AND (techStack OR achievements) visible */}
+                  {showProjects &&
+                    (showTechStack ||
+                      showAchievements ||
+                      showCertificates ||
+                      showSummary) && (
+                      <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                    )}
 
                   {/* --- TECH STACK MARQUEE --- */}
                   {showTechStack && allTech.length > 0 && (
@@ -778,8 +791,12 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     </div>
                   )}
 
-                  {/* Minimal Divider */}
-                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                  {/* Minimal Divider - only show if techStack visible AND achievements visible */}
+                  {showTechStack &&
+                    allTech.length > 0 &&
+                    (showAchievements || showCertificates || showSummary) && (
+                      <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                    )}
 
                   {/* --- ACHIEVEMENTS --- */}
                   <div id="achievements" className="scroll-mt-24">
@@ -789,8 +806,10 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     />
                   </div>
 
-                  {/* Minimal Divider */}
-                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                  {/* Minimal Divider - only show if achievements visible AND (certificates OR summary) visible */}
+                  {showAchievements && (showCertificates || showSummary) && (
+                    <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                  )}
 
                   {/* --- CERTIFICATES --- */}
                   {data.profileSettings.showCertificates !== false &&
@@ -801,8 +820,10 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                       </div>
                     )}
 
-                  {/* Minimal Divider */}
-                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                  {/* Minimal Divider - only show if certificates visible AND summary visible */}
+                  {showCertificates && showSummary && (
+                    <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                  )}
 
                   {/* Summary (About) */}
                   {showSummary && profile.summary && (
@@ -830,7 +851,10 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     </div>
                   )}
 
-                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                  {/* Minimal Divider - only show if summary visible AND contact visible */}
+                  {showSummary && showContact && (
+                    <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-8 opacity-60" />
+                  )}
 
                   {/* --- CTA SECTION --- */}
                   {data.profileSettings.showContact !== false && (
