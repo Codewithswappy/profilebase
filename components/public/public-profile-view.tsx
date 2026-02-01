@@ -557,14 +557,14 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     {/* Resume Section */}
                     <div className="relative">
                       {/* Left Side Lines - Matching Contact style & Symmetric Flow */}
-                      <svg
+                      {/* <svg
                         className="absolute hidden md:block right-full top-1/2 -translate-y-1/2 w-8 h-12 text-neutral-400 dark:text-neutral-500 pointer-events-none overflow-visible z-[-1]"
                         viewBox="0 0 48 80"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
-                      >
+                      > */}
                         {/* Static Background Lines */}
-                        <path
+                        {/* <path
                           d="M48 40 H24 L16 32 H0"
                           stroke="currentColor"
                           strokeWidth="1"
@@ -581,10 +581,10 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                           stroke="currentColor"
                           strokeWidth="1"
                           className="opacity-30"
-                        />
+                        /> */}
 
                         {/* Flowing Data Streams - Persistent Right-to-Left */}
-                        {[
+                        {/* {[
                           "M48 40 H24 L16 32 H0",
                           "M48 24 H32 L24 16 H0",
                           "M48 56 H32 L24 64 H0",
@@ -604,18 +604,18 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                             className="stroke-neutral-950 dark:stroke-white"
                           />
                         ))}
-                      </svg>
+                      </svg> */}
 
                       {/* Connecting Lines (Circuitry) - Behind Buttons */}
-                      <svg
+                      {/* <svg
                         className="absolute left-full top-1/2 -translate-y-1/2 w-8 h-12 text-neutral-400 dark:text-neutral-500 pointer-events-none overflow-visible z-[-1]"
                         viewBox="0 0 48 80"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
-                      >
+                      > */}
                         {/* Static Background Lines */}
                         {/* We mirror the contact paths so they merge perfectly */}
-                        <path
+                        {/* <path
                           d="M48 40 H24 L16 32 H0"
                           stroke="currentColor"
                           strokeWidth="1"
@@ -632,10 +632,10 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                           stroke="currentColor"
                           strokeWidth="1"
                           className="opacity-30"
-                        />
+                        /> */}
 
                         {/* Flowing Data Streams - Persistent Right-to-Left */}
-                        {[
+                        {/* {[
                           "M48 40 H24 L16 32 H0",
                           "M48 24 H32 L24 16 H0",
                           "M48 56 H32 L24 64 H0",
@@ -655,7 +655,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                             className="stroke-neutral-950 dark:stroke-white"
                           />
                         ))}
-                      </svg>
+                      </svg> */}
 
                       <motion.button
                         whileHover={{ scale: 1.02 }}
