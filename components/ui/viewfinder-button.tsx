@@ -1,18 +1,30 @@
 import { cn } from "@/lib/utils";
 import { IconMail } from "@tabler/icons-react";
-import { Mail } from "lucide-react";
-import { ButtonHTMLAttributes, forwardRef } from "react";
+import { ButtonHTMLAttributes, forwardRef, ReactNode } from "react";
 
 interface ViewfinderButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "outline" | "filled";
-  children: React.ReactNode;
+  children: ReactNode;
+  /** Optional icon component to display. Defaults to IconMail */
+  icon?: ReactNode;
 }
 
 export const ViewfinderButton = forwardRef<
   HTMLButtonElement,
   ViewfinderButtonProps
->(({ className, variant = "outline", children, ...props }, ref) => {
+>(({ className, variant = "outline", children, icon, ...props }, ref) => {
+  // Default icon with proper styling
+  const defaultIcon = (
+    <IconMail
+      className={cn(
+        "w-4 h-4 transition-transform group-hover:scale-110",
+        variant === "filled"
+          ? "text-neutral-50 dark:text-white"
+          : "text-neutral-950",
+      )}
+    />
+  );
   return (
     <div className="relative inline-flex group perspective-1000 isolate">
       {/* --- Circuit Lines (Background Layer) --- */}
@@ -183,14 +195,7 @@ export const ViewfinderButton = forwardRef<
       >
         <div className="relative z-10 flex items-center gap-2">
           {children}
-          <IconMail
-            className={cn(
-              "w-4 h-4 transition-transform group-hover:scale-110",
-              variant === "filled"
-                ? "text-neutral-50 dark:text-white"
-                : "text-neutral-950",
-            )}
-          />
+          {icon !== undefined ? icon : defaultIcon}
         </div>
 
         {/* Shine Effect */}
