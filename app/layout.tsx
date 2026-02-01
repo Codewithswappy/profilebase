@@ -35,9 +35,22 @@ export const metadata: Metadata = {
   authors: [{ name: "ProfileBase" }],
   creator: "ProfileBase",
   publisher: "ProfileBase",
+  manifest: "/manifest.json",
   icons: {
-    icon: "/logo/favicon.png",
-    apple: "/logo/favicon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/icon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/icons/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "ProfileBase",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
   },
   openGraph: {
     type: "website",

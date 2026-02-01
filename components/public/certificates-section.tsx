@@ -60,6 +60,7 @@ export function CertificatesSection({
               <CertificateItem item={item} />
             </motion.div>
           ))}
+          <IconArrowUpRight/>
         </div>
       </div>
 
