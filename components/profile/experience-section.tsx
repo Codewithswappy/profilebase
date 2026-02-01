@@ -12,21 +12,50 @@ interface ExperienceSectionProps {
 }
 
 // Group experiences by company
-function groupByCompany(experiences: Experience[]) {
+// Group experiences by company and sort groups/roles
+function groupByCompanyAndSort(experiences: Experience[]) {
   const groups: Record<string, Experience[]> = {};
+
+  // 1. Group by company
   experiences.forEach((exp) => {
     if (!groups[exp.company]) {
       groups[exp.company] = [];
     }
     groups[exp.company].push(exp);
   });
-  return Object.entries(groups);
+
+  // 2. Sort roles within each company
+  Object.keys(groups).forEach((company) => {
+    groups[company].sort((a, b) => {
+      // Current jobs first
+      if (a.current && !b.current) return -1;
+      if (!a.current && b.current) return 1;
+      // Newest start date first
+      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+    });
+  });
+
+  // 3. Sort companies by their most recent role's date
+  return Object.entries(groups).sort(([, rolesA], [, rolesB]) => {
+    const latestA = rolesA[0];
+    const latestB = rolesB[0];
+
+    // Current jobs group first
+    if (latestA.current && !latestB.current) return -1;
+    if (!latestA.current && latestB.current) return 1;
+
+    // Newest start date first
+    return (
+      new Date(latestB.startDate).getTime() -
+      new Date(latestA.startDate).getTime()
+    );
+  });
 }
 
 export function ExperienceSection({ experiences }: ExperienceSectionProps) {
   if (!experiences || experiences.length === 0) return null;
 
-  const grouped = groupByCompany(experiences);
+  const grouped = groupByCompanyAndSort(experiences);
 
   // Create a flattened list to determine global index for "first open" logic
   // But actually the user request implies "only first one should stay open by default"
