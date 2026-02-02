@@ -14,16 +14,53 @@ import {
   IconTemplate,
   IconEdit,
   IconEye,
+  IconChartBar,
 } from "@tabler/icons-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ResumeEditorSidebar } from "./editor-sidebar";
 import { ResumeEditorForm } from "./editor-form";
 import { ResumePreview } from "./resume-preview";
+import { ATSScoreAnalyzer, getATSScore } from "./ats-score-analyzer";
 import { cn } from "@/lib/utils";
 
-// Available templates
+// Available templates - ordered by use case with ATS scores
 const TEMPLATES = [
-  { id: "modern", name: "Modern", description: "Clean and professional" },
-  { id: "minimal", name: "Minimal", description: "Simple and elegant" },
+  {
+    id: "modern",
+    name: "Modern",
+    description: "Clean & contemporary with blue accents",
+    atsScore: 85,
+  },
+  {
+    id: "minimal",
+    name: "Minimal",
+    description: "Simple, ATS-optimized serif design",
+    atsScore: 95,
+  },
+  {
+    id: "professional",
+    name: "Professional",
+    description: "Maximum ATS compatibility",
+    atsScore: 98,
+  },
+  {
+    id: "classic",
+    name: "Classic",
+    description: "Traditional formal style",
+    atsScore: 90,
+  },
+  {
+    id: "executive",
+    name: "Executive",
+    description: "Premium design for senior roles",
+    atsScore: 80,
+  },
 ] as const;
 
 type TemplateId = (typeof TEMPLATES)[number]["id"];
@@ -259,37 +296,76 @@ export function ResumeEditorRoot({ resume }: ResumeEditorRootProps) {
           )}
         >
           {/* Preview Toolbar */}
-          <header className="h-14 shrink-0 flex items-center justify-between px-4 md:px-6 border-b border-dashed border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 md:bg-transparent">
-            {/* Template Selector */}
-            <div className="flex items-center gap-2 md:gap-4">
-              <IconTemplate className="w-4 h-4 text-neutral-400" />
-              <select
-                value={templateId}
-                onChange={(e) => setTemplateId(e.target.value as TemplateId)}
-                className="text-sm bg-white md:bg-neutral-200 dark:bg-neutral-800 border border-dashed border-neutral-400 dark:border-neutral-700 rounded-md px-2 md:px-4 py-1.5 text-neutral-700 dark:text-neutral-200 focus:outline-none max-w-[120px] md:max-w-none font-mono"
+          <header className="shrink-0 flex items-center justify-between px-4 md:px-6 py-3 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 md:bg-transparent gap-4">
+            {/* Left: Template & ATS Score */}
+            <div className="flex items-center gap-3 md:gap-4">
+              {/* Template Selector */}
+              <div className="flex items-center gap-2">
+                <Select
+                  value={templateId}
+                  onValueChange={(val) => setTemplateId(val as TemplateId)}
+                >
+                  <SelectTrigger className="w-[180px] py-4 bg-white dark:bg-neutral-800 border border-dashed border-neutral-200 dark:border-neutral-700 h-9">
+                    <SelectValue placeholder="Select Template" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TEMPLATES.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        <div className="flex items-center justify-between w-full gap-8">
+                          <span className="font-medium">{t.name}</span>
+                          <span
+                            className={cn(
+                              "text-[10px] px-1.5 py-0.5 rounded-full font-bold",
+                              t.atsScore >= 90
+                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                : t.atsScore >= 80
+                                  ? "bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-400"
+                                  : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+                            )}
+                          >
+                            {t.atsScore}%
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Live ATS Score Badge */}
+              <div
+                className={cn(
+                  "hidden md:flex items-center gap-2 px-4 py-1.5 rounded-md border border-black/10 shadow shadow-black/10  transition-colors",
+                  getATSScore(content) >= 80
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400"
+                    : getATSScore(content) >= 60
+                      ? "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-400"
+                      : "bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400",
+                )}
               >
-                {TEMPLATES.map((t) => (
-                  <option
-                    key={t.id}
-                    value={t.id}
-                    className="text-neutral-700 dark:text-neutral-200"
-                  >
-                    {t.name}
-                  </option>
-                ))}
-              </select>
+                <IconChartBar className="w-4 h-4" />
+                <span className="text-xs font-semibold">
+                  ATS Score:{" "}
+                  <span className="font-bold text-sm">
+                    {getATSScore(content)}%
+                  </span>
+                </span>
+              </div>
             </div>
 
-            {/* Export Button */}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleDownload}
-              className="gap-2 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 font-mono text-xs uppercase tracking-wider"
-            >
-              <IconDownload className="w-4 h-4" />
-              <span className="hidden md:inline">Download PDF</span>
-            </Button>
+            {/* Right: Actions */}
+            <div className="flex items-center gap-2">
+              {/* Export Button */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleDownload}
+                className="gap-2 bg-black text-white dark:bg-white cursor-pointer dark:text-black dark:border-neutral-700 font-mono text-sm py-4 uppercase tracking-wider"
+              >
+                <IconDownload className="w-5 h-5" />
+                <span className="hidden md:inline">Download PDF</span>
+              </Button>
+            </div>
           </header>
 
           {/* Preview Canvas */}

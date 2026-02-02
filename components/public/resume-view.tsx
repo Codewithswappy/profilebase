@@ -99,6 +99,12 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
     summarySuggestion?: string;
     isFallback?: boolean;
     missingKeywords?: string[];
+    improvementPlan?: { action: string; impact: "high" | "medium" | "low" }[];
+    checks?: {
+      label: string;
+      status: "pass" | "warning" | "fail";
+      message: string;
+    }[];
   } | null>(null);
 
   // Track Resume View on mount
@@ -168,6 +174,7 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
     }
   };
 
+  // Enhanced ATS Analysis
   const calculateATS = async () => {
     setIsScanning(true);
     setShowFeedback(false);
@@ -193,22 +200,86 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
       console.error("AI Scan Integrity Failed:", e);
     }
 
-    // Strict Fallback
+    // Enhanced Fallback Analysis
     setTimeout(() => {
-      let score = 0;
-      const feedback: string[] = [];
-      const missingKeywords: string[] = [];
       const fullText = JSON.stringify(data).toLowerCase();
+      const checks: {
+        label: string;
+        status: "pass" | "warning" | "fail";
+        message: string;
+      }[] = [];
+      const improvementPlan: {
+        action: string;
+        impact: "high" | "medium" | "low";
+      }[] = [];
+      let score = 0;
+      let totalWeight = 0;
 
-      // Detection for Lorem Ipsum
+      // Power action verbs
+      const POWER_VERBS = [
+        "led",
+        "directed",
+        "managed",
+        "developed",
+        "designed",
+        "built",
+        "implemented",
+        "architected",
+        "achieved",
+        "exceeded",
+        "improved",
+        "increased",
+        "reduced",
+        "optimized",
+        "streamlined",
+        "automated",
+        "created",
+        "launched",
+        "delivered",
+        "resolved",
+        "analyzed",
+        "collaborated",
+        "mentored",
+        "established",
+      ];
+
+      // Common tech keywords with relationships
+      const TECH_KEYWORDS: Record<string, string[]> = {
+        docker: ["kubernetes", "devops", "aws", "cloud", "containerization"],
+        kubernetes: ["docker", "k8s", "devops", "aws", "cloud"],
+        "ci/cd": ["jenkins", "github actions", "devops", "automation"],
+        testing: ["jest", "cypress", "tdd", "unit test", "qa"],
+        typescript: ["javascript", "react", "node", "frontend"],
+        react: ["javascript", "frontend", "next.js", "redux"],
+        node: ["javascript", "backend", "api", "express"],
+        aws: ["cloud", "s3", "ec2", "lambda", "infrastructure"],
+        python: ["django", "flask", "ml", "data"],
+        sql: ["database", "postgresql", "mysql", "backend"],
+        graphql: ["api", "apollo", "react"],
+        redis: ["caching", "database", "performance"],
+        mongodb: ["nosql", "database", "node"],
+      };
+
+      // Weak phrases to avoid
+      const WEAK_PHRASES = [
+        "responsible for",
+        "helped with",
+        "assisted in",
+        "worked on",
+        "was involved in",
+        "participated in",
+        "duties included",
+      ];
+
+      // Detection for Lorem Ipsum / Empty content
       if (fullText.includes("lorem") || fullText.length < 200) {
         setAtsScore({
           score: 0,
           status: "Invalid Content",
           feedback: [
-            "Placeholder text detected found. Replace with real content.",
+            "Placeholder or insufficient content detected. Replace with real content.",
           ],
-          missingKeywords: ["Real Experience", "Real Skills"],
+          missingKeywords: ["Real Experience", "Real Skills", "Achievements"],
           isFallback: true,
         });
         setIsScanning(false);
@@ -216,43 +287,386 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
         return;
       }
 
-      // Basic Scoring
-      if (profile.headline) score += 10;
-      else feedback.push("Add a professional headline.");
-      if (profile.summary) score += 10;
-      else feedback.push("Add a summary.");
-      if (experiences.length > 0) score += 20;
-      else feedback.push("Add work experience.");
-      if (projects.length > 0) score += 15;
-      else feedback.push("Add projects.");
+      // ============ CHECK 1: Profile Completeness ============
+      const profileWeight = 15;
+      totalWeight += profileWeight;
+      const hasName = !!displayName;
+      const hasHeadline = !!profile.headline;
+      const hasLocation = !!profile.location;
+      const profileScore = [hasName, hasHeadline, hasLocation].filter(
+        Boolean,
+      ).length;
 
-      const commonTech = [
-        "react",
-        "node",
-        "typescript",
-        "python",
-        "aws",
-        "docker",
-        "sql",
-        "api",
-        "git",
-        "ci/cd",
-        "agile",
-        "testing",
+      if (profileScore === 3) {
+        score += profileWeight;
+        checks.push({
+          label: "Profile Info",
+          status: "pass",
+          message: "Name, headline, and location complete",
+        });
+      } else if (profileScore >= 2) {
+        score += profileWeight * 0.5;
+        checks.push({
+          label: "Profile Info",
+          status: "warning",
+          message: `Missing: ${[!hasHeadline && "headline", !hasLocation && "location"].filter(Boolean).join(", ")}`,
+        });
+        improvementPlan.push({
+          action: "Complete your profile with headline and location",
+          impact: "high",
+        });
+      } else {
+        checks.push({
+          label: "Profile Info",
+          status: "fail",
+          message: "Profile information incomplete",
+        });
+        improvementPlan.push({
+          action: "Add professional headline and location",
+          impact: "high",
+        });
+      }
+
+      // ============ CHECK 2: Professional Summary ============
+      const summaryWeight = 15;
+      totalWeight += summaryWeight;
+      const summaryLength = profile.summary?.length || 0;
+      const summaryHasYears = /\d+\+?\s*(years?|yrs?)/i.test(
+        profile.summary || "",
+      );
+
+      if (summaryLength >= 100 && summaryHasYears) {
+        score += summaryWeight;
+        checks.push({
+          label: "Summary",
+          status: "pass",
+          message: `Well-structured summary (${summaryLength} chars)`,
+        });
+      } else if (summaryLength >= 50) {
+        score += summaryWeight * 0.5;
+        checks.push({
+          label: "Summary",
+          status: "warning",
+          message: "Summary could be more detailed",
+        });
+        if (!summaryHasYears)
+          improvementPlan.push({
+            action: "Add years of experience to summary",
+            impact: "medium",
+          });
+      } else {
+        checks.push({
+          label: "Summary",
+          status: "fail",
+          message: "Add a professional summary",
+        });
+        improvementPlan.push({
+          action: "Write a 2-3 sentence professional summary",
+          impact: "high",
+        });
+      }
+
+      // ============ CHECK 3: Work Experience ============
+      const expWeight = 20;
+      totalWeight += expWeight;
+      const expCount = experiences.length;
+      const expWithDescriptions = experiences.filter(
+        (e) => e.description && e.description.length > 50,
+      ).length;
+
+      if (expCount >= 2 && expWithDescriptions >= 2) {
+        score += expWeight;
+        checks.push({
+          label: "Experience",
+          status: "pass",
+          message: `${expCount} positions with detailed descriptions`,
+        });
+      } else if (expCount >= 1) {
+        score += expWeight * 0.5;
+        checks.push({
+          label: "Experience",
+          status: "warning",
+          message: `${expCount} position(s), ${expWithDescriptions} with details`,
+        });
+        if (expWithDescriptions < expCount) {
+          improvementPlan.push({
+            action: "Add detailed bullet points to all experience entries",
+            impact: "high",
+          });
+        }
+      } else {
+        checks.push({
+          label: "Experience",
+          status: "fail",
+          message: "Add work experience",
+        });
+        improvementPlan.push({
+          action: "Add at least 2 relevant work experiences",
+          impact: "high",
+        });
+      }
+
+      // ============ CHECK 4: Action Verbs ============
+      const verbWeight = 10;
+      totalWeight += verbWeight;
+      const verbsUsed = POWER_VERBS.filter((verb) => fullText.includes(verb));
+      const uniqueVerbs = verbsUsed.length;
+
+      if (uniqueVerbs >= 6) {
+        score += verbWeight;
+        checks.push({
+          label: "Action Verbs",
+          status: "pass",
+          message: `Using ${uniqueVerbs} power verbs`,
+        });
+      } else if (uniqueVerbs >= 3) {
+        score += verbWeight * 0.5;
+        checks.push({
+          label: "Action Verbs",
+          status: "warning",
+          message: `Only ${uniqueVerbs} action verbs found`,
+        });
+        improvementPlan.push({
+          action:
+            "Start bullet points with action verbs (Led, Built, Achieved)",
+          impact: "medium",
+        });
+      } else {
+        checks.push({
+          label: "Action Verbs",
+          status: "fail",
+          message: "Use more action verbs",
+        });
+        improvementPlan.push({
+          action: "Replace passive language with action verbs",
+          impact: "high",
+        });
+      }
+
+      // ============ CHECK 5: Quantifiable Metrics ============
+      const metricsWeight = 12;
+      totalWeight += metricsWeight;
+      const metricsPatterns = [
+        /\d+%/g,
+        /\$[\d,]+/g,
+        /\d+x/g,
+        /\d+\+?\s*(users?|clients?|customers?|team|members?)/gi,
+        /\d+\+?\s*(projects?|apps?|features?)/gi,
+        /(increased?|decreased?|reduced?|improved?)\s*(by\s*)?\d+/gi,
       ];
-      const matches = commonTech.filter((k) => fullText.includes(k));
-      const needed = commonTech
-        .filter((k) => !fullText.includes(k))
-        .slice(0, 4);
+      const metricsFound = metricsPatterns.reduce((count, pattern) => {
+        const matches = fullText.match(pattern);
+        return count + (matches?.length || 0);
+      }, 0);
 
-      score += Math.min(30, matches.length * 4);
-      if (matches.length < 5) feedback.push("Add more technical skills.");
+      if (metricsFound >= 4) {
+        score += metricsWeight;
+        checks.push({
+          label: "Metrics",
+          status: "pass",
+          message: `${metricsFound} quantifiable achievements`,
+        });
+      } else if (metricsFound >= 1) {
+        score += metricsWeight * 0.5;
+        checks.push({
+          label: "Metrics",
+          status: "warning",
+          message: `Only ${metricsFound} metric(s) found`,
+        });
+        improvementPlan.push({
+          action: "Add metrics: %, $, team sizes, user counts",
+          impact: "high",
+        });
+      } else {
+        checks.push({
+          label: "Metrics",
+          status: "fail",
+          message: "No quantifiable achievements found",
+        });
+        improvementPlan.push({
+          action: "Quantify achievements with specific numbers",
+          impact: "high",
+        });
+      }
+
+      // ============ CHECK 6: Projects ============
+      const projectWeight = 10;
+      totalWeight += projectWeight;
+      const projectCount = projects.length;
+      const projectsWithTech = projects.filter(
+        (p) => p.techStack && p.techStack.length > 0,
+      ).length;
+
+      if (projectCount >= 2 && projectsWithTech >= 2) {
+        score += projectWeight;
+        checks.push({
+          label: "Projects",
+          status: "pass",
+          message: `${projectCount} projects with tech stacks`,
+        });
+      } else if (projectCount >= 1) {
+        score += projectWeight * 0.5;
+        checks.push({
+          label: "Projects",
+          status: "warning",
+          message: `${projectCount} project(s)`,
+        });
+      } else {
+        checks.push({
+          label: "Projects",
+          status: "fail",
+          message: "Add personal/work projects",
+        });
+        improvementPlan.push({
+          action: "Add 2-3 relevant projects with descriptions",
+          impact: "medium",
+        });
+      }
+
+      // ============ CHECK 7: Technical Skills ============
+      const skillWeight = 15;
+      totalWeight += skillWeight;
+      const allSkills = new Set<string>();
+      projects.forEach((p) =>
+        p.techStack?.forEach((t) => allSkills.add(t.toLowerCase())),
+      );
+      experiences.forEach((e) =>
+        e.skills?.forEach((s) => allSkills.add(s.toLowerCase())),
+      );
+      const skillsCount = allSkills.size;
+
+      if (skillsCount >= 8) {
+        score += skillWeight;
+        checks.push({
+          label: "Skills",
+          status: "pass",
+          message: `${skillsCount} technical skills`,
+        });
+      } else if (skillsCount >= 4) {
+        score += skillWeight * 0.5;
+        checks.push({
+          label: "Skills",
+          status: "warning",
+          message: `${skillsCount} skills (aim for 8+)`,
+        });
+        improvementPlan.push({
+          action: "Add more relevant technical skills",
+          impact: "medium",
+        });
+      } else {
+        checks.push({
+          label: "Skills",
+          status: "fail",
+          message: "Add technical skills",
+        });
+        improvementPlan.push({
+          action: "Add 8-15 relevant technical skills",
+          impact: "high",
+        });
+      }
+
+      // ============ CHECK 8: Weak Phrases ============
+      const languageWeight = 5;
+      totalWeight += languageWeight;
+      const weakFound = WEAK_PHRASES.filter((phrase) =>
+        fullText.includes(phrase),
+      );
+
+      if (weakFound.length === 0) {
+        score += languageWeight;
+        checks.push({
+          label: "Language",
+          status: "pass",
+          message: "No weak phrases detected",
+        });
+      } else {
+        score += languageWeight * 0.3;
+        checks.push({
+          label: "Language",
+          status: "warning",
+          message: `Found: "${weakFound[0]}"`,
+        });
+        improvementPlan.push({
+          action: `Replace "${weakFound[0]}" with action verbs`,
+          impact: "low",
+        });
+      }
+
+      // ============ MISSING KEYWORDS DETECTION ============
+      const missingKeywords: string[] = [];
+      const skillsLower = Array.from(allSkills);
+
+      Object.entries(TECH_KEYWORDS).forEach(([keyword, relatedTerms]) => {
+        const keywordPresent = fullText.includes(keyword);
+        if (!keywordPresent) {
+          // Check if related terms exist (meaning this keyword would be relevant)
+          const hasRelated = relatedTerms.some(
+            (term) =>
+              fullText.includes(term) ||
+              skillsLower.some((s) => s.includes(term)),
+          );
+          if (hasRelated && missingKeywords.length < 5) {
+            missingKeywords.push(keyword.toUpperCase());
+          }
+        }
+      });
+
+      // Add generic missing keywords if we don't have enough
+      const genericMissing = [
+        "Docker",
+        "CI/CD",
+        "Testing Frameworks",
+        "Cloud Services",
+        "Agile",
+      ];
+      genericMissing.forEach((kw) => {
+        if (
+          !fullText.includes(kw.toLowerCase()) &&
+          missingKeywords.length < 5
+        ) {
+          // Only add if not already present in some form
+          if (
+            !missingKeywords.some((m) => m.toLowerCase() === kw.toLowerCase())
+          ) {
+            missingKeywords.push(kw);
+          }
+        }
+      });
+
+      // Calculate final score
+      const finalScore = Math.round((score / totalWeight) * 100);
+
+      // Determine status
+      let status: string;
+      if (finalScore >= 85) status = "Excellent";
+      else if (finalScore >= 70) status = "Good";
+      else if (finalScore >= 50) status = "Needs Improvement";
+      else status = "Poor";
+
+      // Generate feedback from failed checks
+      const feedback = checks
+        .filter((c) => c.status !== "pass")
+        .map((c) => `${c.label}: ${c.message}`)
+        .slice(0, 5);
+
+      // Sort improvement plan by impact
+      improvementPlan.sort((a, b) => {
+        const order = { high: 0, medium: 1, low: 2 };
+        return order[a.impact] - order[b.impact];
+      });
 
       setAtsScore({
-        score: Math.min(95, score),
-        status: score > 70 ? "Good" : "Needs Work",
-        feedback: feedback.slice(0, 3),
-        missingKeywords: needed,
+        score: finalScore,
+        status,
+        feedback:
+          feedback.length > 0
+            ? feedback
+            : [
+                "Your resume looks good! Consider adding more quantifiable achievements.",
+              ],
+        missingKeywords: missingKeywords.slice(0, 5),
+        improvementPlan: improvementPlan.slice(0, 5),
+        checks,
         isFallback: true,
       });
       setIsScanning(false);
@@ -558,25 +972,100 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
                   </div>
                 )}
 
-              {/* Improvements */}
-              <div>
-                <h4 className="flex items-center gap-2 font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-widest text-xs mb-4 font-mono">
-                  <IconBriefcase className="w-4 h-4" /> Improvement Plan
-                </h4>
-                <div className="space-y-3">
-                  {atsScore.feedback.map((item: string, i: number) => (
-                    <div
-                      key={i}
-                      className="flex gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-dashed border-neutral-200 dark:border-neutral-800"
-                    >
-                      <span className="text-red-500 mt-0.5">•</span>
-                      <span className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-mono">
-                        {item}
-                      </span>
-                    </div>
-                  ))}
+              {/* Improvement Plan with Impact Levels */}
+              {atsScore.improvementPlan && atsScore.improvementPlan.length > 0 && (
+                <div>
+                  <h4 className="flex items-center gap-2 font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-widest text-xs mb-4 font-mono">
+                    <IconBriefcase className="w-4 h-4" /> Improvement Plan
+                  </h4>
+                  <ol className="space-y-3">
+                    {atsScore.improvementPlan.map((item: { action: string; impact: string }, i: number) => (
+                      <li
+                        key={i}
+                        className="flex gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-dashed border-neutral-200 dark:border-neutral-800"
+                      >
+                        <span className={cn(
+                          "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white",
+                          item.impact === "high" && "bg-red-500",
+                          item.impact === "medium" && "bg-amber-500",
+                          item.impact === "low" && "bg-neutral-400",
+                        )}>
+                          {i + 1}
+                        </span>
+                        <div className="flex-1">
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-mono">
+                            {item.action}
+                          </span>
+                          <span className={cn(
+                            "ml-2 text-[10px] font-bold uppercase",
+                            item.impact === "high" && "text-red-500",
+                            item.impact === "medium" && "text-amber-500",
+                            item.impact === "low" && "text-neutral-400",
+                          )}>
+                            ({item.impact})
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
                 </div>
-              </div>
+              )}
+
+              {/* Analysis Checks Summary */}
+              {atsScore.checks && atsScore.checks.length > 0 && (
+                <div>
+                  <h4 className="flex items-center gap-2 font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-widest text-xs mb-4 font-mono">
+                    <IconAward className="w-4 h-4" /> Analysis Breakdown
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {atsScore.checks.map((check: { label: string; status: string; message: string }, i: number) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "p-2.5 rounded-lg border border-dashed text-center",
+                          check.status === "pass" && "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50",
+                          check.status === "warning" && "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/50",
+                          check.status === "fail" && "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/50",
+                        )}
+                      >
+                        <div className={cn(
+                          "text-[10px] font-bold uppercase tracking-wide mb-0.5",
+                          check.status === "pass" && "text-emerald-600 dark:text-emerald-500",
+                          check.status === "warning" && "text-amber-600 dark:text-amber-500",
+                          check.status === "fail" && "text-red-600 dark:text-red-500",
+                        )}>
+                          {check.status === "pass" ? "✓" : check.status === "warning" ? "!" : "✗"} {check.label}
+                        </div>
+                        <div className="text-[9px] text-neutral-500 dark:text-neutral-400 font-mono truncate" title={check.message}>
+                          {check.message.length > 25 ? check.message.substring(0, 25) + "..." : check.message}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Fallback: Show feedback if no improvement plan */}
+              {(!atsScore.improvementPlan || atsScore.improvementPlan.length === 0) && atsScore.feedback.length > 0 && (
+                <div>
+                  <h4 className="flex items-center gap-2 font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-widest text-xs mb-4 font-mono">
+                    <IconBriefcase className="w-4 h-4" /> Suggestions
+                  </h4>
+                  <div className="space-y-3">
+                    {atsScore.feedback.map((item: string, i: number) => (
+                      <div
+                        key={i}
+                        className="flex gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-dashed border-neutral-200 dark:border-neutral-800"
+                      >
+                        <span className="text-amber-500 mt-0.5">•</span>
+                        <span className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-mono">
+                          {item}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Empty footer */}

@@ -9,13 +9,19 @@ export const ourFileRouter = {
   imageUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
     // Set permissions and file types for this FileRoute
     .middleware(async ({ req }) => {
-      // This code runs on your server before upload
-      const session = await auth();
+      // Debugging: Check for Env Vars
+      if (!process.env.UPLOADTHING_SECRET) {
+        console.error("❌ MISSING UPLOADTHING_SECRET in .env");
+      }
+      if (!process.env.UPLOADTHING_APP_ID) {
+        console.error("❌ MISSING UPLOADTHING_APP_ID in .env");
+      }
 
-      // If you throw, the user will not be able to upload
+      const session = await auth();
+      console.log("📂 UploadThing Middleware - Session:", session?.user?.email || "None");
+
       if (!session || !session.user) throw new Error("Unauthorized");
 
-      // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return { userId: session.user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {

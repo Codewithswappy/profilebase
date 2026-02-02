@@ -4,10 +4,21 @@ import { ResumeContent } from "@/lib/schemas/resume";
 import { useRef, useState, useEffect } from "react";
 import { ModernTemplate } from "./renderer/modern-template";
 import { MinimalTemplate } from "./renderer/minimal-template";
+import { ClassicTemplate } from "./renderer/classic-template";
+import { ExecutiveTemplate } from "./renderer/executive-template";
+import { ProfessionalTemplate } from "./renderer/professional-template";
+
+export type TemplateId =
+  | "modern"
+  | "minimal"
+  | "classic"
+  | "executive"
+  | "professional"
+  | "creative";
 
 interface ResumePreviewProps {
   content: ResumeContent;
-  template?: "modern" | "minimal";
+  template?: TemplateId;
 }
 
 export function ResumePreview({
@@ -44,6 +55,12 @@ export function ResumePreview({
     switch (template) {
       case "minimal":
         return <MinimalTemplate content={content} />;
+      case "classic":
+        return <ClassicTemplate content={content} />;
+      case "executive":
+        return <ExecutiveTemplate content={content} />;
+      case "professional":
+        return <ProfessionalTemplate content={content} />;
       case "modern":
       default:
         return <ModernTemplate content={content} />;

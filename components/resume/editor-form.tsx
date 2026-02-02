@@ -8,6 +8,7 @@ import { ProjectsForm } from "./forms/projects-form";
 import { SkillsForm } from "./forms/skills-form";
 import { EducationForm } from "./forms/education-form";
 import { CertificationsForm } from "./forms/certifications-form";
+import { ATSAnalysisView } from "./forms/ats-analysis-view";
 
 export function ResumeEditorForm() {
   const { activeSection } = useResumeStore();
@@ -27,6 +28,8 @@ export function ResumeEditorForm() {
       return <EducationForm />;
     case "certifications":
       return <CertificationsForm />;
+    case "analysis":
+      return <ATSAnalysisView />;
     default:
       return (
         <div className="p-8 text-center text-neutral-500 dark:text-neutral-400">
