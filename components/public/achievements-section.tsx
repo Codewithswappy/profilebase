@@ -158,6 +158,7 @@ function AchievementItem({ item }: { item: Achievement }) {
               <Link
                 href={item.url}
                 target="_blank"
+                rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 className="p-1 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
                 title="View Link"

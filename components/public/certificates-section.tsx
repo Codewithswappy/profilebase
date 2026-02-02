@@ -120,6 +120,7 @@ function CertificateItem({ item }: { item: Certificate }) {
           <Link
             href={item.url}
             target="_blank"
+            rel="noopener noreferrer"
             className="block p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors transform group-hover:translate-x-1 duration-300 group-hover:-translate-y-1"
           >
             <ExternalLink className="w-4 h-4" />

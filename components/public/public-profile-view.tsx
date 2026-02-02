@@ -308,12 +308,12 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
 
                   {profile.coverImage ? (
                     <Image
-                      src={profile.coverImage}
+                      src={profile.coverImage!}
                       alt="Cover"
                       fill
                       priority
                       className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 800px"
+                      sizes="100vw"
                     />
                   ) : (
                     <div className="w-full h-full bg-linear-to-br from-neutral-200 to-neutral-400 dark:from-neutral-800 dark:to-neutral-900" />
@@ -357,6 +357,8 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                             alt={displayName}
                             width={96}
                             height={96}
+                            loading="lazy"
+                            sizes="96px"
                             className="w-full h-full object-cover"
                           />
                         ) : (

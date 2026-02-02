@@ -6,6 +6,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "motion/react";
+import Image from "next/image";
 
 interface ExperienceSectionProps {
   experiences: Experience[];
@@ -110,10 +111,12 @@ function CompanyGroup({
       <div className="relative flex items-center gap-4">
         <div className="relative z-10 w-8 h-8 rounded-lg bg-white border border-neutral-200 dark:border-neutral-800 flex items-center justify-center shrink-0 shadow-sm overflow-hidden ring-4 ring-neutral-50 dark:ring-neutral-950">
           {roles[0].logo ? (
-            <img
+            <Image
               src={roles[0].logo}
               alt={company}
-              className="w-full h-full object-contain p-1"
+              fill
+              className="object-contain p-1"
+              sizes="32px"
             />
           ) : (
             <div className="w-full h-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">

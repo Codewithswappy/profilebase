@@ -6,7 +6,12 @@ import { Project } from "@prisma/client";
 import Image from "next/image";
 import { ViewfinderFrame } from "@/components/ui/viewfinder-frame";
 import { TechIcons } from "@/components/TechIcons";
-import { IconArrowUp, IconArrowUpFromArc, IconArrowUpRight, IconBrandGithub } from "@tabler/icons-react";
+import {
+  IconArrowUp,
+  IconArrowUpFromArc,
+  IconArrowUpRight,
+  IconBrandGithub,
+} from "@tabler/icons-react";
 
 interface ProjectCardProps {
   project: Project;
@@ -60,6 +65,8 @@ export function ProjectCard({
               src={project.thumbnail}
               alt={project.title}
               fill
+              loading="lazy"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (

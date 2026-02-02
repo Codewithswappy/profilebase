@@ -42,6 +42,7 @@ export function ProjectDetailsDialog({
                   src={project.thumbnail}
                   alt={project.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, 800px"
                   className="object-cover"
                 />
               ) : (
