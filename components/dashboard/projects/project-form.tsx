@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createProject, updateProject } from "@/lib/actions/project";
 import { Button } from "@/components/ui/button";
@@ -214,10 +215,12 @@ export function ProjectForm({
             {thumbnail ? (
               <div className="space-y-2">
                 <div className="relative group rounded-sm overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 aspect-video w-full max-w-[280px]">
-                  <img
+                  <Image
                     src={thumbnail}
                     alt="Project thumbnail"
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    fill
+                    className="object-cover transition-transform group-hover:scale-105"
+                    sizes="280px"
                   />
                   <div className="absolute inset-0 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity gap-2 bg-neutral-900/40 backdrop-blur-[1px]">
                     <div className="relative">

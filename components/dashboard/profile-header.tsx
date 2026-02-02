@@ -49,6 +49,7 @@ export function ProfileHeader({ data }: ProfileHeaderProps) {
           <Link
             href={`/${profile.slug}`}
             target="_blank"
+            rel="noopener noreferrer"
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
               "h-9 px-3 rounded-md text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors",

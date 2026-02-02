@@ -412,10 +412,11 @@ export function URLPreview({
       {data.image && !compact && (
         <div className="relative w-24 h-24 shrink-0 bg-neutral-100 dark:bg-neutral-800">
           <Image
-            src={data.image}
+            src={data.image || ""}
             alt={data.title || "Preview"}
             fill
             className="object-cover"
+            sizes="96px"
             unoptimized
           />
         </div>

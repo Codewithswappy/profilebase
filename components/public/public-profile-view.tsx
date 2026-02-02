@@ -313,7 +313,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                       fill
                       priority
                       className="object-cover"
-                      sizes="100vw"
+                      sizes="(max-width: 768px) 100vw, 768px"
                     />
                   ) : (
                     <div className="w-full h-full bg-linear-to-br from-neutral-200 to-neutral-400 dark:from-neutral-800 dark:to-neutral-900" />
@@ -358,7 +358,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                             width={96}
                             height={96}
                             loading="lazy"
-                            sizes="96px"
+                            sizes="80px"
                             className="w-full h-full object-cover"
                           />
                         ) : (

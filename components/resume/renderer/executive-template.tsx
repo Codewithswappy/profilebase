@@ -84,7 +84,7 @@ export function ExecutiveTemplate({ content }: ExecutiveTemplateProps) {
           <div className="space-y-5">
             {content.experience.map((item) => (
               <div key={item.id}>
-                <div className="flex justify-between items-baseline mb-0.5">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
                   <span className="font-bold text-[12pt] text-black">
                     {item.company}
                   </span>
@@ -93,7 +93,7 @@ export function ExecutiveTemplate({ content }: ExecutiveTemplateProps) {
                   </span>
                 </div>
 
-                <div className="flex justify-between items-baseline mb-2">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-2">
                   <span className="italic text-[11pt] font-semibold text-neutral-800">
                     {item.title}
                   </span>
@@ -119,8 +119,8 @@ export function ExecutiveTemplate({ content }: ExecutiveTemplateProps) {
           <div className="space-y-4">
             {content.projects.map((item) => (
               <div key={item.id}>
-                <div className="flex justify-between items-baseline mb-1">
-                  <div className="font-bold text-[11pt] text-black flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
+                  <div className="font-bold text-[11pt] text-black flex flex-wrap items-center gap-2">
                     {item.title}
                     {(item.url || item.repoUrl) && (
                       <span className="text-[9pt] font-normal text-neutral-500">
@@ -162,15 +162,17 @@ export function ExecutiveTemplate({ content }: ExecutiveTemplateProps) {
             {content.education.map((item) => (
               <div
                 key={item.id}
-                className="flex justify-between items-baseline"
+                className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline"
               >
-                <div>
+                <div className="mb-1 sm:mb-0">
                   <div className="font-bold text-[11pt]">{item.school}</div>
                   <div className="text-[11pt] italic">
                     {item.degree} {item.field && `in ${item.field}`}
                   </div>
                 </div>
-                <div className="text-[10pt]">{formatDate(item.endDate)}</div>
+                <div className="text-[10pt] sm:text-right">
+                  {formatDate(item.endDate)}
+                </div>
               </div>
             ))}
           </div>
@@ -276,7 +278,7 @@ export function ExecutiveTemplate({ content }: ExecutiveTemplateProps) {
 
   return (
     <div
-      className="w-full min-h-full bg-white text-black p-[40px] font-serif"
+      className="w-full min-h-full bg-white text-black p-5 md:p-[40px] font-serif"
       style={{
         fontFamily: "Georgia, 'Times New Roman', serif",
         fontSize: "11pt",

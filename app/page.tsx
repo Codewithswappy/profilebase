@@ -1,4 +1,5 @@
 import { Link } from "next-view-transitions";
+import Image from "next/image";
 import { buttonVariants } from "@/components/ui/button-variants";
 import {
   Rocket,
@@ -30,14 +31,18 @@ export default function Home() {
       <header className="fixed top-0 left-0 right-0 z-50 px-4 md:px-6 py-2 md:py-2 border-b border-dashed border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-neutral-950/60">
         <div className="max-w-6xl mx-auto flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
-            <img
+            <Image
               src="/logo/newLogo.png"
               alt="ProfileBase"
+              width={120}
+              height={48}
               className="h-10 md:h-12 w-auto object-cover dark:hidden"
             />
-            <img
+            <Image
               src="/logo/newlogodarkMode.png"
               alt="ProfileBase"
+              width={120}
+              height={48}
               className="h-10 md:h-12 w-auto object-cover hidden dark:block"
             />
           </div>
@@ -163,6 +168,8 @@ export default function Home() {
           <span className="text-red-600">&hearts;</span> by{" "}
           <Link
             href="https://x.com/heyyswap"
+            target="_blank"
+            rel="noopener noreferrer"
             className="hover:underline hover:text-lime-400 transition-all"
           >
             heyyswap

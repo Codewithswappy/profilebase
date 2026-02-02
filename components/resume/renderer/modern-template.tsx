@@ -93,17 +93,17 @@ export function ModernTemplate({ content }: TemplateProps) {
           </h2>
           <div className="space-y-4">
             {content.experience.map((item) => (
-              <div key={item.id}>
-                <div className="flex justify-between items-baseline mb-0.5">
+              <div key={item.id} className="group">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
                   <h3 className="font-bold text-[11pt] text-black">
                     {item.company}
                   </h3>
-                  <span className="text-[10pt] font-medium text-neutral-600">
+                  <span className="text-[10pt] font-medium text-neutral-600 sm:text-right">
                     {formatDate(item.startDate)} –{" "}
                     {item.current ? "Present" : formatDate(item.endDate)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline mb-1">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
                   <div
                     className="text-[10.5pt] font-bold italic"
                     style={{ color: themeColor }}
@@ -111,7 +111,7 @@ export function ModernTemplate({ content }: TemplateProps) {
                     {item.title}
                   </div>
                   {item.location && (
-                    <span className="text-[10pt] text-neutral-500">
+                    <span className="text-[10pt] text-neutral-500 sm:text-right">
                       {item.location}
                     </span>
                   )}
@@ -132,10 +132,10 @@ export function ModernTemplate({ content }: TemplateProps) {
           >
             {sectionTitles["projects"] || "Projects"}
           </h2>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {content.projects.map((item) => (
               <div key={item.id}>
-                <div className="flex justify-between items-baseline mb-0.5">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
                   <h3 className="font-bold text-[10.5pt] text-black flex items-center gap-2">
                     {item.title}
                     {(item.url || item.repoUrl) && (
@@ -165,7 +165,7 @@ export function ModernTemplate({ content }: TemplateProps) {
                     )}
                   </h3>
                   {(item.startDate || item.endDate) && (
-                    <span className="text-[10pt] text-neutral-600">
+                    <span className="text-[10pt] text-neutral-600 sm:text-right">
                       {formatDate(item.startDate)} - {formatDate(item.endDate)}
                     </span>
                   )}
@@ -344,7 +344,7 @@ export function ModernTemplate({ content }: TemplateProps) {
 
   return (
     <div
-      className="w-full min-h-full bg-white text-neutral-900 p-[40px] font-sans"
+      className="w-full min-h-full bg-white text-neutral-900 p-5 md:p-[40px] font-sans"
       style={{
         fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
         fontSize: "10.5pt",
@@ -368,24 +368,24 @@ export function ModernTemplate({ content }: TemplateProps) {
         )}
 
         {/* Contact Grid */}
-        <div className="flex flex-wrap gap-x-4 text-[10pt] text-neutral-600">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10pt] text-neutral-600">
           {profile.location && (
             <div className="flex items-center gap-1">
               <span>{profile.location}</span>
             </div>
           )}
           {profile.phone && (
-            <div className="flex items-center gap-1 before:content-['•'] before:mr-4 before:text-neutral-300">
+            <div className="flex items-center gap-1">
               <span>{profile.phone}</span>
             </div>
           )}
           {profile.email && (
-            <div className="flex items-center gap-1 before:content-['•'] before:mr-4 before:text-neutral-300">
+            <div className="flex items-center gap-1">
               <span className="text-black">{profile.email}</span>
             </div>
           )}
           {profile.linkedin && (
-            <div className="flex items-center gap-1 before:content-['•'] before:mr-4 before:text-neutral-300">
+            <div className="flex items-center gap-1">
               <a
                 href={profile.linkedin}
                 className="hover:underline"
@@ -396,7 +396,7 @@ export function ModernTemplate({ content }: TemplateProps) {
             </div>
           )}
           {profile.github && (
-            <div className="flex items-center gap-1 before:content-['•'] before:mr-4 before:text-neutral-300">
+            <div className="flex items-center gap-1">
               <a
                 href={profile.github}
                 className="hover:underline"
@@ -407,7 +407,7 @@ export function ModernTemplate({ content }: TemplateProps) {
             </div>
           )}
           {profile.website && (
-            <div className="flex items-center gap-1 before:content-['•'] before:mr-4 before:text-neutral-300">
+            <div className="flex items-center gap-1">
               <a
                 href={profile.website}
                 className="hover:underline"

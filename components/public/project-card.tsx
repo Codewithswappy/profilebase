@@ -66,7 +66,7 @@ export function ProjectCard({
               alt={project.title}
               fill
               loading="lazy"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="(max-width: 768px) 100vw, 384px"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (

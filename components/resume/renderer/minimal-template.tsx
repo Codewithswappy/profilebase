@@ -90,9 +90,9 @@ export function MinimalTemplate({ content }: MinimalTemplateProps) {
           <div className="space-y-3">
             {content.experience.map((item) => (
               <div key={item.id}>
-                <div className="flex justify-between font-bold text-[10pt]">
+                <div className="flex flex-col sm:flex-row sm:justify-between font-bold text-[10pt] mb-1">
                   <span>{item.title}</span>
-                  <span>
+                  <span className="text-neutral-600 sm:text-black sm:text-right">
                     {formatDate(item.startDate)} –{" "}
                     {item.current ? "Present" : formatDate(item.endDate)}
                   </span>
@@ -119,10 +119,12 @@ export function MinimalTemplate({ content }: MinimalTemplateProps) {
           <div className="space-y-3">
             {content.projects.map((item) => (
               <div key={item.id}>
-                <div className="flex justify-between font-bold text-[10pt]">
-                  <span>{item.title}</span>
+                <div className="flex flex-col sm:flex-row sm:justify-between font-bold text-[10pt] mb-1">
+                  <span className="flex flex-wrap items-center gap-2">
+                    {item.title}
+                  </span>
                   {(item.startDate || item.endDate) && (
-                    <span className="font-normal text-[9pt]">
+                    <span className="font-normal text-[9pt] text-neutral-600 sm:text-right">
                       {formatDate(item.startDate)} - {formatDate(item.endDate)}
                     </span>
                   )}
@@ -172,18 +174,22 @@ export function MinimalTemplate({ content }: MinimalTemplateProps) {
           >
             {sectionTitles["education"] || "Education"}
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {content.education.map((item) => (
               <div key={item.id}>
-                <div className="flex justify-between font-bold text-[10pt]">
+                <div className="flex flex-col sm:flex-row sm:justify-between font-bold text-[10pt] mb-1">
                   <span>{item.school}</span>
-                  <span>{formatDate(item.endDate)}</span>
+                  <span className="text-neutral-600 sm:text-black sm:text-right">
+                    {formatDate(item.endDate)}
+                  </span>
                 </div>
                 <div className="text-[10pt]">
                   {item.degree} {item.field && `in ${item.field}`}
                 </div>
                 {item.location && (
-                  <div className="text-[10pt] italic">{item.location}</div>
+                  <div className="text-[10pt] italic text-neutral-600">
+                    {item.location}
+                  </div>
                 )}
               </div>
             ))}
@@ -296,7 +302,7 @@ export function MinimalTemplate({ content }: MinimalTemplateProps) {
 
   return (
     <div
-      className="w-full min-h-full bg-white text-black p-[40px] font-sans"
+      className="w-full min-h-full bg-white text-black p-5 md:p-[40px] font-sans"
       style={{ fontFamily: "Arial, Helvetica, sans-serif", fontSize: "10pt" }}
     >
       {/* 1. Header */}

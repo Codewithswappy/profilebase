@@ -210,7 +210,11 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
             />
           </div>
 
-          <Link href={`/${profile.slug}`} target="_blank">
+          <Link
+            href={`/${profile.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Button
               variant="outline"
               size="sm"
@@ -248,10 +252,12 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
                 )}
 
                 {coverImagePreview && (
-                  <img
+                  <Image
                     src={coverImagePreview}
                     alt="Cover"
-                    className="w-full h-full object-cover transition-opacity group-hover:opacity-40"
+                    fill
+                    className="object-cover transition-opacity group-hover:opacity-40"
+                    sizes="(max-width: 1024px) 100vw, 800px"
                   />
                 )}
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -119,14 +120,18 @@ export function DashboardSidebar({
         >
           {isCollapsed ? (
             <div className="relative w-8 h-8 flex items-center justify-center select-none">
-              <img
+              <Image
                 src="/logo/newLogo.png"
                 alt="Logo"
+                width={32}
+                height={32}
                 className="h-8 w-auto object-contain block dark:hidden"
               />
-              <img
+              <Image
                 src="/logo/newlogodarkMode.png"
                 alt="Logo"
+                width={32}
+                height={32}
                 className="h-8 w-auto object-contain hidden dark:block"
               />
             </div>
@@ -136,14 +141,18 @@ export function DashboardSidebar({
               animate={{ opacity: 1 }}
               className="flex items-center gap-2"
             >
-              <img
+              <Image
                 src="/logo/newLogo.png"
                 alt="Logo"
+                width={24}
+                height={24}
                 className="h-6 w-auto object-contain block dark:hidden"
               />
-              <img
+              <Image
                 src="/logo/newlogodarkMode.png"
                 alt="Logo"
+                width={24}
+                height={24}
                 className="h-6 w-auto object-contain hidden dark:block"
               />
               <span className="text-sm font-bold tracking-tight text-neutral-900 dark:text-neutral-100 font-mono">

@@ -309,7 +309,11 @@ export function ResumeList({ initialResumes, profileData }: ResumeListProps) {
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        window.open(`/resume-editor/${resume.id}`, "_blank")
+                        window.open(
+                          `/resume-editor/${resume.id}`,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
                       }
                     >
                       <IconExternalLink className="w-4 h-4 mr-2 text-neutral-500 dark:text-neutral-400" />{" "}

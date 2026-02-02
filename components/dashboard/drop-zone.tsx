@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { UploadButton } from "@/lib/uploadthing";
 import {
@@ -76,15 +77,15 @@ export function DropZone({
         className={cn(
           "relative rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-800",
           className,
+          compact ? "h-32" : "h-48", // Added height for Image fill to work
         )}
       >
-        <img
+        <Image
           src={currentImage}
           alt="Uploaded screenshot"
-          className={cn(
-            "w-full object-cover",
-            compact ? "max-h-32" : "max-h-48",
-          )}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 400px"
         />
         {/* Overlay with remove button */}
         <div className="absolute inset-0 bg-neutral-900/0 hover:bg-neutral-900/60 transition-colors group flex items-center justify-center">

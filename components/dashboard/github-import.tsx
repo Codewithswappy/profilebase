@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
+import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -165,9 +166,11 @@ export function GitHubImportPanel({
       <div className="flex items-center justify-between pb-3 border-b border-dashed border-neutral-200 dark:border-neutral-800">
         <div className="flex items-center gap-2">
           {status?.avatarUrl ? (
-            <img
+            <Image
               src={status.avatarUrl}
-              alt=""
+              alt={status.username || "Avatar"}
+              width={20}
+              height={20}
               className="w-5 h-5 rounded-sm ring-1 ring-neutral-200 dark:ring-neutral-800"
             />
           ) : (

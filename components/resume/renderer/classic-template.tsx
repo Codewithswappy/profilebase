@@ -94,11 +94,11 @@ export function ClassicTemplate({ content }: ClassicTemplateProps) {
           <div className="space-y-4">
             {content.experience.map((item) => (
               <div key={item.id}>
-                <div className="flex justify-between items-baseline mb-0.5">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
                   <span className="font-bold text-[11pt] uppercase text-black">
                     {item.title}
                   </span>
-                  <span className="font-bold text-[10pt] text-black">
+                  <span className="font-bold text-[10pt] text-black sm:text-right">
                     {formatDate(item.startDate)} –{" "}
                     {item.current ? "Present" : formatDate(item.endDate)}
                   </span>
@@ -127,11 +127,11 @@ export function ClassicTemplate({ content }: ClassicTemplateProps) {
           >
             {sectionTitles["projects"] || "Projects"}
           </h2>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {content.projects.map((item) => (
               <div key={item.id}>
-                <div className="flex justify-between items-baseline font-bold mb-0.5">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline font-bold mb-1">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span>{item.title}</span>
                     {(item.url || item.repoUrl) && (
                       <span className="text-[9pt] font-normal text-gray-700">
@@ -160,7 +160,7 @@ export function ClassicTemplate({ content }: ClassicTemplateProps) {
                     )}
                   </div>
                   {(item.startDate || item.endDate) && (
-                    <span className="text-[10pt] font-normal">
+                    <span className="text-[10pt] font-normal sm:text-right">
                       {formatDate(item.startDate)}{" "}
                       {item.endDate && `– ${formatDate(item.endDate)}`}
                     </span>
@@ -191,13 +191,13 @@ export function ClassicTemplate({ content }: ClassicTemplateProps) {
           >
             {sectionTitles["education"] || "Education"}
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {content.education.map((item) => (
               <div
                 key={item.id}
-                className="flex justify-between items-baseline"
+                className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline"
               >
-                <div>
+                <div className="mb-1 sm:mb-0">
                   <span className="font-bold text-[11pt] text-black">
                     {item.degree}
                     {item.field && <span> in {item.field}</span>}
@@ -206,7 +206,7 @@ export function ClassicTemplate({ content }: ClassicTemplateProps) {
                     {item.school}, {item.location}
                   </div>
                 </div>
-                <div className="text-[10pt] font-bold text-black shrink-0">
+                <div className="text-[10pt] font-bold text-black shrink-0 sm:text-right">
                   {formatDate(item.endDate)}
                 </div>
               </div>
@@ -336,7 +336,7 @@ export function ClassicTemplate({ content }: ClassicTemplateProps) {
 
   return (
     <div
-      className="w-full min-h-full bg-white text-black p-[40px] font-serif"
+      className="w-full min-h-full bg-white text-black p-5 md:p-[40px] font-serif"
       style={{
         fontFamily: "'Times New Roman', Times, serif",
         fontSize: "11pt",

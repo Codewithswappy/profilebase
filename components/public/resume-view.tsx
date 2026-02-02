@@ -973,43 +973,53 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
                 )}
 
               {/* Improvement Plan with Impact Levels */}
-              {atsScore.improvementPlan && atsScore.improvementPlan.length > 0 && (
-                <div>
-                  <h4 className="flex items-center gap-2 font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-widest text-xs mb-4 font-mono">
-                    <IconBriefcase className="w-4 h-4" /> Improvement Plan
-                  </h4>
-                  <ol className="space-y-3">
-                    {atsScore.improvementPlan.map((item: { action: string; impact: string }, i: number) => (
-                      <li
-                        key={i}
-                        className="flex gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-dashed border-neutral-200 dark:border-neutral-800"
-                      >
-                        <span className={cn(
-                          "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white",
-                          item.impact === "high" && "bg-red-500",
-                          item.impact === "medium" && "bg-amber-500",
-                          item.impact === "low" && "bg-neutral-400",
-                        )}>
-                          {i + 1}
-                        </span>
-                        <div className="flex-1">
-                          <span className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-mono">
-                            {item.action}
-                          </span>
-                          <span className={cn(
-                            "ml-2 text-[10px] font-bold uppercase",
-                            item.impact === "high" && "text-red-500",
-                            item.impact === "medium" && "text-amber-500",
-                            item.impact === "low" && "text-neutral-400",
-                          )}>
-                            ({item.impact})
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
+              {atsScore.improvementPlan &&
+                atsScore.improvementPlan.length > 0 && (
+                  <div>
+                    <h4 className="flex items-center gap-2 font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-widest text-xs mb-4 font-mono">
+                      <IconBriefcase className="w-4 h-4" /> Improvement Plan
+                    </h4>
+                    <ol className="space-y-3">
+                      {atsScore.improvementPlan.map(
+                        (
+                          item: { action: string; impact: string },
+                          i: number,
+                        ) => (
+                          <li
+                            key={i}
+                            className="flex gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-dashed border-neutral-200 dark:border-neutral-800"
+                          >
+                            <span
+                              className={cn(
+                                "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white",
+                                item.impact === "high" && "bg-red-500",
+                                item.impact === "medium" && "bg-amber-500",
+                                item.impact === "low" && "bg-neutral-400",
+                              )}
+                            >
+                              {i + 1}
+                            </span>
+                            <div className="flex-1">
+                              <span className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-mono">
+                                {item.action}
+                              </span>
+                              <span
+                                className={cn(
+                                  "ml-2 text-[10px] font-bold uppercase",
+                                  item.impact === "high" && "text-red-500",
+                                  item.impact === "medium" && "text-amber-500",
+                                  item.impact === "low" && "text-neutral-400",
+                                )}
+                              >
+                                ({item.impact})
+                              </span>
+                            </div>
+                          </li>
+                        ),
+                      )}
+                    </ol>
+                  </div>
+                )}
 
               {/* Analysis Checks Summary */}
               {atsScore.checks && atsScore.checks.length > 0 && (
@@ -1018,54 +1028,83 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
                     <IconAward className="w-4 h-4" /> Analysis Breakdown
                   </h4>
                   <div className="grid grid-cols-2 gap-2">
-                    {atsScore.checks.map((check: { label: string; status: string; message: string }, i: number) => (
-                      <div
-                        key={i}
-                        className={cn(
-                          "p-2.5 rounded-lg border border-dashed text-center",
-                          check.status === "pass" && "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50",
-                          check.status === "warning" && "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/50",
-                          check.status === "fail" && "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/50",
-                        )}
-                      >
-                        <div className={cn(
-                          "text-[10px] font-bold uppercase tracking-wide mb-0.5",
-                          check.status === "pass" && "text-emerald-600 dark:text-emerald-500",
-                          check.status === "warning" && "text-amber-600 dark:text-amber-500",
-                          check.status === "fail" && "text-red-600 dark:text-red-500",
-                        )}>
-                          {check.status === "pass" ? "✓" : check.status === "warning" ? "!" : "✗"} {check.label}
+                    {atsScore.checks.map(
+                      (
+                        check: {
+                          label: string;
+                          status: string;
+                          message: string;
+                        },
+                        i: number,
+                      ) => (
+                        <div
+                          key={i}
+                          className={cn(
+                            "p-2.5 rounded-lg border border-dashed text-center",
+                            check.status === "pass" &&
+                              "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50",
+                            check.status === "warning" &&
+                              "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/50",
+                            check.status === "fail" &&
+                              "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/50",
+                          )}
+                        >
+                          <div
+                            className={cn(
+                              "text-[10px] font-bold uppercase tracking-wide mb-0.5",
+                              check.status === "pass" &&
+                                "text-emerald-600 dark:text-emerald-500",
+                              check.status === "warning" &&
+                                "text-amber-600 dark:text-amber-500",
+                              check.status === "fail" &&
+                                "text-red-600 dark:text-red-500",
+                            )}
+                          >
+                            {check.status === "pass"
+                              ? "✓"
+                              : check.status === "warning"
+                                ? "!"
+                                : "✗"}{" "}
+                            {check.label}
+                          </div>
+                          <div
+                            className="text-[9px] text-neutral-500 dark:text-neutral-400 font-mono truncate"
+                            title={check.message}
+                          >
+                            {check.message.length > 25
+                              ? check.message.substring(0, 25) + "..."
+                              : check.message}
+                          </div>
                         </div>
-                        <div className="text-[9px] text-neutral-500 dark:text-neutral-400 font-mono truncate" title={check.message}>
-                          {check.message.length > 25 ? check.message.substring(0, 25) + "..." : check.message}
-                        </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </div>
               )}
 
               {/* Fallback: Show feedback if no improvement plan */}
-              {(!atsScore.improvementPlan || atsScore.improvementPlan.length === 0) && atsScore.feedback.length > 0 && (
-                <div>
-                  <h4 className="flex items-center gap-2 font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-widest text-xs mb-4 font-mono">
-                    <IconBriefcase className="w-4 h-4" /> Suggestions
-                  </h4>
-                  <div className="space-y-3">
-                    {atsScore.feedback.map((item: string, i: number) => (
-                      <div
-                        key={i}
-                        className="flex gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-dashed border-neutral-200 dark:border-neutral-800"
-                      >
-                        <span className="text-amber-500 mt-0.5">•</span>
-                        <span className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-mono">
-                          {item}
-                        </span>
-                      </div>
-                    ))}
+              {(!atsScore.improvementPlan ||
+                atsScore.improvementPlan.length === 0) &&
+                atsScore.feedback.length > 0 && (
+                  <div>
+                    <h4 className="flex items-center gap-2 font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-widest text-xs mb-4 font-mono">
+                      <IconBriefcase className="w-4 h-4" /> Suggestions
+                    </h4>
+                    <div className="space-y-3">
+                      {atsScore.feedback.map((item: string, i: number) => (
+                        <div
+                          key={i}
+                          className="flex gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-dashed border-neutral-200 dark:border-neutral-800"
+                        >
+                          <span className="text-amber-500 mt-0.5">•</span>
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-mono">
+                            {item}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
 
             {/* Empty footer */}
@@ -1112,7 +1151,7 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
       </div>
 
       {/* MAIN DOCUMENT VIEW */}
-      <div className="print-content flex-1 overflow-y-auto bg-neutral-100 dark:bg-neutral-900/50 flex max-w-3xl mx-auto justify-center py-4 print:p-0 print:m-0 print:overflow-visible print:bg-white">
+      <div className="print-content flex-1 overflow-y-auto bg-neutral-100 dark:bg-neutral-900/50 flex max-w-3xl mx-auto justify-center md:py-4 print:p-0 print:m-0 print:overflow-visible print:bg-white">
         <div className="print-content transform origin-top transition-transform print:scale-100 print:w-full">
           <div id="resume-content-view">{renderResumeContent()}</div>
         </div>

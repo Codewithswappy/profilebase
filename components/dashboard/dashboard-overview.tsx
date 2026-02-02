@@ -106,7 +106,11 @@ export function DashboardOverview({ data, analytics }: DashboardOverviewProps) {
               NEW PROJECT
             </Button>
           </Link>
-          <Link href={`/${data.profile.slug}`} target="_blank">
+          <Link
+            href={`/${data.profile.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Button
               variant="outline"
               size="sm"
@@ -327,6 +331,7 @@ export function DashboardOverview({ data, analytics }: DashboardOverviewProps) {
                 key={i}
                 href={action.href}
                 target={action.external ? "_blank" : undefined}
+                rel={action.external ? "noopener noreferrer" : undefined}
               >
                 <div className="p-2 rounded-sm border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-900/20 hover:bg-neutral-100 dark:hover:bg-neutral-800/50 transition-colors flex items-center gap-2 justify-center group">
                   <action.icon className="w-4 h-4 text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors" />

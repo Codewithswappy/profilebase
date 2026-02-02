@@ -84,7 +84,7 @@ export function ProfessionalTemplate({ content }: ProfessionalTemplateProps) {
           <div className="space-y-5">
             {content.experience.map((item) => (
               <div key={item.id}>
-                <div className="flex justify-between items-baseline mb-1">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
                   <h3 className="font-bold text-[11pt] text-neutral-900">
                     {item.title}
                   </h3>
@@ -112,8 +112,8 @@ export function ProfessionalTemplate({ content }: ProfessionalTemplateProps) {
           <div className="space-y-4">
             {content.projects.map((item) => (
               <div key={item.id}>
-                <div className="flex justify-between items-baseline mb-0.5">
-                  <div className="font-bold text-[10.5pt] text-neutral-900 flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
+                  <div className="font-bold text-[10.5pt] text-neutral-900 flex flex-wrap items-center gap-2">
                     {item.title}
                     {(item.url || item.repoUrl) && (
                       <span className="text-[9pt] font-normal text-neutral-500">
@@ -160,7 +160,10 @@ export function ProfessionalTemplate({ content }: ProfessionalTemplateProps) {
           </h2>
           <div className="space-y-3">
             {content.education.map((item) => (
-              <div key={item.id} className="flex justify-between items-start">
+              <div
+                key={item.id}
+                className="flex flex-col sm:flex-row sm:justify-between sm:items-start"
+              >
                 <div>
                   <div className="font-bold text-[10.5pt] text-neutral-900">
                     {item.school}
@@ -169,7 +172,7 @@ export function ProfessionalTemplate({ content }: ProfessionalTemplateProps) {
                     {item.degree} {item.field && `in ${item.field}`}
                   </div>
                 </div>
-                <div className="text-[10pt] font-medium text-neutral-600 text-right">
+                <div className="text-[10pt] font-medium text-neutral-600 sm:text-right">
                   {formatDate(item.endDate)}
                   {item.location && (
                     <div className="text-[9pt]">{item.location}</div>
@@ -282,7 +285,7 @@ export function ProfessionalTemplate({ content }: ProfessionalTemplateProps) {
 
   return (
     <div
-      className="w-full min-h-full bg-white text-neutral-900 p-[40px] font-sans"
+      className="w-full min-h-full bg-white text-neutral-900 p-5 md:p-[40px] font-sans"
       style={{
         fontFamily:
           "'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif",
