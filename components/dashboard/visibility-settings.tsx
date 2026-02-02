@@ -72,6 +72,7 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
     const showAchievements = formData.get("showAchievements") === "on";
     const showCertificates = formData.get("showCertificates") === "on";
     const showContact = formData.get("showContact") === "on";
+    const showGithubHeatmap = formData.get("showGithubHeatmap") === "on";
 
     const result = await updateProfileSettings({
       showEmail,
@@ -82,6 +83,7 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
       showAchievements,
       showCertificates,
       showContact,
+      showGithubHeatmap,
     });
 
     if (result.success) {
@@ -167,6 +169,14 @@ export function VisibilitySettings({ data }: VisibilitySettingsProps) {
             label="Show Contact / CTA Section"
             description="Display the 'Book a Free Call' section at the bottom."
             defaultChecked={(profileSettings as any).showContact ?? true}
+          />
+
+          {/* Show GitHub Heatmap */}
+          <ToggleItem
+            id="showGithubHeatmap"
+            label="Show GitHub Heatmap"
+            description="Display your GitHub contribution graph on your profile."
+            defaultChecked={(profileSettings as any).showGithubHeatmap ?? true}
           />
         </div>
 

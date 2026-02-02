@@ -125,42 +125,56 @@ export function ResumeEditorRoot({ resume }: ResumeEditorRootProps) {
         return;
       }
 
-      // Clone the element to avoid manipulating the visible DOM
-      const clone = element.cloneNode(true) as HTMLElement;
+      // Extract ONLY the paper element to avoid wrapper issues
+      const originalPaper = element.querySelector(".bg-white") as HTMLElement;
+      if (!originalPaper) {
+        toast.error("Could not find resume paper");
+        return;
+      }
 
-      // Create a temporary container for the clone
+      const paper = originalPaper.cloneNode(true) as HTMLElement;
+
+      // Create a temporary container
       const container = document.createElement("div");
       container.style.position = "absolute";
       container.style.top = "-9999px";
       container.style.left = "0";
-      container.style.width = "210mm"; // Exact A4 width
-      container.style.minHeight = "297mm"; // A4 Height
+      container.style.width = "793px";
       container.style.background = "white";
       container.style.margin = "0";
-      container.style.padding = "0"; // No padding in container
+      container.style.padding = "0";
+      container.style.overflow = "hidden"; // Clip to single page logic
 
-      // Ensure the clone fills the container and has no transforms
-      clone.style.transform = "none";
-      clone.style.margin = "0";
-      clone.style.padding = "0";
-      clone.style.width = "100%";
-      clone.style.height = "100%";
-      // We do NOT strip className, as Tailwind styles are needed.
+      // Style the paper
+      paper.style.transform = "none";
+      paper.style.boxShadow = "none";
+      paper.style.margin = "0";
+      paper.style.width = "100%";
+      paper.style.minHeight = "1122px";
+      // User wanted equal padding. 30px is a good balanced value (~0.8 inch)
+      paper.style.setProperty("padding", "20px", "important");
 
-      container.appendChild(clone);
+      // TARGETED PAGE BREAK HANDLING
+      const sections = paper.querySelectorAll("section");
+      sections.forEach((s) => {
+        (s as HTMLElement).style.pageBreakInside = "avoid";
+        (s as HTMLElement).style.breakInside = "avoid";
+      });
+
+      container.appendChild(paper);
       document.body.appendChild(container);
 
       const opt = {
         margin: 0,
         filename: `${title.replace(/\s+/g, "_")}_resume.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: 793 },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       };
 
       await html2pdf()
         .set(opt as any)
-        .from(clone)
+        .from(paper)
         .save();
 
       // Cleanup

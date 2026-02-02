@@ -10,9 +10,14 @@ import { EducationForm } from "./forms/education-form";
 import { CertificationsForm } from "./forms/certifications-form";
 import { ATSAnalysisView } from "./forms/ats-analysis-view";
 import { SettingsForm } from "./forms/settings-form";
+import { CustomSectionForm } from "./forms/custom-section-form";
 
 export function ResumeEditorForm() {
   const { activeSection } = useResumeStore();
+
+  if (activeSection && activeSection.startsWith("custom_")) {
+    return <CustomSectionForm sectionId={activeSection} />;
+  }
 
   switch (activeSection) {
     case "profile":

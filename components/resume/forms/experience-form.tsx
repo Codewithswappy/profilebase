@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { Switch } from "@/components/ui/switch";
 import { ResumeTips } from "../resume-tips";
 import { IconSparkles, IconAlertCircle } from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
 
 // Power action verbs for suggestions
 const SUGGESTED_VERBS = [
@@ -110,18 +111,25 @@ export function ExperienceForm() {
                     onChange={(e) => update({ startDate: e.target.value })}
                   />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 flex-1">
                   <div className="flex justify-between items-center mb-1">
                     <Label className="text-xs uppercase text-neutral-500 dark:text-neutral-400">
                       End Date
                     </Label>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-800/80 px-2 py-0.5 rounded-full scale-90 origin-right">
                       <Switch
-                        className="h-4 w-7"
                         checked={item.current}
                         onCheckedChange={(c) => update({ current: c })}
+                        className="scale-75 ml-0 data-[state=checked]:bg-emerald-500"
                       />
-                      <span className="text-[10px] text-neutral-500 dark:text-neutral-400">
+                      <span
+                        className={cn(
+                          "text-[9px] font-bold uppercase tracking-widest transition-colors",
+                          item.current
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-neutral-500",
+                        )}
+                      >
                         Current
                       </span>
                     </div>
@@ -132,6 +140,10 @@ export function ExperienceForm() {
                     value={item.endDate || ""}
                     onChange={(e) => update({ endDate: e.target.value })}
                     disabled={item.current}
+                    className={cn(
+                      item.current &&
+                        "opacity-50 grayscale bg-neutral-50 dark:bg-neutral-900",
+                    )}
                   />
                 </div>
               </div>

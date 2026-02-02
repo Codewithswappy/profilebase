@@ -66,6 +66,24 @@ export const ResumeCertificationSchema = z.object({
   url: z.string().nullish().or(z.literal("")),
 });
 
+export const ResumeCustomItemSchema = z.object({
+  id: z.string(),
+  title: z.string().default(""),
+  subtitle: z.string().optional(),
+  location: z.string().optional(),
+  date: z.string().optional(),
+  url: z.string().optional().or(z.literal("")),
+  description: z.string().optional(),
+});
+
+export const ResumeCustomSectionSchema = z.object({
+  id: z.string(),
+  name: z.string().default("New Section"),
+  layout: z.enum(["list", "grid"]).default("list"),
+  icon: z.string().optional(),
+  items: z.array(ResumeCustomItemSchema).default([]),
+});
+
 // The core JSON structure stored in DB
 export const ResumeContentSchema = z.object({
   profile: ResumeProfileSchema.default({ firstName: "", lastName: "" }),
@@ -75,6 +93,7 @@ export const ResumeContentSchema = z.object({
   education: z.array(ResumeEducationSchema).default([]),
   skills: z.array(ResumeSkillGroupSchema).default([]),
   certifications: z.array(ResumeCertificationSchema).default([]),
+  customSections: z.array(ResumeCustomSectionSchema).default([]),
   
   // Layout/Ordering configuration
   sectionOrder: z.array(z.string()).default([
@@ -104,3 +123,5 @@ export type ResumeExperience = z.infer<typeof ResumeExperienceSchema>;
 export type ResumeProject = z.infer<typeof ResumeProjectSchema>;
 export type ResumeEducation = z.infer<typeof ResumeEducationSchema>;
 export type ResumeSkillGroup = z.infer<typeof ResumeSkillGroupSchema>;
+export type ResumeCustomSection = z.infer<typeof ResumeCustomSectionSchema>;
+export type ResumeCustomItem = z.infer<typeof ResumeCustomItemSchema>;

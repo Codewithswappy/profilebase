@@ -69,9 +69,27 @@ export function ResumeList({ initialResumes, profileData }: ResumeListProps) {
     }
   };
 
-  const handleCreate = async () => {
+  const BLANK_RESUME_DATA: ResumeData = {
+    userName: "",
+    email: "",
+    profile: {
+      headline: "",
+      summary: "",
+      location: "",
+    },
+    experiences: [],
+    projects: [],
+    education: [],
+    skillsString: "",
+    socialLinks: [],
+  };
+
+  const handleCreate = async (withSeed: boolean = true) => {
     setLoading(true);
-    const result = await createResume("Untitled Resume", profileData);
+    const result = await createResume(
+      withSeed ? "Tailored Resume" : "Blank Resume",
+      withSeed ? profileData : BLANK_RESUME_DATA,
+    );
     if (result.success && result.data) {
       router.push(`/resume-editor/${result.data.id}`);
     } else {
@@ -120,7 +138,7 @@ export function ResumeList({ initialResumes, profileData }: ResumeListProps) {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex-col md:block items-center justify-between border-b border-dashed border-neutral-200 dark:border-neutral-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-neutral-200 dark:border-neutral-800 pb-6 gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
             My Resumes
@@ -129,20 +147,32 @@ export function ResumeList({ initialResumes, profileData }: ResumeListProps) {
             Manage and create tailored resumes for your job applications.
           </p>
         </div>
-        <Button
-          onClick={handleCreate}
-          disabled={loading}
-          size="lg"
-          className="gap-2 mt-6 bg-neutral-900 dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white shadow-none rounded-none border border-transparent"
-        >
-          {loading ? (
-            "Creating..."
-          ) : (
-            <>
-              <IconPlus className="w-4 h-4" /> Create New Resume
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => handleCreate(false)}
+            disabled={loading}
+            variant="outline"
+            size="lg"
+            className="gap-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-none shadow-none font-mono text-xs uppercase"
+          >
+            <IconFileText className="w-4 h-4" />
+            Blank Page
+          </Button>
+          <Button
+            onClick={() => handleCreate(true)}
+            disabled={loading}
+            size="lg"
+            className="gap-2 bg-neutral-900 dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white shadow-none rounded-none border border-transparent font-mono text-xs uppercase"
+          >
+            {loading ? (
+              "Creating..."
+            ) : (
+              <>
+                <IconPlus className="w-4 h-4" /> Tailored (Profile)
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {resumes.length === 0 ? (
@@ -157,13 +187,21 @@ export function ResumeList({ initialResumes, profileData }: ResumeListProps) {
             Create your first resume to get started. You can create multiple
             versions tailored to different jobs.
           </p>
-          <Button
-            onClick={handleCreate}
-            variant="outline"
-            className="border-dashed dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800"
-          >
-            Create Resume
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button
+              onClick={() => handleCreate(false)}
+              variant="outline"
+              className="border-dashed dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 font-mono text-xs uppercase"
+            >
+              Start from Blank
+            </Button>
+            <Button
+              onClick={() => handleCreate(true)}
+              className="bg-neutral-900 dark:bg-white dark:text-black font-mono text-xs uppercase font-bold"
+            >
+              Tailored (Profile)
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">

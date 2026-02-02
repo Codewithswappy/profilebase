@@ -235,6 +235,65 @@ export function MinimalTemplate({ content }: MinimalTemplateProps) {
       ) : null,
   };
 
+  // Add Custom Section Renderers
+  (content.customSections || []).forEach((section) => {
+    if (section.items.length > 0) {
+      renderers[section.id] = (
+        <section key={section.id}>
+          <h2
+            className="text-[10pt] font-bold uppercase border-b mb-2"
+            style={{ color: themeColor, borderColor: themeColor }}
+          >
+            {sectionTitles[section.id] || section.name}
+          </h2>
+          <div
+            className={cn(
+              "space-y-3",
+              section.layout === "grid" && "grid grid-cols-2 gap-4 space-y-0",
+            )}
+          >
+            {section.items.map((item) => (
+              <div key={item.id}>
+                <div className="flex justify-between font-bold text-[10pt]">
+                  <span>{item.title}</span>
+                  <span>{item.date}</span>
+                </div>
+                {(item.subtitle ||
+                  (item as any).location ||
+                  (item as any).url) && (
+                  <div className="italic text-[10pt] mb-1 flex flex-wrap gap-2 text-wrap wrap-break-word">
+                    {item.subtitle && <span>{item.subtitle}</span>}
+                    {(item as any).location && (
+                      <span className="text-neutral-500">
+                        {item.subtitle && (
+                          <span className="mx-1 opacity-50 not-italic">|</span>
+                        )}
+                        {(item as any).location}
+                      </span>
+                    )}
+                    {(item as any).url && (
+                      <a
+                        href={(item as any).url}
+                        className="hover:underline text-neutral-500 break-all"
+                        style={{ color: themeColor }}
+                      >
+                        {(item.subtitle || (item as any).location) && (
+                          <span className="mx-1 opacity-50 not-italic">|</span>
+                        )}
+                        {(item as any).url}
+                      </a>
+                    )}
+                  </div>
+                )}
+                <HTML html={item.description} />
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+  });
+
   return (
     <div
       className="w-full min-h-full bg-white text-black p-[40px] font-sans"

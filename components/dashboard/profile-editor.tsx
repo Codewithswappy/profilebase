@@ -36,6 +36,7 @@ import Link from "next/link";
 import { UploadButton } from "@/lib/uploadthing";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
+import { motion, AnimatePresence } from "motion/react";
 import { ExperienceForm } from "@/components/dashboard/forms/experience-form";
 import { AchievementsForm } from "@/components/dashboard/forms/achievements-form";
 import { CertificatesForm } from "@/components/dashboard/forms/certificates-form";
@@ -55,6 +56,7 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(
     profile.image || null,
   );
+  const [isPublic, setIsPublic] = useState(profileSettings.isPublic);
 
   // We keep imageUrl state for form submission, updated by upload success
   const [imageUrl, setImageUrl] = useState<string>(profile.image || "");
@@ -125,11 +127,19 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
 
   // Handle Public/Private Toggle
   async function handleVisibilityToggle(checked: boolean) {
+    // Optimistic update
+    setIsPublic(checked);
+
     const result = await updateProfileSettings({
       isPublic: checked,
     });
+
     if (result.success) {
       router.refresh();
+    } else {
+      // Revert on failure
+      setIsPublic(!checked);
+      setError(result.error);
     }
   }
 
@@ -168,26 +178,35 @@ export function ProfileEditor({ data }: ProfileEditorProps) {
 
         {/* Visibility Toggle */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-900 rounded-sm px-3 py-1.5 border border-dashed border-neutral-200 dark:border-neutral-800">
-            {profileSettings.isPublic ? (
-              <IconWorld className="w-4 h-4 text-emerald-500" />
-            ) : (
-              <IconLock className="w-4 h-4 text-neutral-400" />
-            )}
-            <span
-              className={cn(
-                "text-xs font-mono font-medium uppercase",
-                profileSettings.isPublic
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-neutral-500",
-              )}
-            >
-              {profileSettings.isPublic ? "Public" : "Private"}
-            </span>
+          <div className="flex items-center gap-2.5 bg-white dark:bg-neutral-950 rounded-lg px-3 py-1.5 border border-dashed border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={isPublic ? "public" : "private"}
+                initial={{ opacity: 0, y: 2 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -2 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                className="flex items-center gap-2"
+              >
+                {isPublic ? (
+                  <IconWorld className="w-4 h-4 text-emerald-500" />
+                ) : (
+                  <IconLock className="w-4 h-4 text-neutral-400" />
+                )}
+                <span
+                  className={cn(
+                    "text-[10px] font-mono font-bold uppercase tracking-widest",
+                    isPublic ? "text-emerald-500" : "text-neutral-500",
+                  )}
+                >
+                  {isPublic ? "Public" : "Private"}
+                </span>
+              </motion.div>
+            </AnimatePresence>
             <Switch
-              checked={profileSettings.isPublic}
+              checked={isPublic}
               onCheckedChange={handleVisibilityToggle}
-              className="scale-75 ml-1"
+              className="scale-75 ml-0 data-[state=checked]:bg-neutral-900 dark:data-[state=checked]:bg-neutral-100"
             />
           </div>
 

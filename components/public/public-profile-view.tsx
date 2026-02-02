@@ -253,6 +253,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
   const showCertificates =
     (profileSettings.showCertificates ?? true) && certificates.length > 0;
   const showContact = profileSettings.showContact !== false;
+  const showGithubHeatmap = profileSettings.showGithubHeatmap !== false;
 
   // Duplicate tech stack for smooth marquee
   const marqueeTech = [...allTech, ...allTech, ...allTech, ...allTech];
@@ -563,8 +564,8 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                       > */}
-                        {/* Static Background Lines */}
-                        {/* <path
+                      {/* Static Background Lines */}
+                      {/* <path
                           d="M48 40 H24 L16 32 H0"
                           stroke="currentColor"
                           strokeWidth="1"
@@ -583,8 +584,8 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                           className="opacity-30"
                         /> */}
 
-                        {/* Flowing Data Streams - Persistent Right-to-Left */}
-                        {/* {[
+                      {/* Flowing Data Streams - Persistent Right-to-Left */}
+                      {/* {[
                           "M48 40 H24 L16 32 H0",
                           "M48 24 H32 L24 16 H0",
                           "M48 56 H32 L24 64 H0",
@@ -613,9 +614,9 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                       > */}
-                        {/* Static Background Lines */}
-                        {/* We mirror the contact paths so they merge perfectly */}
-                        {/* <path
+                      {/* Static Background Lines */}
+                      {/* We mirror the contact paths so they merge perfectly */}
+                      {/* <path
                           d="M48 40 H24 L16 32 H0"
                           stroke="currentColor"
                           strokeWidth="1"
@@ -634,8 +635,8 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                           className="opacity-30"
                         /> */}
 
-                        {/* Flowing Data Streams - Persistent Right-to-Left */}
-                        {/* {[
+                      {/* Flowing Data Streams - Persistent Right-to-Left */}
+                      {/* {[
                           "M48 40 H24 L16 32 H0",
                           "M48 24 H32 L24 16 H0",
                           "M48 56 H32 L24 64 H0",
@@ -719,18 +720,19 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     </div>
                   </motion.div>
 
-                  {/* GitHub Heatmap - Render if username exists */}
-                  {githubUsername && (
-                    <div className="pt-10">
-                      <GithubHeatmap
-                        username={githubUsername}
-                        className="scale-100 origin-center"
-                      />
-                    </div>
+                  {/* GitHub Heatmap - Render if username exists and visibility is enabled */}
+                  {githubUsername && showGithubHeatmap && (
+                    <>
+                      <div className="pt-10">
+                        <GithubHeatmap
+                          username={githubUsername}
+                          className="scale-100 origin-center"
+                        />
+                      </div>
+                      {/* Dotted Line Divider - only show after heatmap */}
+                      <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-4 opacity-60" />
+                    </>
                   )}
-
-                  {/* Dotted Line Divider */}
-                  <div className="w-full h-px bg-linear-to-r from-transparent via-neutral-200 dark:via-neutral-800 to-transparent my-4 opacity-60" />
                 </motion.div>
 
                 {/* --- MAIN CONTENT --- */}
@@ -1114,7 +1116,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
                     <div className="flex items-center gap-4 opacity-70 hover:opacity-100 transition-opacity">
                       <SocialsSection
                         links={data.socialLinks}
-                        className="scale-90"
+                        className="scale-70 origin-center md:origin-right gap-4"
                       />
                     </div>
                   </footer>

@@ -362,12 +362,13 @@ export async function updateProfileSettings(
       showSummary,
       showAchievements,
       showCertificates,
-      showContact
+      showContact,
+      showGithubHeatmap
     } = validated.data;
 
-    const settings = await db.profileSettings.update({
+    const settings = await db.profileSettings.upsert({
       where: { userId },
-      data: {
+      update: {
         ...(isPublic !== undefined && { isPublic }),
         ...(showEmail !== undefined && { showEmail }),
         ...(showExperience !== undefined && { showExperience }),
@@ -377,13 +378,27 @@ export async function updateProfileSettings(
         ...(showAchievements !== undefined && { showAchievements }),
         ...(showCertificates !== undefined && { showCertificates }),
         ...(showContact !== undefined && { showContact }),
+        ...(showGithubHeatmap !== undefined && { showGithubHeatmap }),
+      },
+      create: {
+        userId,
+        isPublic: isPublic ?? false,
+        showEmail: showEmail ?? false,
+        showExperience: showExperience ?? true,
+        showProjects: showProjects ?? true,
+        showTechStack: showTechStack ?? true,
+        showSummary: showSummary ?? true,
+        showAchievements: showAchievements ?? true,
+        showCertificates: showCertificates ?? true,
+        showContact: showContact ?? true,
+        showGithubHeatmap: showGithubHeatmap ?? true,
       },
     });
 
     return { success: true, data: settings };
-  } catch (error) {
+  } catch (error: any) {
     console.error("updateProfileSettings error:", error);
-    return { success: false, error: "Failed to update settings" };
+    return { success: false, error: `Update failed: ${error?.message || "Unknown error"}` };
   }
 }
 

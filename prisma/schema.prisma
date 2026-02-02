@@ -1,52 +1,29 @@
-// ============================================
-// Profilebase PRISMA SCHEMA
-// Portfolio Generator Architecture
-// ============================================
-// Clean portfolio creation with projects,
-// experience, and social links.
-// ============================================
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
-  engineType = "library"
+  engineType      = "library"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-// ============================================
-// USER
-// ============================================
-// The human who owns a Profilebase profile.
-// Root of all ownership. Authentication anchor.
-// ============================================
-
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  name          String?
-  passwordHash  String?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // 1:1 relationships
+  id              String           @id @default(cuid())
+  email           String           @unique
+  emailVerified   DateTime?
+  name            String?
+  passwordHash    String?
+  image           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  accounts        Account[]
   profile         Profile?
   profileSettings ProfileSettings?
-
-  // NextAuth.js
-  accounts Account[]
-  sessions Session[]
+  sessions        Session[]
 
   @@index([email])
 }
-
-// ============================================
-// NEXTAUTH MODELS
-// ============================================
 
 model Account {
   id                String  @id @default(cuid())
@@ -54,15 +31,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -83,265 +59,170 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// ============================================
-// PROFILE
-// ============================================
-// The public-facing identity of a User.
-// What recruiters see when they open a link.
-// ============================================
-
 model Profile {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  slug      String   @unique
-  headline  String?
-  summary   String?  @db.Text
-  image     String?  // Profile picture URL
-  coverImage String? // Profile cover/banner image URL
-  location   String?
-  profession String?
-  ctaMessage String? // Custom Call-to-Action message
-  meetingUrl String? // Custom meeting URL (e.g. Cal.com)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 1:1 relationship to User
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // 1:many relationships
-  projects       Project[]
-  experiences    Experience[]
-  socialLinks    SocialLink[]
-  dailyAnalytics DailyAnalytics[]
+  id             String           @id @default(cuid())
+  userId         String           @unique
+  slug           String           @unique
+  headline       String?
+  summary        String?
+  image          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  coverImage     String?
+  location       String?
+  ctaMessage     String?
+  meetingUrl     String?
+  profession     String?
   achievements   Achievement[]
   certificates   Certificate[]
+  dailyAnalytics DailyAnalytics[]
+  experiences    Experience[]
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects       Project[]
   resumes        Resume[]
+  socialLinks    SocialLink[]
 
   @@index([slug])
   @@index([userId])
 }
 
-// ============================================
-// RESUME (NEW)
-// ============================================
-// Versioned resumes with snapshot data
-// ============================================
-
 model Resume {
-  id          String   @id @default(cuid())
-  profileId   String
-  title       String   @default("My Resume")
-  
-  // Design Snapshot
-  templateId  String   @default("modern") // modern, ats-clean, classic, minimal
-  fontFamily  String   @default("Inter, sans-serif")
-  fontSize    Int      @default(14)
-  lineHeight  Float    @default(1.5)
-  margins     Int      @default(15)
-  primaryColor String  @default("#000000")
-  
-  // Content Snapshot (Full JSON of profile, exp, projs, etc.)
-  // This ensures versions are independent.
-  data        Json     
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  profileId    String
+  title        String   @default("My Resume")
+  templateId   String   @default("modern")
+  fontFamily   String   @default("Inter, sans-serif")
+  fontSize     Int      @default(14)
+  lineHeight   Float    @default(1.5)
+  margins      Int      @default(15)
+  primaryColor String   @default("#000000")
+  data         Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([profileId])
 }
-
-// ============================================
-// EXPERIENCE
-// ============================================
-// Work history and professional experience.
-// ============================================
 
 model Experience {
-  id           String    @id @default(cuid())
-  profileId    String
-  position     String
-  company      String
-  logo         String?   // Company logo URL
-  location     String?
-  startDate    DateTime
-  endDate      DateTime?
-  current      Boolean   @default(false)
-  employmentType String? // e.g., "Full-time", "Contract"
-  skills       String[]  // e.g., ["React", "TypeScript"]
-  description  String?   @db.Text
-  displayOrder Int       @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id             String    @id @default(cuid())
+  profileId      String
+  position       String
+  company        String
+  logo           String?
+  location       String?
+  startDate      DateTime
+  endDate        DateTime?
+  current        Boolean   @default(false)
+  employmentType String?
+  skills         String[]
+  description    String?
+  displayOrder   Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  profile        Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([profileId])
 }
-
-// ============================================
-// SOCIAL LINKS
-// ============================================
-// External social media and custom links.
-// ============================================
 
 model SocialLink {
   id           String   @id @default(cuid())
   profileId    String
-  platform     String   // e.g. "github", "twitter", "linkedin", "instagram", "custom"
+  platform     String
   url          String
-  title        String?  // Required for custom links
-  icon         String?  // For custom icons later if needed
+  title        String?
+  icon         String?
   displayOrder Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([profileId])
 }
 
-// ============================================
-// PROFILE SETTINGS
-// ============================================
-// Privacy and visibility controls.
-// ============================================
-
 model ProfileSettings {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  isPublic  Boolean  @default(false)
-  showEmail Boolean  @default(false)
-  
-  // Section Visibility Controls
-  showExperience  Boolean  @default(true)
-  showProjects    Boolean  @default(true)
-  showTechStack   Boolean  @default(true)
-  showSummary     Boolean  @default(true)
-  showAchievements Boolean @default(true)
-  showCertificates Boolean @default(true)
-  showContact     Boolean  @default(true)
-  
-  // Primary Resume for Public Profile (Optional - falls back to auto-generated)
-  primaryResumeId String?
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 1:1 relationship to User
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  isPublic          Boolean  @default(false)
+  showEmail         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  showExperience    Boolean  @default(true)
+  showProjects      Boolean  @default(true)
+  showSummary       Boolean  @default(true)
+  showTechStack     Boolean  @default(true)
+  showAchievements  Boolean  @default(true)
+  showCertificates  Boolean  @default(true)
+  primaryResumeId   String?
+  showContact       Boolean  @default(true)
+  showGithubHeatmap Boolean  @default(true)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
-// ============================================
-// PROJECT
-// ============================================
-// A body of work created by the User.
-// Showcases skills and achievements.
-// ============================================
-
 model Project {
-  id          String    @id @default(cuid())
-  profileId   String
-  title       String
-  description String?   @db.Text
-  
-  // Links
-  url         String?   // Main project URL
-  repoUrl     String?   // GitHub/GitLab repository URL
-  demoUrl     String?   // Live demo URL
-  
-  // Media
-  thumbnail   String?   // Preview image URL
-  
-  // Tech & Context
-  techStack   String[]  // Array of technologies (e.g. ["React", "Node.js"])
-  role        String?   // User's role (e.g. "Lead Developer", "Designer")
-  highlights  String[]  // Key achievements as bullet points
-  keyFeatures String[]  // Key functional features
-  problem     String?   @db.Text // "Why I Built This" / Challenge
-  solution    String?   @db.Text // How it solved the problem
-  impact      String?   @db.Text // Launch & Impact
-  futurePlans String?   @db.Text // Roadmap / Future plans
-  
-  // Timeline
-  startDate   DateTime?
-  endDate     DateTime?
-  
-  // Status & Display
-  status       String?   @default("complete") // "planning" | "in_progress" | "complete" | "archived"
-  isFeatured   Boolean  @default(false) // Pin to top of profile
-  isPublic     Boolean  @default(true)  // Show on public profile
-  displayOrder Int      @default(0)
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Many:1 relationship to Profile
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  profileId    String
+  title        String
+  description  String?
+  url          String?
+  repoUrl      String?
+  demoUrl      String?
+  thumbnail    String?
+  techStack    String[]
+  role         String?
+  highlights   String[]
+  startDate    DateTime?
+  endDate      DateTime?
+  isFeatured   Boolean   @default(false)
+  displayOrder Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  status       String?   @default("complete")
+  isPublic     Boolean   @default(true)
+  futurePlans  String?
+  impact       String?
+  keyFeatures  String[]
+  problem      String?
+  solution     String?
+  profile      Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([profileId])
 }
-
-// ============================================
-// ACHIEVEMENT
-// ============================================
-// Honors, Awards, Hackathons, OSS
-// ============================================
 
 model Achievement {
-  id          String   @id @default(cuid())
-  profileId   String
-  title       String
-  subtitle    String?
-  date        DateTime?
-  description String[]
-  url         String?
-  type        String   @default("award") // "award", "badge", "hackathon", "oss"
-  
-  displayOrder Int      @default(0)
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
+  id           String    @id @default(cuid())
+  profileId    String
+  title        String
+  subtitle     String?
+  date         DateTime?
+  description  String[]
+  url          String?
+  type         String    @default("award")
+  displayOrder Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  profile      Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([profileId])
 }
 
-// ============================================
-// CERTIFICATE
-// ============================================
-
 model Certificate {
-  id           String    @id @default(cuid())
+  id           String   @id @default(cuid())
   profileId    String
   name         String
   issuer       String
   date         DateTime
   url          String?
   credentialId String?
-  
-  displayOrder Int       @default(0)
-
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  profile      Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([profileId])
 }
-
-
-
-// ============================================
-// ANALYTICS
-// ============================================
-// Lightweight daily aggregation for profile stats.
-// ============================================
 
 model DailyAnalytics {
   id                  String   @id @default(cuid())
@@ -354,8 +235,7 @@ model DailyAnalytics {
   deviceStats         Json?    @default("{}")
   referrerStats       Json?    @default("{}")
   projectInteractions Json?    @default("{}")
-
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile             Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@unique([profileId, date])
   @@index([date])

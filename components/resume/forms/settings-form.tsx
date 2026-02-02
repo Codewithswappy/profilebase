@@ -10,7 +10,11 @@ import {
   IconTypography,
   IconLayoutList,
   IconCheck,
+  IconPlus,
+  IconTrash,
 } from "@tabler/icons-react";
+import { v4 as uuidv4 } from "uuid";
+
 import {
   DndContext,
   closestCenter,
@@ -54,7 +58,15 @@ const COLOR_PRESETS = [
   { name: "Midnight", value: "#1e1b4b", bg: "bg-indigo-950" },
 ];
 
-function SortableItem({ id, label }: { id: string; label: string }) {
+function SortableItem({
+  id,
+  label,
+  onRemove,
+}: {
+  id: string;
+  label: string;
+  onRemove?: () => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
@@ -76,9 +88,20 @@ function SortableItem({ id, label }: { id: string; label: string }) {
       >
         <IconGripVertical className="w-5 h-5" />
       </div>
-      <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+      <span className="flex-1 text-sm font-medium text-neutral-700 dark:text-neutral-300">
         {label}
       </span>
+      {onRemove && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 text-neutral-400 transition-all rounded"
+        >
+          <IconTrash className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 }
@@ -87,6 +110,7 @@ export function SettingsForm() {
   const { content, updateSettings, updateContent } = useResumeStore();
   const {
     sectionOrder = SECTIONS.map((s) => s.id),
+    customSections = [],
     settings = {
       themeColor: "#000000",
       font: "Inter",
@@ -99,6 +123,12 @@ export function SettingsForm() {
     string,
     string
   >;
+
+  // Combine standard and custom sections
+  const allSections = [
+    ...SECTIONS,
+    ...customSections.map((cs) => ({ id: cs.id, label: cs.name })),
+  ];
 
   // Dnd Sensors
   const sensors = useSensors(
@@ -120,6 +150,27 @@ export function SettingsForm() {
     }
   };
 
+  const handleAddSection = () => {
+    const newId = `custom_${uuidv4()}`;
+    const newSection = {
+      id: newId,
+      name: "New Section",
+      layout: "list" as const,
+      items: [],
+    };
+    updateContent({
+      customSections: [...customSections, newSection],
+      sectionOrder: [...sectionOrder, newId],
+    });
+  };
+
+  const handleRemoveSection = (sectionId: string) => {
+    updateContent({
+      customSections: (customSections || []).filter((s) => s.id !== sectionId),
+      sectionOrder: sectionOrder.filter((id) => id !== sectionId),
+    });
+  };
+
   return (
     <div className="p-6 space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
       {/* Theme Color Section */}
@@ -131,7 +182,7 @@ export function SettingsForm() {
           </h3>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-4">
           {COLOR_PRESETS.map((color) => (
             <button
               key={color.name}
@@ -139,23 +190,52 @@ export function SettingsForm() {
                 updateSettings({ ...settings, themeColor: color.value })
               }
               className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 focus:outline-none ring-2 ring-offset-2 ring-offset-white dark:ring-offset-neutral-950",
-                color.bg,
+                "relative w-8 h-8 rounded-md flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none",
                 settings.themeColor === color.value
-                  ? "ring-neutral-900 dark:ring-white scale-110"
-                  : "ring-transparent hover:ring-neutral-200 dark:hover:ring-neutral-700",
+                  ? "scale-110 z-10"
+                  : "opacity-80 hover:opacity-100",
               )}
+              style={{
+                backgroundColor: color.value,
+                boxShadow:
+                  settings.themeColor === color.value
+                    ? `0 0 20px ${color.value}60`
+                    : "none",
+                border:
+                  settings.themeColor === color.value
+                    ? "2px solid white"
+                    : "none",
+              }}
               title={color.name}
             >
               {settings.themeColor === color.value && (
-                <IconCheck className="w-5 h-5 text-white drop-shadow-sm" />
+                <IconCheck className="w-5 h-5 text-white drop-shadow-md animate-in zoom-in duration-300" />
               )}
             </button>
           ))}
 
           {/* Custom Color Picker */}
-          <div className="relative group" title="Custom Color">
-            <div className="w-10 h-10 rounded-full border border-neutral-200 dark:border-neutral-700 bg-[conic-gradient(at_center,_var(--tw-gradient-stops))] from-red-500 via-purple-500 to-blue-500 flex items-center justify-center overflow-hidden cursor-pointer ring-offset-2 ring-offset-white dark:ring-offset-neutral-950 transition-all group-hover:scale-110 group-hover:ring-2 ring-neutral-200">
+          <div className="relative group cursor-pointer" title="Custom Color">
+            <div
+              className={cn(
+                "w-8 h-8 rounded-md flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-110 ring-offset-2 ring-offset-white dark:ring-offset-neutral-950",
+                !COLOR_PRESETS.some((cp) => cp.value === settings.themeColor)
+                  ? "ring-2 ring-neutral-900 dark:ring-white scale-110"
+                  : "ring-1 ring-neutral-200 dark:ring-neutral-800",
+              )}
+              style={{
+                background: !COLOR_PRESETS.some(
+                  (cp) => cp.value === settings.themeColor,
+                )
+                  ? settings.themeColor
+                  : "conic-gradient(from 0deg, #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000)",
+                boxShadow: !COLOR_PRESETS.some(
+                  (cp) => cp.value === settings.themeColor,
+                )
+                  ? `0 0 20px ${settings.themeColor}60`
+                  : "none",
+              }}
+            >
               <input
                 type="color"
                 value={settings.themeColor}
@@ -164,10 +244,9 @@ export function SettingsForm() {
                 }
                 className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
               />
-              <div
-                className="w-full h-full"
-                style={{ backgroundColor: settings.themeColor }}
-              />
+              {!COLOR_PRESETS.some(
+                (cp) => cp.value === settings.themeColor,
+              ) && <IconCheck className="w-5 h-5 text-white drop-shadow-md" />}
             </div>
           </div>
         </div>
@@ -196,18 +275,32 @@ export function SettingsForm() {
           >
             <div className="space-y-2">
               {sectionOrder.map((sectionId) => {
-                const section = SECTIONS.find((s) => s.id === sectionId);
+                const section = allSections.find((s) => s.id === sectionId);
                 return section ? (
                   <SortableItem
                     key={sectionId}
                     id={sectionId}
                     label={sectionTitles[sectionId] || section.label}
+                    onRemove={
+                      sectionId.startsWith("custom_")
+                        ? () => handleRemoveSection(sectionId)
+                        : undefined
+                    }
                   />
                 ) : null;
               })}
             </div>
           </SortableContext>
         </DndContext>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleAddSection}
+          className="w-full mt-2 gap-2 border-dashed"
+        >
+          <IconPlus className="w-4 h-4" /> Add Custom Section
+        </Button>
       </div>
 
       {/* Custom Titles Section */}
@@ -220,7 +313,7 @@ export function SettingsForm() {
         </div>
 
         <div className="grid gap-4">
-          {SECTIONS.map((section) => (
+          {allSections.map((section) => (
             <div
               key={section.id}
               className="grid grid-cols-[120px_1fr] items-center gap-4"

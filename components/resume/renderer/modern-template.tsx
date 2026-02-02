@@ -16,6 +16,7 @@ export function ModernTemplate({ content }: TemplateProps) {
   const {
     profile,
     settings,
+    customSections = [],
     sectionOrder = [
       "summary",
       "experience",
@@ -266,6 +267,80 @@ export function ModernTemplate({ content }: TemplateProps) {
         </section>
       ) : null,
   };
+
+  // Add Custom Section Renderers
+  customSections.forEach((section) => {
+    if (section.items.length > 0) {
+      renderers[section.id] = (
+        <section key={section.id}>
+          <h2
+            className="text-[11pt] font-bold uppercase tracking-wider mb-3 border-b pb-1"
+            style={{ color: themeColor, borderColor: themeColor + "40" }}
+          >
+            {sectionTitles[section.id] || section.name}
+          </h2>
+          <div
+            className={cn(
+              "space-y-4",
+              section.layout === "grid" && "grid grid-cols-2 gap-4 space-y-0",
+            )}
+          >
+            {section.items.map((item) => (
+              <div key={item.id}>
+                <div className="flex justify-between items-baseline mb-0.5">
+                  <h3 className="font-bold text-[10.5pt] text-black">
+                    {item.title}
+                  </h3>
+                  <span className="text-[10pt] text-neutral-600">
+                    {item.date}
+                  </span>
+                </div>
+                {(item.subtitle ||
+                  (item as any).location ||
+                  (item as any).url) && (
+                  <div className="flex flex-wrap gap-2 mb-1">
+                    {item.subtitle && (
+                      <div
+                        className="text-[10pt] font-bold italic"
+                        style={{ color: themeColor }}
+                      >
+                        {item.subtitle}
+                      </div>
+                    )}
+                    {(item as any).location && (
+                      <div className="text-[10pt] text-neutral-500 italic">
+                        {item.subtitle && (
+                          <span className="mr-2 text-neutral-300 not-italic">
+                            |
+                          </span>
+                        )}
+                        {(item as any).location}
+                      </div>
+                    )}
+                    {(item as any).url && (
+                      <div className="text-[10pt]">
+                        {(item.subtitle || (item as any).location) && (
+                          <span className="mr-2 text-neutral-300">|</span>
+                        )}
+                        <a
+                          href={(item as any).url}
+                          className="hover:underline"
+                          style={{ color: themeColor }}
+                        >
+                          {(item as any).url}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <HTML html={item.description} className="text-neutral-800" />
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+  });
 
   return (
     <div

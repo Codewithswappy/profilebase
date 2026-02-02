@@ -265,6 +265,75 @@ export function ClassicTemplate({ content }: ClassicTemplateProps) {
       ) : null,
   };
 
+  // Add Custom Section Renderers
+  (content.customSections || []).forEach((section) => {
+    if (section.items.length > 0) {
+      renderers[section.id] = (
+        <section key={section.id}>
+          <h2
+            className="text-[10pt] font-bold uppercase tracking-widest mb-3 border-b pb-1"
+            style={{ color: themeColor, borderColor: "#d1d5db" }}
+          >
+            {sectionTitles[section.id] || section.name}
+          </h2>
+          <div
+            className={cn(
+              "space-y-4",
+              section.layout === "grid" && "grid grid-cols-2 gap-4 space-y-0",
+            )}
+          >
+            {section.items.map((item) => (
+              <div key={item.id}>
+                <div className="flex justify-between items-baseline mb-0.5">
+                  <span className="font-bold text-[11pt] uppercase text-black">
+                    {item.title}
+                  </span>
+                  <span className="font-bold text-[10pt] text-black">
+                    {item.date}
+                  </span>
+                </div>
+                {(item.subtitle ||
+                  (item as any).location ||
+                  (item as any).url) && (
+                  <div className="text-[11pt] text-black italic mb-1 font-bold flex flex-wrap gap-2 text-wrap wrap-break-word">
+                    {item.subtitle && <span>{item.subtitle}</span>}
+                    {(item as any).location && (
+                      <>
+                        {item.subtitle && (
+                          <span className="not-italic opacity-50 font-normal ml-1">
+                            |
+                          </span>
+                        )}
+                        <span>{(item as any).location}</span>
+                      </>
+                    )}
+                    {(item as any).url && (
+                      <>
+                        {(item.subtitle || (item as any).location) && (
+                          <span className="not-italic opacity-50 font-normal ml-1">
+                            |
+                          </span>
+                        )}
+                        <a
+                          href={(item as any).url}
+                          className="hover:underline not-italic font-normal"
+                          style={{ color: themeColor }}
+                        >
+                          {(item as any).url}
+                        </a>
+                      </>
+                    )}
+                  </div>
+                )}
+                <HTML html={item.description} />
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+  });
+
   return (
     <div
       className="w-full min-h-full bg-white text-black p-[40px] font-serif"

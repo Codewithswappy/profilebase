@@ -12,10 +12,12 @@ import {
   IconLayoutList,
   IconChartBar,
   IconSettings,
+  IconStar,
 } from "@tabler/icons-react";
 
 export function ResumeEditorSidebar() {
-  const { activeSection } = useResumeStore();
+  const { activeSection, content } = useResumeStore();
+  const { customSections = [] } = content;
 
   const sections = [
     { id: "profile", label: "Personal", icon: IconUser },
@@ -26,6 +28,11 @@ export function ResumeEditorSidebar() {
     { id: "education", label: "Education", icon: IconSchool },
     { id: "certifications", label: "Certificates", icon: IconCertificate },
     { id: "analysis", label: "Analysis", icon: IconChartBar },
+    ...customSections.map((cs) => ({
+      id: cs.id,
+      label: cs.name,
+      icon: IconStar,
+    })),
     { id: "settings", label: "Customize", icon: IconSettings },
   ];
 

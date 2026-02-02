@@ -46,6 +46,7 @@ export type PublicProfileData = {
     showAchievements: boolean;
     showCertificates?: boolean;
     showContact?: boolean;
+    showGithubHeatmap?: boolean;
     primaryResumeId?: string | null;
   };
   projects: ProjectData[];
@@ -192,6 +193,7 @@ export async function getPublicProfile(slug: string): Promise<ActionResult<Publi
         showAchievements: profileSettings.showAchievements,
         showCertificates: profileSettings.showCertificates,
         showContact: (profileSettings as any).showContact ?? true,
+        showGithubHeatmap: (profileSettings as any).showGithubHeatmap ?? true,
         primaryResumeId: profileSettings.primaryResumeId,
       },
       projects: profile.projects,
