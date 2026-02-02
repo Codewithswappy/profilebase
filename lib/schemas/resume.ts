@@ -90,7 +90,7 @@ export const ResumeContentSchema = z.object({
   settings: z.object({
     themeColor: z.string().default("#000000"),
     font: z.string().default("Inter"),
-    sectionTitles: z.record(z.string()).default({}), 
+    sectionTitles: z.record(z.string(), z.string()).default({}), 
   }).default({
     themeColor: "#000000",
     font: "Inter",
