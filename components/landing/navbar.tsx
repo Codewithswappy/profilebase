@@ -13,7 +13,7 @@ const navlinks = [
 
 export const Navbar = () => {
   return (
-    <div className=" md:block sticky top-0 z-20 rounded-none py-2 bg-neutral-50 dark:bg-neutral-950">
+    <div className=" md:block sticky top-0 z-20 rounded-none py-4 bg-neutral-50 dark:bg-neutral-950">
       <div className="flex items-center justify-end px-4">
         <div className="flex items-end gap-4">
           <div className="flex items-center justify-center gap-4">

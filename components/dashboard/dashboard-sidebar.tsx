@@ -285,7 +285,7 @@ export function DashboardSidebar({
                       {/* Interactive Hover Shine Effect */}
                       <div
                         className={cn(
-                          "absolute inset-0 bg-gradient-to-r from-transparent via-white/40 dark:via-white/5 to-transparent -translate-x-full transition-transform duration-1000",
+                          "absolute inset-0 bg-linear-to-r from-transparent via-white/40 dark:via-white/5 to-transparent -translate-x-full transition-transform duration-1000",
                           isActive && "group-hover:translate-x-full",
                         )}
                       />
