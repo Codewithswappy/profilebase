@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -348,43 +349,47 @@ export const GithubHeatmap = ({ className, username }: GithubHeatmapProps) => {
       )}
 
       {/* Custom Floating Tooltip - Compact Liquid Style */}
-      <AnimatePresence>
-        {hoveredCell && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.8 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              transition: { type: "spring", stiffness: 260, damping: 20 },
-            }}
-            exit={{ opacity: 0, y: 5, scale: 0.8 }}
-            style={{
-              position: "fixed",
-              left: hoveredCell.x,
-              top: hoveredCell.y - 40,
-              transform: "translateX(-50%)",
-            }}
-            className="pointer-events-none z-50 px-2.5 py-1.5 bg-neutral-900 dark:bg-neutral-100 rounded-lg shadow-xl flex flex-col items-center justify-center whitespace-nowrap min-w-20"
-          >
-            {/* Content */}
-            <div className="relative z-10 flex flex-col items-center gap-0.5">
-              <div className="text-[10px] font-bold text-neutral-100 dark:text-neutral-900 font-mono">
-                {hoveredCell.count} {hoveredCell.count === 1 ? "ctrb" : "ctrbs"}
+      {createPortal(
+        <AnimatePresence>
+          {hoveredCell && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.8 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                transition: { type: "spring", stiffness: 260, damping: 20 },
+              }}
+              exit={{ opacity: 0, y: 5, scale: 0.8 }}
+              style={{
+                position: "fixed",
+                left: hoveredCell.x,
+                top: hoveredCell.y - 40,
+                transform: "translateX(-50%)",
+              }}
+              className="pointer-events-none z-[9999] px-2.5 py-1.5 bg-neutral-900 dark:bg-neutral-100 rounded-lg shadow-xl flex flex-col items-center justify-center whitespace-nowrap min-w-20"
+            >
+              {/* Content */}
+              <div className="relative z-10 flex flex-col items-center gap-0.5">
+                <div className="text-[10px] font-bold text-neutral-100 dark:text-neutral-900 font-mono">
+                  {hoveredCell.count}{" "}
+                  {hoveredCell.count === 1 ? "ctrb" : "ctrbs"}
+                </div>
+                <div className="text-[9px] text-neutral-400 dark:text-neutral-500 font-mono uppercase">
+                  {new Date(hoveredCell.date).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </div>
               </div>
-              <div className="text-[9px] text-neutral-400 dark:text-neutral-500 font-mono uppercase">
-                {new Date(hoveredCell.date).toLocaleDateString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                })}
-              </div>
-            </div>
 
-            {/* Liquid Arrow */}
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-neutral-900 dark:bg-neutral-100" />
-          </motion.div>
-        )}
-      </AnimatePresence>
+              {/* Liquid Arrow */}
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-neutral-900 dark:bg-neutral-100" />
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
     </div>
   );
 };
