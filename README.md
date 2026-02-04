@@ -1,6 +1,6 @@
 # ProfileBase
 
-![ProfileBase](public/og-image/project-og.png)
+![ProfileBase](public/og-image/og-image.png)
 
 **The Structured Skills Profile for Developers.**
 
