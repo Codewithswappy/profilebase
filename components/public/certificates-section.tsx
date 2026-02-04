@@ -90,7 +90,7 @@ function CertificateItem({ item }: { item: Certificate }) {
 
   return (
     <div className="group relative flex items-center justify-between p-2 border border-dashed border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-all duration-300">
-      <div className="flex items-center gap-4 text-left">
+      <div className="flex items-center gap-4 text-left group-hover:translate-x-1 transition-transform duration-300">
         {/* Initials Icon Block */}
         <div className="w-8 h-8 rounded-sm bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center shrink-0 text-neutral-500 dark:text-neutral-400 font-bold text-sm tracking-tighter shadow-sm border border-neutral-200 dark:border-neutral-800">
           {item.issuer.substring(0, 2).toUpperCase()}

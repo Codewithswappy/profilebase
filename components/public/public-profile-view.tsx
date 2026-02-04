@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { PublicProfileData } from "@/lib/actions/public";
 import { Project } from "@prisma/client";
@@ -19,6 +20,7 @@ import { ResumeView } from "@/components/public/resume-view";
 import { GithubHeatmap } from "./GithubHeatmap";
 import { AnimatePresence, motion } from "motion/react";
 import {
+  IconArrowUp,
   IconArrowUpRight,
   IconChevronDown,
   IconFoldUp,
@@ -129,6 +131,26 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
     undefined,
   );
   const [visibleProjects, setVisibleProjects] = useState(4);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  // Back to Top Logic
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show after scrolling 20% of the viewport height
+      if (window.scrollY > window.innerHeight * 0.2) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Verification Logic
   const isVerified =
@@ -1192,6 +1214,62 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Back to Top Button - Portal to Body */}
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {showBackToTop && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="fixed bottom-4 right-2 md:right-50 z-9990 flex flex-col items-center gap-0 group cursor-pointer"
+                onClick={scrollToTop}
+              >
+                {/* Text Label (Left Side) */}
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 overflow-hidden">
+                  <span className="block text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 translate-x-full group-hover:translate-x-0 transition-transform duration-300 w-max bg-white dark:bg-neutral-950 px-2 py-0.5 rounded border border-neutral-100 dark:border-neutral-800 shadow-sm">
+                    Back to Top
+                  </span>
+                </div>
+
+                {/* Button Container */}
+                <motion.div
+                  whileHover={{ y: -2 }}
+                  className="relative w-10 h-10 flex items-center justify-center bg-white dark:bg-neutral-900 border border-dashed border-neutral-300 dark:border-neutral-700 shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_rgba(255,255,255,0.05)] text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                >
+                  <IconArrowUp className="w-5 h-5" />
+
+                  {/* Corner Nodes - Circuit Style */}
+                  <div className="absolute -top-0.5 -left-0.5 w-1 h-1 bg-neutral-800 dark:bg-neutral-200" />
+                  <div className="absolute -top-0.5 -right-0.5 w-1 h-1 bg-neutral-800 dark:bg-neutral-200" />
+                  <div className="absolute -bottom-0.5 -left-0.5 w-1 h-1 bg-neutral-800 dark:bg-neutral-200" />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-1 h-1 bg-neutral-800 dark:bg-neutral-200" />
+
+                  {/* Inner Scanline */}
+                  <div className="absolute inset-0 bg-linear-to-b from-transparent via-neutral-400/10 to-transparent translate-y-full group-hover:translate-y-[-200%] transition-transform duration-1000 ease-in-out" />
+                </motion.div>
+
+                {/* Vertical Connector Line (Bottom Tether) */}
+                <div className="h-6 w-px bg-neutral-300 dark:bg-neutral-700 relative overflow-hidden">
+                  <motion.div
+                    animate={{ top: ["100%", "-100%"] }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    className="absolute left-0 w-full h-1/2 bg-linear-to-t from-transparent via-neutral-900 dark:via-white to-transparent"
+                  />
+                  {/* Bottom Dot */}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-neutral-400 dark:bg-neutral-600" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 }
