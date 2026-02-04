@@ -193,20 +193,20 @@ export function DashboardSidebar({
       )}
 
       {/* Navigation */}
-      <div className="flex-1 py-6 px-3 relative overflow-hidden overflow-y-auto no-scrollbar">
+      <div className="flex-1 py-6 px-2 relative overflow-hidden overflow-y-auto no-scrollbar">
         {!isCollapsed && (
-          <p className="px-3 text-[10px] font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-[0.2em] mb-3 mt-2 font-mono">
+          <p className="px-2 text-[10px] font-semibold text-neutral-400 dark:text-neutral-600 uppercase tracking-widest mb-4 mt-2 font-mono ml-3">
             Navigation
           </p>
         )}
 
-        <div className="relative">
-          {/* Vertical Rail (Solid Tech) - Only visible when not collapsed */}
+        <div className="relative ml-1">
+          {/* Vertical Rail - Gradient Fade */}
           {!isCollapsed && (
-            <div className="absolute left-[10px] top-0 bottom-0 w-[2px] bg-neutral-100 dark:bg-neutral-800/50 z-0" />
+            <div className="absolute left-[4px] top-0 bottom-0 w-px bg-linear-to-b from-transparent via-neutral-200 dark:via-neutral-800 to-transparent z-0 opacity-80" />
           )}
 
-          <div className="space-y-2 relative z-10">
+          <div className="space-y-0.5 relative z-10">
             {navItems
               .filter((item) => item.title !== "Settings")
               .map((item) => {
@@ -220,52 +220,91 @@ export function DashboardSidebar({
                     className="block relative group"
                     title={isCollapsed ? item.title : undefined}
                   >
-                    {/* Cyber Step Node - Only visible when not collapsed */}
+                    {/* Creative Connector - Only visible when not collapsed */}
                     {!isCollapsed && (
-                      <div className="absolute left-[10px] top-1/2 -translate-y-1/2 w-12 h-8 pointer-events-none flex items-center">
-                        {/* The Node (Square Tech Block) */}
+                      <div className="absolute left-[4px] top-0 bottom-0 w-6 pointer-events-none overflow-visible">
+                        {/* The Node Dot (On the rail) - Pulsing when active */}
                         <motion.div
                           animate={{
-                            scale: isActive ? 1 : 0.8,
-                            opacity: isActive ? 1 : 0.5,
-                            backgroundColor: isActive
-                              ? "var(--primary-color, #000)"
-                              : "var(--bg-color, #262626)",
+                            scale: isActive ? 1 : 0,
+                            opacity: isActive ? 1 : 0,
+                            boxShadow: isActive
+                              ? [
+                                  "0 0 0 0px rgba(0,0,0,0)",
+                                  "0 0 0 4px rgba(0,0,0,0.1)",
+                                  "0 0 0 0px rgba(0,0,0,0)",
+                                ]
+                              : "none",
                           }}
-                          className={cn(
-                            "absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[6px] h-[6px] z-20 transition-colors duration-300",
-                            isActive
-                              ? "bg-neutral-900 dark:bg-white shadow-[0_0_8px_rgba(0,0,0,0.5)] dark:shadow-[0_0_8px_rgba(255,255,255,0.6)]"
-                              : "bg-neutral-400 dark:bg-neutral-700",
-                          )}
+                          transition={{
+                            boxShadow: {
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                            },
+                            scale: { duration: 0.2 },
+                          }}
+                          className="absolute -left-[2.5px] top-1/2 -translate-y-1/2 w-[5px] h-[5px] rounded-full bg-neutral-900 dark:bg-white z-20 ring-2 ring-white dark:ring-neutral-950"
                         />
 
-                        {/* The Connecting Line (Stepped Tech Shape) */}
+                        {/* The Curved Line */}
                         <svg
-                          width="48"
-                          height="32"
-                          viewBox="0 0 48 32"
-                          className="overflow-visible absolute left-0 top-0 w-full h-full pointer-events-none"
+                          className="absolute left-0 top-0 w-6 h-full overflow-visible"
+                          preserveAspectRatio="none"
                         >
+                          <defs>
+                            {/* Gradient: Fades from rail (transparent/light) to item (solid) */}
+                            <linearGradient
+                              id={`grad-${item.href}`}
+                              x1="0%"
+                              y1="0%"
+                              x2="100%"
+                              y2="0%"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="currentColor"
+                                stopOpacity="0"
+                              />
+                              <stop
+                                offset="40%"
+                                stopColor="currentColor"
+                                stopOpacity="1"
+                              />
+                            </linearGradient>
+                          </defs>
+
                           <motion.path
-                            // Stepped shape: Start -> Right -> Down Dip -> Up -> End
-                            d="M 0 16 L 12 16 L 16 22 L 24 22 L 28 16 L 48 16"
+                            // Smooth curve from rail to item
+                            d="M 0.5 0 L 0.5 20 C 0.5 20 8 20 20 20"
                             fill="none"
-                            strokeWidth="2"
-                            strokeLinecap="square" // Edgy look
-                            strokeLinejoin="miter" // Sharp corners
+                            strokeWidth="1.5"
+                            stroke={`url(#grad-${item.href})`}
                             className={cn(
-                              "stroke-neutral-300 dark:stroke-neutral-800",
-                              isActive &&
-                                "stroke-neutral-900 dark:stroke-white",
+                              "transition-all duration-300",
+                              isActive
+                                ? "text-neutral-900 dark:text-white opacity-100"
+                                : "text-neutral-400 dark:text-neutral-600 opacity-0 group-hover:opacity-50",
                             )}
-                            initial={{ pathLength: 0, opacity: 0 }}
+                            initial={{ pathLength: 0 }}
                             animate={{
                               pathLength: 1,
-                              opacity: 1,
-                              transition: { duration: 0.4, ease: "easeOut" },
                             }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
                           />
+
+                          {/* Active Tip Glow */}
+                          {isActive && (
+                            <motion.circle
+                              cx="20"
+                              cy="20"
+                              r="1.5"
+                              className="fill-neutral-900 dark:fill-white"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: 0.3 }}
+                            />
+                          )}
                         </svg>
                       </div>
                     )}
@@ -273,37 +312,29 @@ export function DashboardSidebar({
                     <motion.div
                       layout
                       className={cn(
-                        "relative flex items-center rounded-r-xl transition-all duration-300 overflow-hidden",
+                        "relative flex items-center transition-all duration-300 group-hover:translate-x-1",
                         isCollapsed
                           ? "justify-center p-2 mb-2 w-10 h-10 mx-auto rounded-xl"
-                          : "gap-3 px-4 py-3 ml-10", // ml-10 to accommodate the stepped line
+                          : "gap-3 px-2.5 py-2 ml-7 rounded-lg",
                         isActive
-                          ? "bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white font-medium border-l-2 border-neutral-900 dark:border-white"
-                          : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 border-l-2 border-transparent",
+                          ? "bg-linear-to-r from-neutral-100 to-white dark:from-neutral-800 dark:to-neutral-900/50 text-neutral-900 dark:text-white font-medium shadow-sm border border-neutral-200/50 dark:border-neutral-800/50"
+                          : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30",
                       )}
                     >
-                      {/* Interactive Hover Shine Effect */}
-                      <div
-                        className={cn(
-                          "absolute inset-0 bg-linear-to-r from-transparent via-white/40 dark:via-white/5 to-transparent -translate-x-full transition-transform duration-1000",
-                          isActive && "group-hover:translate-x-full",
-                        )}
-                      />
-
                       <Icon
                         className={cn(
-                          "transition-all duration-300 shrink-0 relative z-10",
-                          isCollapsed ? "w-5 h-5" : "w-4.5 h-4.5",
+                          "transition-all duration-200 shrink-0",
+                          isCollapsed ? "w-5 h-5" : "w-4 h-4",
                           isActive
-                            ? "text-neutral-900 dark:text-white scale-110"
-                            : "text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-600 dark:group-hover:text-neutral-300",
+                            ? "text-neutral-900 dark:text-white"
+                            : "text-neutral-500 dark:text-neutral-400",
                         )}
                       />
 
                       {!isCollapsed && (
                         <motion.span
                           variants={navItemVariants}
-                          className="whitespace-nowrap overflow-hidden text-sm relative z-10"
+                          className="whitespace-nowrap overflow-hidden text-sm"
                         >
                           {item.title}
                         </motion.span>
@@ -317,64 +348,217 @@ export function DashboardSidebar({
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50/30 dark:bg-neutral-900/30 shrink-0 backdrop-blur-sm">
-        <div className="space-y-1">
-          {/* Settings Link */}
-          <Link
-            href="/dashboard/settings"
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800/50",
-              pathname === "/dashboard/settings" &&
-                "bg-neutral-200/60 dark:bg-neutral-800 text-neutral-900 dark:text-white font-medium",
-            )}
-            title="Settings"
-          >
-            <Settings
-              className={cn(
-                "w-4.5 h-4.5 transition-transform group-hover:rotate-45",
-                isCollapsed && "mx-auto",
-                pathname === "/dashboard/settings"
-                  ? "text-neutral-900 dark:text-white"
-                  : "text-neutral-400 dark:text-neutral-500",
+      <div className="py-4 px-2 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50/30 dark:bg-neutral-900/30 shrink-0 backdrop-blur-sm">
+        {/* Footer Navigation Tree */}
+        <div className="relative ml-1">
+          {/* Footer Rail - Fades out at bottom */}
+          {!isCollapsed && (
+            <div className="absolute left-[4px] -top-4 bottom-4 w-px bg-linear-to-b from-neutral-200 via-neutral-200 to-transparent dark:from-neutral-800 dark:via-neutral-800 dark:to-transparent z-0 opacity-80" />
+          )}
+
+          <div className="space-y-0.5 relative z-10">
+            {/* Settings Item */}
+            <Link
+              href="/dashboard/settings"
+              className="block relative group"
+              title={isCollapsed ? "Settings" : undefined}
+            >
+              {!isCollapsed && (
+                <div className="absolute left-[4px] top-0 bottom-0 w-6 pointer-events-none overflow-visible">
+                  {/* Node Dot */}
+                  <motion.div
+                    animate={{
+                      scale: pathname === "/dashboard/settings" ? 1 : 0,
+                      opacity: pathname === "/dashboard/settings" ? 1 : 0,
+                      boxShadow:
+                        pathname === "/dashboard/settings"
+                          ? [
+                              "0 0 0 0px rgba(0,0,0,0)",
+                              "0 0 0 4px rgba(0,0,0,0.1)",
+                              "0 0 0 0px rgba(0,0,0,0)",
+                            ]
+                          : "none",
+                    }}
+                    transition={{
+                      boxShadow: {
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      },
+                      scale: { duration: 0.2 },
+                    }}
+                    className="absolute -left-[2.5px] top-1/2 -translate-y-1/2 w-[5px] h-[5px] rounded-full bg-neutral-900 dark:bg-white z-20 ring-2 ring-white dark:ring-neutral-950"
+                  />
+
+                  {/* Connector Line */}
+                  <svg
+                    className="absolute left-0 top-0 w-6 h-full overflow-visible"
+                    preserveAspectRatio="none"
+                  >
+                    <defs>
+                      <linearGradient
+                        id="grad-settings"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="0%"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="currentColor"
+                          stopOpacity="0"
+                        />
+                        <stop
+                          offset="40%"
+                          stopColor="currentColor"
+                          stopOpacity="1"
+                        />
+                      </linearGradient>
+                    </defs>
+                    <motion.path
+                      d="M 0.5 0 L 0.5 20 C 0.5 20 8 20 20 20"
+                      fill="none"
+                      strokeWidth="1.5"
+                      stroke="url(#grad-settings)"
+                      className={cn(
+                        "transition-all duration-300",
+                        pathname === "/dashboard/settings"
+                          ? "text-neutral-900 dark:text-white opacity-100"
+                          : "text-neutral-400 dark:text-neutral-600 opacity-0 group-hover:opacity-50",
+                      )}
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    />
+                    {pathname === "/dashboard/settings" && (
+                      <motion.circle
+                        cx="20"
+                        cy="20"
+                        r="1.5"
+                        className="fill-neutral-900 dark:fill-white"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.3 }}
+                      />
+                    )}
+                  </svg>
+                </div>
               )}
-            />
-            {!isCollapsed && <span className="text-sm">Settings</span>}
-          </Link>
 
-          {/* Sign Out */}
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group text-rose-500/80 hover:text-rose-600 dark:text-rose-400/80 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/30"
-            title="Sign Out"
-          >
-            <LogOut
-              className={cn(
-                "w-4.5 h-4.5 transition-transform group-hover:-translate-x-0.5",
-                isCollapsed && "mx-auto",
+              <motion.div
+                layout
+                className={cn(
+                  "relative flex items-center transition-all duration-300 group-hover:translate-x-1",
+                  isCollapsed
+                    ? "justify-center p-2 mb-2 w-10 h-10 mx-auto rounded-xl"
+                    : "gap-3 px-2.5 py-2 ml-7 rounded-lg",
+                  pathname === "/dashboard/settings"
+                    ? "bg-linear-to-r from-neutral-100 to-white dark:from-neutral-800 dark:to-neutral-900/50 text-neutral-900 dark:text-white font-medium shadow-sm border border-neutral-200/50 dark:border-neutral-800/50"
+                    : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30",
+                )}
+              >
+                <Settings
+                  className={cn(
+                    "transition-all duration-300 shrink-0",
+                    isCollapsed ? "w-5 h-5" : "w-4 h-4",
+                    pathname === "/dashboard/settings"
+                      ? "text-neutral-900 dark:text-white"
+                      : "text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-300",
+                  )}
+                />
+                {!isCollapsed && (
+                  <span className="whitespace-nowrap overflow-hidden text-sm">
+                    Settings
+                  </span>
+                )}
+              </motion.div>
+            </Link>
+
+            {/* Sign Out Button */}
+            <button
+              onClick={handleLogout}
+              className="block relative group w-full text-left"
+              title={isCollapsed ? "Sign Out" : undefined}
+            >
+              {!isCollapsed && (
+                <div className="absolute left-[4px] top-0 bottom-0 w-6 pointer-events-none overflow-visible">
+                  <svg
+                    className="absolute left-0 top-0 w-6 h-full overflow-visible"
+                    preserveAspectRatio="none"
+                  >
+                    <defs>
+                      <linearGradient
+                        id="grad-logout"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="0%"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="currentColor"
+                          stopOpacity="0"
+                        />
+                        <stop
+                          offset="40%"
+                          stopColor="currentColor"
+                          stopOpacity="1"
+                        />
+                      </linearGradient>
+                    </defs>
+                    <motion.path
+                      d="M 0.5 0 L 0.5 20 C 0.5 20 8 20 20 20"
+                      fill="none"
+                      strokeWidth="1.5"
+                      stroke="url(#grad-logout)"
+                      className="text-rose-400 opacity-0 group-hover:opacity-100 transition-all duration-300"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    />
+                    <motion.circle
+                      cx="20"
+                      cy="20"
+                      r="1.5"
+                      className="fill-rose-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    />
+                  </svg>
+                </div>
               )}
-            />
-            {!isCollapsed && (
-              <span className="text-sm font-medium">Sign Out</span>
-            )}
-          </button>
 
-          {/* Divider */}
-          <div className="my-2 h-px bg-neutral-200 dark:bg-neutral-800 border-t border-neutral-300 dark:border-neutral-700 w-full" />
-
-          {/* Mode Toggle & Info */}
-          <div
-            className={cn(
-              "flex items-center",
-              isCollapsed ? "justify-center" : "justify-between px-1",
-            )}
-          >
-            {!isCollapsed && (
-              <div className="flex flex-col">
-                <span className="text-[10px] font-mono text-neutral-400 uppercase">
-                  v1.0.0
-                </span>
+              <div
+                className={cn(
+                  "relative flex items-center transition-all duration-300 group-hover:translate-x-1",
+                  isCollapsed
+                    ? "justify-center p-2 mb-2 w-10 h-10 mx-auto rounded-xl"
+                    : "gap-3 px-2.5 py-2 ml-7 rounded-lg",
+                  "text-neutral-500 dark:text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50/50 dark:hover:bg-rose-950/20",
+                )}
+              >
+                <LogOut
+                  className={cn(
+                    "transition-all duration-300 shrink-0",
+                    isCollapsed ? "w-5 h-5" : "w-4 h-4",
+                  )}
+                />
+                {!isCollapsed && (
+                  <span className="whitespace-nowrap overflow-hidden text-sm font-medium">
+                    Sign Out
+                  </span>
+                )}
               </div>
-            )}
+            </button>
+          </div>
+        </div>
+
+        {/* Status Bar */}
+        <div
+          className={cn(
+            "flex items-center pt-4",
+            isCollapsed ? "justify-center" : "justify-end px-2",
+          )}
+        >
+          <div className={cn(isCollapsed && "scale-125 origin-center")}>
             <ModeToggle />
           </div>
         </div>
