@@ -28,7 +28,7 @@ Built with a focus on performance, type safety, and modern UX.
 | **Database**  | ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white)                   |
 | **Auth**      | ![NextAuth.js](https://img.shields.io/badge/Auth.js-purple?style=flat-square)                                         |
 | **Icons**     | ![Tabler Icons](https://img.shields.io/badge/Tabler_Icons-blue?style=flat-square)                                     |
-| **Animation** | ![Motion](https://img.shields.io/badge/Framer_Motion-black?style=flat-square&logo=framer&logoColor=white)      |
+| **Animation** | ![Motion](https://img.shields.io/badge/Motion-black?style=flat-square&logo=framer&logoColor=white)      |
 
 ## Getting Started
 
