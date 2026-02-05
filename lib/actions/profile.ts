@@ -56,63 +56,7 @@ export async function getMyProfile(): Promise<ActionResult<FullProfile | null>> 
       },
     });
 
-    // Lazy creation of profile if it doesn't exist
-    if (!profile) {
-       // Generate a basic slug
-       const user = await db.user.findUnique({ where: { id: userId } });
-       const baseSlug = user?.name?.toLowerCase().replace(/[^a-z0-9]/g, "") || "user";
-       const slug = `${baseSlug}-${userId.substring(0, 8)}`; 
 
-       try {
-         await db.$transaction(async (tx) => {
-           // check if slug exists uniquely
-           const slugExists = await tx.profile.findUnique({ where: { slug } });
-           const finalSlug = slugExists ? `${slug}-${Date.now()}` : slug;
-
-           profile = await tx.profile.create({
-             data: {
-               userId,
-               slug: finalSlug,
-               headline: "Welcome to my profile",
-               summary: "I'm a new user on ProfileBase.",
-             },
-             include: {
-                user: true,
-                projects: true,
-                experiences: true,
-                socialLinks: true,
-                achievements: true,
-                certificates: true,
-             },
-           });
-
-           await tx.profileSettings.create({
-             data: {
-               userId,
-               isPublic: false,
-               showEmail: false,
-             },
-           });
-         });
-       } catch (createError) {
-          console.error("Failed to auto-create profile:", createError);
-          // If transaction failed, likely race condition or constraint. 
-          // We can try to fetch one last time or return null.
-       }
-       
-       // Refetch cleanly to ensure we have the full object with relations (empty arrays)
-       profile = await db.profile.findUnique({
-        where: { userId },
-        include: {
-          user: true,
-          projects: { orderBy: { displayOrder: "asc" } },
-          experiences: { orderBy: { startDate: "desc" } },
-          socialLinks: { orderBy: { displayOrder: "asc" } },
-          achievements: { orderBy: { displayOrder: "asc" } },
-          certificates: { orderBy: { date: "desc" } },
-        },
-      });
-    }
 
     if (!profile) {
       // Should not happen after creation, but safety check

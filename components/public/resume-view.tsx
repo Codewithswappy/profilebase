@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { PublicProfileData } from "@/lib/actions/public";
 import { aiEvaluateResume } from "@/lib/actions/ai";
 import { trackInteraction } from "@/lib/analytics";
@@ -87,6 +88,7 @@ const formatBullets = (text: string | null) => {
 };
 
 export function ResumeView({ data, onClose }: ResumeViewProps) {
+  const router = useRouter(); // Refresh data on mount
   const { profile, experiences, projects, profileSettings, primaryResume } =
     data;
   const displayName = data.userName || profile.slug;
@@ -112,9 +114,10 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
   useEffect(() => {
     if (!viewTracked.current) {
       trackInteraction(profile.slug, "resume", "view");
+      router.refresh(); // Force refresh to get latest portfolio data
       viewTracked.current = true;
     }
-  }, [profile.slug]);
+  }, [profile.slug, router]);
 
   const handleDownload = async () => {
     // Track download first
@@ -154,11 +157,12 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
       document.body.appendChild(container);
 
       const opt = {
-        margin: 0,
+        margin: [10, 10, 10, 10], // Increased side margins slightly
         filename: `${displayName.replace(/\s+/g, "_")}_resume.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: 800 },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"] },
       };
 
       await html2pdf()
@@ -683,6 +687,8 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
     }
 
     // Fallback Legacy Layout with Dashed styles
+    // --- DEFAULT/FALLBACK RESUME LAYOUT (EDIT HERE) ---
+    // This layout is shown when no custom template is selected.
     return (
       <div className="w-full max-w-[210mm] min-h-[297mm] h-fit bg-white text-black shadow-xl print:shadow-none mx-auto p-[8mm] flex flex-col gap-6 print:p-0 font-sans relative">
         {/* RESUME HEADER */}
@@ -752,7 +758,7 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
             </h3>
             <div className="space-y-4">
               {experiences.map((exp) => (
-                <div key={exp.id}>
+                <div key={exp.id} className="break-inside-avoid">
                   <div className="flex justify-between items-baseline mb-0.5">
                     <h4 className="font-bold text-sm text-neutral-900">
                       {exp.position}
@@ -784,15 +790,24 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
             </h3>
             <div className="space-y-4">
               {projects.slice(0, 5).map((proj) => (
-                <div key={proj.id}>
+                <div key={proj.id} className="break-inside-avoid">
                   <div className="flex justify-between items-baseline mb-0.5">
                     <h4 className="font-bold text-sm text-neutral-900 flex items-center gap-2">
                       {proj.title}
                     </h4>
                   </div>
                   {proj.techStack && (
-                    <p className="text-[10px] uppercase tracking-wide text-neutral-500 mb-1.5 font-mono">
-                      {proj.techStack.join(" • ")}
+                    <p className="text-[10px] uppercase tracking-wide text-neutral-500 mb-2 font-mono border-b border-neutral-100 pb-1">
+                      {(() => {
+                        const normalizedMap = new Map<string, string>();
+                        proj.techStack.forEach((t) => {
+                          if (!t) return;
+                          const key = t.toLowerCase().replace(/[\s\.\-]/g, "");
+                          if (!normalizedMap.has(key))
+                            normalizedMap.set(key, t);
+                        });
+                        return Array.from(normalizedMap.values()).join(" • ");
+                      })()}
                     </p>
                   )}
                   {formatBullets(proj.description)}
@@ -809,17 +824,34 @@ export function ResumeView({ data, onClose }: ResumeViewProps) {
               <IconCode className="w-3.5 h-3.5 text-neutral-400" /> Technical
               Skills
             </h3>
-            <div className="text-sm text-neutral-700 leading-relaxed font-mono text-xs">
+            <div className="text-xs text-neutral-700 leading-relaxed font-mono">
               {(() => {
-                const skills = new Set<string>();
+                // Normalize and deduplicate skills
+                const normalizedSkills = new Map<string, string>();
+
+                const addSkill = (s: string) => {
+                  if (!s) return;
+                  // distinct key: lowercase, no spaces/dots/dashes
+                  const key = s.toLowerCase().replace(/[\s\.\-]/g, "");
+                  // If key doesn't exist, or if the current 's' looks "better" (e.g. has casing), update it?
+                  // Actually, usually the first one found wins, or we prioritize the one with proper casing?
+                  // Let's just keep the first one encountered, but checking against normalized key.
+                  if (!normalizedSkills.has(key)) {
+                    normalizedSkills.set(key, s);
+                  }
+                };
+
                 projects.forEach((p) =>
-                  p.techStack?.forEach((t) => skills.add(t)),
+                  p.techStack?.forEach((t) => addSkill(t)),
                 );
                 experiences.forEach((e) =>
-                  e.skills.forEach((s) => skills.add(s)),
+                  e.skills?.forEach((s) => addSkill(s)),
                 );
-                return Array.from(skills).length > 0
-                  ? Array.from(skills).join(" • ")
+
+                const distinctSkills = Array.from(normalizedSkills.values());
+
+                return distinctSkills.length > 0
+                  ? distinctSkills.join(" • ")
                   : "No specific skills listed.";
               })()}
             </div>
