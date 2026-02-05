@@ -69,9 +69,11 @@ export async function getMyProfile(): Promise<ActionResult<FullProfile | null>> 
     });
 
     if (!profileSettings) {
-        // Create if missing (e.g. data desync)
-        profileSettings = await db.profileSettings.create({
-            data: {
+        // Create if missing (e.g. data desync), safe upsert to handle races
+        profileSettings = await db.profileSettings.upsert({
+            where: { userId },
+            update: {},
+            create: {
                 userId,
                 isPublic: false,
                 showEmail: false,
@@ -153,8 +155,11 @@ export async function createProfile(
         },
       });
 
-      await tx.profileSettings.create({
-        data: {
+      // Safe upsert for settings in case they exist from a previous partial state
+      await tx.profileSettings.upsert({
+        where: { userId },
+        update: {},
+        create: {
           userId,
           isPublic: false,
           showEmail: false,
@@ -167,8 +172,14 @@ export async function createProfile(
     return { success: true, data: result };
   } catch (error: any) {
     console.error("createProfile error:", error);
-    const errorMessage = error?.message || "Failed to create profile";
-    return { success: false, error: errorMessage };
+    
+    // Check for Prisma unique constraint error
+    if (error.code === 'P2002') {
+       const field = error.meta?.target?.[0] || 'field';
+       return { success: false, error: `This ${field} is already taken.` };
+    }
+
+    return { success: false, error: "Failed to create profile. Please try again." };
   }
 }
 
@@ -241,7 +252,7 @@ export async function updateProfile(
     console.error("updateProfile error:", error);
     return { 
       success: false, 
-      error: error instanceof Error ? error.message : "Failed to update profile" 
+      error: "Failed to update profile. Please check your inputs and try again." 
     };
   }
 }
@@ -342,7 +353,7 @@ export async function updateProfileSettings(
     return { success: true, data: settings };
   } catch (error: any) {
     console.error("updateProfileSettings error:", error);
-    return { success: false, error: `Update failed: ${error?.message || "Unknown error"}` };
+    return { success: false, error: "Failed to update settings." };
   }
 }
 

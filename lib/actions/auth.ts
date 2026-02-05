@@ -93,3 +93,11 @@ export async function login(input: LoginInput): Promise<ActionResult> {
 export async function logout(): Promise<void> {
   await signOut({ redirect: false });
 }
+
+// ============================================
+// SOCIAL LOGIN
+// ============================================
+
+export async function loginWithGoogle() {
+  await signIn("google", { redirectTo: "/dashboard" });
+}
